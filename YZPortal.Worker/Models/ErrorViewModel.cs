@@ -1,4 +1,4 @@
-namespace YZPortal.WorkerSub.Models
+namespace YZPortal.Worker.Models
 {
     public class ErrorViewModel
     {

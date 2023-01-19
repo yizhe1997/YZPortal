@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using YZPortal.WorkerSub.Models;
+using YZPortal.Worker.Models;
 
-namespace YZPortal.WorkerSub.Controllers
+namespace YZPortal.Worker.Controllers
 {
     public class HomeController : Controller
     {
