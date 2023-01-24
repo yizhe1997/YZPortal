@@ -1,4 +1,4 @@
-﻿# Annata 365 Dealer Portal - Backend API
+﻿# YZ Portal - Backend API
 
 ## 3. Configuration
 
