@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace YZPortal.API.Controllers
+namespace YZPortal.API.Controllers.Foo
 {
     [ApiController]
     [Route("[controller]")]
