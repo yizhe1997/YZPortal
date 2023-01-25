@@ -28,7 +28,7 @@ namespace YZPortal.API.Controllers.Users.Authorize
                 new Claim("dealerId", membership.Dealer.Id.ToString())
             };
 
-            if (membership.Admin || CurrentContext?.User?.Admin == true)
+            if (membership.Admin || CurrentContext?.CurrentUser?.Admin == true)
             {
                 // set all roles
                 foreach (var role in await Database.DealerRoles.Where(x => x.Name == (int)DealerRoleNames.Admin).ToListAsync())

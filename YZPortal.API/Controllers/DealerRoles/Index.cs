@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Memberships;
 
@@ -25,7 +26,7 @@ namespace YZPortal.Api.Controllers.DealerRoles
                 return await CreateIndexResponseAsync<DealerRole, Model>(
                     request,
                     Database.DealerRoles,
-                    x => x.Name == request.SearchString);
+                    x => ((DealerRoleNames)x.Name).ToString() == request.SearchString);
             }
         }
     }

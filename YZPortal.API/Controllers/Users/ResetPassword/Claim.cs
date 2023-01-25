@@ -3,6 +3,11 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using YZPortal.API.Infrastructure.Mediatr;
+using YZPortal.API.Infrastructure.Security.Jwt;
+using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Error;
 
 namespace YZPortal.API.Controllers.Users.ResetPassword
 {
@@ -11,12 +16,12 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
         public class Request : IRequest<Model>
         {
             public Guid Token { get; set; }
-            public string Password { get; set; }
+            public string? Password { get; set; }
         }
 
         public class Model
         {
-            public string AuthToken { get; set; }
+            public string? AuthToken { get; set; }
         }
 
         public class RequestHandler : BaseRequestHandler<Request, Model>
@@ -24,7 +29,7 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
             UserManager<User> UserManager { get; }
             JwtTokenGenerator JwtTokenGenerator { get; }
 
-            public RequestHandler(DealerPortalContext dbContext, FunctionApiContext apiContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentUserContext userAccessor, UserManager<User> userManager, JwtTokenGenerator jwtTokenGenerator) : base(dbContext, apiContext, mapper, httpContext, userAccessor)
+            public RequestHandler(PortalContext dbContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor, UserManager<User> userManager, JwtTokenGenerator jwtTokenGenerator) : base(dbContext, mapper, httpContext, userAccessor)
             {
                 UserManager = userManager;
                 JwtTokenGenerator = jwtTokenGenerator;
@@ -33,12 +38,10 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
                 // We use token as Id here since we don't want to send the actual reset token through email
-                var passwordReset = await Database.PasswordResets.FirstOrDefaultAsync(pr => pr.Token == request.Token && pr.Claimed == null && pr.ValidUntil > DateTime.UtcNow);
-
+                var passwordReset = await Database.UserPasswordResets.FirstOrDefaultAsync(pr => pr.Token == request.Token && pr.ClaimedDateTime == null && pr.ValidUntilDateTime > DateTime.UtcNow);
                 if (passwordReset == null) throw new RestException(HttpStatusCode.NotFound, "Password reset request not found or expired.");
 
-                var user = await Database.Users.FirstOrDefaultAsync(u => u.Id == passwordReset.UserId);
-
+                var user = await Database.Users.FirstOrDefaultAsync(u => u.Id == passwordReset.User.Id);
                 if (user == null) throw new RestException(HttpStatusCode.NotFound, "User not found.");
 
                 if (user.SecurityStamp == null)
@@ -52,8 +55,8 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
 
                 if (result.Succeeded)
                 {
-                    passwordReset.Claimed = DateTime.UtcNow;
-                    Database.PasswordResets.Update(passwordReset);
+                    passwordReset.ClaimedDateTime = DateTime.UtcNow;
+                    Database.UserPasswordResets.Update(passwordReset);
                     await Database.SaveChangesAsync();
                     return new Model { AuthToken = jwtToken };
                 }

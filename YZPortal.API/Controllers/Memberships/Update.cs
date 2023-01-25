@@ -27,7 +27,7 @@ namespace YZPortal.Api.Controllers.Memberships
             }
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
-                var membership = await CurrentContext.DealerMemberships
+                var membership = await CurrentContext.CurrentDealerMemberships
                     .Include(x => x.MembershipDealerRole)
                     .Include(x => x.MembershipContentAccessLevels)
                     .FirstOrDefaultAsync(m => m.Id == request.Id);
@@ -48,7 +48,7 @@ namespace YZPortal.Api.Controllers.Memberships
                     MembershipsHelper.CreateUpdateMasterAdmin(membershipList, dealerList, membership.UserId, request.MasterAdmin, Database);
                 }
 
-                var membershipResponse = await CurrentContext.DealerMemberships
+                var membershipResponse = await CurrentContext.CurrentDealerMemberships
                     .Include(x => x.MembershipDealerRole)
                     .Include(x => x.MembershipContentAccessLevels)
                     .FirstOrDefaultAsync(m => m.Id == request.Id);

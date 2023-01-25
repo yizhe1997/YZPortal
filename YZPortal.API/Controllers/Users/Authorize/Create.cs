@@ -36,10 +36,11 @@ namespace YZPortal.API.Controllers.Users.Authorize
             {
                 JwtTokenGenerator = jwtTokenGenerator;
             }
+
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
-                var membership = CurrentContext.UserMemberships != null ? 
-                    await CurrentContext.UserMemberships
+                var membership = CurrentContext.CurrentUserMemberships != null ? 
+                    await CurrentContext.CurrentUserMemberships
                     .Include(x => x.MembershipDealerRole)
                     .ThenInclude(x => x.DealerRole)
                     .Include(x => x.MembershipContentAccessLevels)

@@ -43,12 +43,12 @@ namespace YZPortal.Api.Controllers.Memberships
                 // If user already exists, cr8 membership and mark the invite as claimed
                 if (user != null)
                 {
-                    var membership = await CurrentContext.DealerMemberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == request.Email);
+                    var membership = await CurrentContext.CurrentDealerMemberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == request.Email);
 
                     if (membership == null && user.EmailConfirmed)
                     {
                         // Create membership
-                        membership = new Membership { DealerId = Core.Domain.Contexts.CurrentContext.DealerId, UserId = user.Id, User = user };
+                        membership = new Membership { DealerId = Core.Domain.Contexts.CurrentContext.CurrentDealerId, UserId = user.Id, User = user };
 
                         membership.UpdateRolesAndContentAccessLevels(Database, request.UserRole, request.UserContentAccessLevels);
 
@@ -58,7 +58,7 @@ namespace YZPortal.Api.Controllers.Memberships
 
                         // Claim the invite                        
                         invite = Mapper.Map<MembershipInvite>(request);
-                        invite.Dealer.Id = Core.Domain.Contexts.CurrentContext.DealerId;
+                        invite.Dealer.Id = Core.Domain.Contexts.CurrentContext.CurrentDealerId;
                         invite.CallbackUrl = string.Format(invite.CallbackUrl, invite.Token);
                         invite.UserRole = request.UserRole;
                         invite.UserContentAccessLevels = string.Join(",", request.UserContentAccessLevels);
@@ -150,12 +150,12 @@ namespace YZPortal.Api.Controllers.Memberships
                 {
                     // for new user added from dealer portal and without membership 
                     // will overwrite existing invite for the new user if already invited
-                    invite = await Core.Domain.Contexts.CurrentContext.DealerInvites.FirstOrDefaultAsync(i => i.Email == request.Email && i.ClaimedDateTime == null);
+                    invite = await Core.Domain.Contexts.CurrentContext.CurrentDealerInvites.FirstOrDefaultAsync(i => i.Email == request.Email && i.ClaimedDateTime == null);
 
                     if (invite == null)
                     {
                         invite = Mapper.Map<MembershipInvite>(request);
-                        invite.DealerId = Core.Domain.Contexts.CurrentContext.DealerId;
+                        invite.DealerId = Core.Domain.Contexts.CurrentContext.CurrentDealerId;
                         invite.CallbackUrl = string.Format(invite.CallbackUrl, invite.Token);
                         invite.UserRole = request.UserRole;
                         invite.UserContentAccessLevels = string.Join(",", request.UserContentAccessLevels);

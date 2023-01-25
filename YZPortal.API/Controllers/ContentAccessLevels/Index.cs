@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Memberships;
 
@@ -25,7 +26,7 @@ namespace YZPortal.Api.Controllers.ContentAccessLevels
                 return await CreateIndexResponseAsync<ContentAccessLevel, Model>(
                     request,
                     Database.ContentAccessLevels,
-                    x => x.Name == request.SearchString);
+                    x => ((ContentAccessLevelNames)x.Name).ToString() == request.SearchString);
             }
         }
     }

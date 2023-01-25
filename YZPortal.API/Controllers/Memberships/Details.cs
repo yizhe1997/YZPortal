@@ -24,7 +24,7 @@ namespace YZPortal.Api.Controllers.Memberships
 
             public async override Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
-                var membership = await CurrentContext.DealerMemberships
+                var membership = await CurrentContext.CurrentDealerMemberships
                     .Include(x => x.MembershipDealerRole)
                     .ThenInclude(x => x.DealerRole)
                     .Include(m => m.MembershipContentAccessLevels)

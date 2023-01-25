@@ -24,30 +24,29 @@ namespace YZPortal.Core.Domain.Contexts
 
         #region Current User Context
 
-        public Guid UserId => string.IsNullOrEmpty(NameClaim) ? Guid.Empty : Guid.Parse(NameClaim);
-        public User? User => _dbContext?.Users.FirstOrDefault(u => u.Id == UserId) ?? null;
+        public Guid CurrentUserId => string.IsNullOrEmpty(NameClaim) ? Guid.Empty : Guid.Parse(NameClaim);
+        public User? CurrentUser => _dbContext?.Users.FirstOrDefault(u => u.Id == CurrentUserId) ?? null;
         //public string ContextToken => CurrentMembership?.ContextToken;
 
-        public IQueryable<Membership>? UserMemberships => _dbContext?.Memberships?.Where(m => m.User.Id == UserId) ?? null;
-        public IQueryable<Dealer>? UserMembershipsDealers => UserMemberships != null ? _dbContext?.Dealers.Join(UserMemberships, d => d.Id, m => m.Dealer.Id, (d, m) => d) ?? null : null;
+        public IQueryable<Membership>? CurrentUserMemberships => _dbContext?.Memberships?.Where(m => m.User.Id == CurrentUserId) ?? null;
+        public IQueryable<Dealer>? CurrentUserDealers => CurrentUserMemberships != null ? _dbContext?.Dealers.Join(CurrentUserMemberships.Where(x => x.Disabled == false), d => d.Id, m => m.Dealer.Id, (d, m) => d) ?? null : null;
 
         #endregion
 
         #region Current Dealer Context
 
-        public Guid DealerId => Claims != null ? Guid.TryParse(Claims.FirstOrDefault(x => x.Type == "dealerId")?.Value, out Guid result) ? result : Guid.Empty : Guid.Empty;
-        public Dealer? Dealer => DealerId != Guid.Empty ? _dbContext?.Dealers.FirstOrDefault(u => u.Id == DealerId) : null;
-        public Membership? UserDealerMembership => UserId != Guid.Empty ? _dbContext?.Memberships.Include(x => x.User)
+        public Guid CurrentDealerId => Claims != null ? Guid.TryParse(Claims.FirstOrDefault(x => x.Type == "dealerId")?.Value, out Guid result) ? result : Guid.Empty : Guid.Empty;
+        public Dealer? CurrentDealer => CurrentDealerId != Guid.Empty ? _dbContext?.Dealers.FirstOrDefault(u => u.Id == CurrentDealerId) : null;
+        public Membership? UserDealerMembership => CurrentUserId != Guid.Empty ? _dbContext?.Memberships.Include(x => x.User)
             .Include(x => x.Dealer)
             .Include(x => x.MembershipDealerRole)
             .ThenInclude(x => x.DealerRole)
             .Include(m => m.MembershipContentAccessLevels)
             .ThenInclude(m => m.ContentAccessLevel)
-            .FirstOrDefault(x => x.Dealer.Id == DealerId && x.User.Id == UserId)
+            .FirstOrDefault(x => x.Dealer.Id == CurrentDealerId && x.User.Id == CurrentUserId)
             : null;
-        public IQueryable<MembershipInvite>? DealerInvites => _dbContext?.MembershipInvites.Where(i => i.Dealer.Id == DealerId) ?? null;
-        public IQueryable<Membership>? DealerMemberships => _dbContext?.Memberships.Where(m => m.Dealer.Id == DealerId) ?? null;
-        public IQueryable<Dealer>? Dealers => DealerMemberships != null ? _dbContext?.Dealers.Join(DealerMemberships.Where(x => x.Disabled == false), d => d.Id, m => m.Dealer.Id, (d, m) => d) : null;
+        public IQueryable<MembershipInvite>? CurrentDealerInvites => _dbContext?.MembershipInvites.Where(i => i.Dealer.Id == CurrentDealerId) ?? null;
+        public IQueryable<Membership>? CurrentDealerMemberships => _dbContext?.Memberships.Where(m => m.Dealer.Id == CurrentDealerId) ?? null;
 
         #endregion
     }

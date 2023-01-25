@@ -8,7 +8,8 @@ namespace YZPortal.Api.Controllers.ContentAccessLevels
         public MappingProfile()
         {
             // Index
-            CreateMap<ContentAccessLevel, Index.Model>();
+            CreateMap<ContentAccessLevel, Index.Model>()
+                .ForMember(c => c.Name, opt => opt.MapFrom(src => ((ContentAccessLevelNames)src.Name).ToString()));
         }
     }
 }

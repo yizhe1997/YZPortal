@@ -8,7 +8,8 @@ namespace YZPortal.Api.Controllers.DealerRoles
         public MappingProfile()
         {
             // Index
-            CreateMap<DealerRole, Index.Model>();
+            CreateMap<DealerRole, Index.Model>()
+                .ForMember(c => c.Name, opt => opt.MapFrom(src => ((DealerRoleNames)src.Name).ToString()));
         }
     }
 }

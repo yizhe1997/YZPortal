@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
+using YZPortal.API.Infrastructure.Mediatr;
+using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Error;
 
 namespace YZPortal.API.Controllers.Users.ResetPassword
 {
@@ -10,29 +14,28 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
     {
         public class Request : IRequest<Model>
         {
-            [Required]
-            public string Email { get; set; }
+            public string? Email { get; set; }
             public string CallbackUrl { get; set; } = "{0}";
         }
 
-        //public class Validator : AbstractValidator<Request>
-        //{
-        //    public Validator()
-        //    {
-        //        RuleFor(c => c.Email).NotNull().NotEmpty().EmailAddress();
-        //    }
-        //}
+        public class Validator : AbstractValidator<Request>
+        {
+            public Validator()
+            {
+                RuleFor(c => c.Email).NotNull().NotEmpty().EmailAddress();
+            }
+        }
 
         public class Model
         {
-            public string CallbackUrl { get; set; }
+            public string? CallbackUrl { get; set; }
         }
 
         internal class RequestHandler : BaseRequestHandler<Request, Model>
         {
             IWebHostEnvironment Environment { get; }
 
-            public RequestHandler(DealerPortalContext dbContext, FunctionApiContext apiContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentUserContext userAccessor, IWebHostEnvironment hostingEnvironment) : base(dbContext, apiContext, mapper, httpContext, userAccessor)
+            public RequestHandler(PortalContext dbContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor, IWebHostEnvironment hostingEnvironment) : base(dbContext, mapper, httpContext, userAccessor)
             {
                 Environment = hostingEnvironment;
             }
@@ -40,23 +43,21 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
                 var user = await Database.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-
                 if (user == null) throw new RestException(HttpStatusCode.NotFound, "User not found.");
 
-                var passwordReset = new PasswordReset { Id = Guid.NewGuid(), Email = request.Email, UserId = user.Id, ValidUntil = DateTime.UtcNow + TimeSpan.FromDays(3), CallbackUrl = request.CallbackUrl };
-
+                var passwordReset = new UserPasswordReset { Id = Guid.NewGuid(), Email = request.Email, User = user, ValidUntilDateTime = DateTime.UtcNow + TimeSpan.FromDays(3), CallbackUrl = request.CallbackUrl };
                 passwordReset.CallbackUrl = string.Format(passwordReset.CallbackUrl, passwordReset.Token);
 
-                Database.PasswordResets.Add(passwordReset);
+                Database.UserPasswordResets.Add(passwordReset);
                 await Database.SaveChangesAsync();
 
-                if (Environment.EnvironmentName.ToLower() == "development")
+                // Return callback url only in dev mode due to security risk
+                if (Environment.IsDevelopment())
                 {
-                    // It is a security hazard to return this so only in dev mode.
                     return Mapper.Map<Model>(passwordReset);
                 }
 
-                return null;
+                return new Model() { CallbackUrl = string.Empty };
             }
         }
     }

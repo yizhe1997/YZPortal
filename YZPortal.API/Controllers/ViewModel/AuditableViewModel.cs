@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace YZPortal.API.Controllers.ViewModel
+﻿namespace YZPortal.API.Controllers.ViewModel
 {
     public class AuditableViewModel : BaseViewModel
     {

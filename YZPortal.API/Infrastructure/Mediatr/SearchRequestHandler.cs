@@ -33,7 +33,7 @@ namespace YZPortal.API.Infrastructure.Mediatr
             });
         }
 
-        protected async Task<TResponse> CreateIndexResponseAsync<TEntity, TModel>(SearchRequest<TResponse> request, IQueryable<TEntity> dbQuery, System.Linq.Expressions.Expression<Func<TEntity, bool>> searchPredicate) where TEntity : class
+        protected async Task<TResponse> CreateIndexResponseAsync<TEntity, TModel>(SearchRequest<TResponse> request, IQueryable<TEntity> dbQuery, System.Linq.Expressions.Expression<Func<TEntity, bool>>? searchPredicate = null) where TEntity : class
         {
             if (!string.IsNullOrEmpty(request.SearchString) && searchPredicate != null)
             {

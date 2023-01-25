@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using YZPortal.Core.Domain.Database.Users;
 
 namespace YZPortal.API.Controllers.Users.ResetPassword
 {
@@ -7,7 +8,7 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
         public MappingProfile()
         {
             // Create
-            CreateMap<PasswordReset, Create.Model>();
+            CreateMap<UserPasswordReset, Create.Model>();
         }
     }
 }

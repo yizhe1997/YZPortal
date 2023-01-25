@@ -44,6 +44,7 @@ namespace YZPortal.API.Controllers.Users.Authenticate
                 JwtTokenGenerator = jwtTokenGenerator;
                 SignInManager = signInManager;
             }
+
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
                 var details = "Incorrect username & password combination.";

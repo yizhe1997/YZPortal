@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using YZPortal.API.Controllers.ControllerTypes;
+using YZPortal.API.Infrastructure.Mediatr;
 
 namespace YZPortal.Api.Controllers.DealerRoles
 {
