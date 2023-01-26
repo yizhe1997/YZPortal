@@ -39,15 +39,13 @@ namespace YZPortal.API.Controllers.Users.Authorize
 
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
-                var membership = CurrentContext.CurrentUserMemberships != null ? 
-                    await CurrentContext.CurrentUserMemberships
+                var membership = await CurrentContext.CurrentUserMemberships
                     .Include(x => x.MembershipDealerRole)
                     .ThenInclude(x => x.DealerRole)
                     .Include(x => x.MembershipContentAccessLevels)
                     .ThenInclude(m => m.ContentAccessLevel)
                     .Where(x => x.Dealer.Id == request.DealerId)
-                    .FirstOrDefaultAsync() :
-                    null;
+                    .FirstOrDefaultAsync();
 
                 var claims = await membership.CreateClaimsForMembership(Database, CurrentContext);
 

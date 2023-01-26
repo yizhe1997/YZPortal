@@ -3,15 +3,15 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
-namespace YZPortal.API.Controllers.Memberships
+namespace YZPortal.API.Controllers.Memberships.Invites
 {
     public class Create
     {
         public class Request : IRequest<Model>
         {
-            public string? Email { get; set; }
-            public string? Name { get; set; }
-            public string? CallbackUrl { get; set; } = "{0}";
+            public string Email { get; set; }
+            public string Name { get; set; }
+            public string CallbackUrl { get; set; } = "{0}";
             public List<string> UserRoles { get; set; } = new List<string> { };
             public List<string> UserAccessLevels { get; set; } = new List<string> { };
         }

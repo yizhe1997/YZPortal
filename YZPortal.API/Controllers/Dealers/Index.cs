@@ -28,8 +28,6 @@ namespace YZPortal.Api.Controllers.Dealers
             public override async Task<SearchResponse<Model>> Handle(Request request, CancellationToken cancellationToken)
             {
                 var query = CurrentContext.CurrentUserDealers;
-                if (query == null)
-                    throw new RestException(HttpStatusCode.Unauthorized, "No dealers asssigned to user yet.");
 
                 if (request.AzureAdTokenSubClaim != Guid.Empty && request.AzureAdB2CTokenSubClaim == Guid.Empty)
                     query = query.Join(

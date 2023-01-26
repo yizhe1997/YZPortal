@@ -9,7 +9,7 @@ namespace YZPortal.Core.Domain.Contexts
 {
     public class CurrentContext
     {
-        private readonly PortalContext? _dbContext;
+        private readonly PortalContext _dbContext;
         private readonly HttpContext? _httpContext;
 
         // Constructor
@@ -19,17 +19,17 @@ namespace YZPortal.Core.Domain.Contexts
             _httpContext = httpContextAccessor.HttpContext;
         }
 
-        public IEnumerable<Claim>? Claims => _httpContext?.User.Claims ?? null;
-        public string? NameClaim => Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? null;
+        public IEnumerable<Claim>? Claims => _httpContext?.User.Claims ?? default;
+        public string NameClaim => Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
 
         #region Current User Context
 
         public Guid CurrentUserId => string.IsNullOrEmpty(NameClaim) ? Guid.Empty : Guid.Parse(NameClaim);
-        public User? CurrentUser => _dbContext?.Users.FirstOrDefault(u => u.Id == CurrentUserId) ?? null;
+        public User? CurrentUser => _dbContext.Users.FirstOrDefault(u => u.Id == CurrentUserId);
         //public string ContextToken => CurrentMembership?.ContextToken;
 
-        public IQueryable<Membership>? CurrentUserMemberships => _dbContext?.Memberships?.Where(m => m.User.Id == CurrentUserId) ?? null;
-        public IQueryable<Dealer>? CurrentUserDealers => CurrentUserMemberships != null ? _dbContext?.Dealers.Join(CurrentUserMemberships.Where(x => x.Disabled == false), d => d.Id, m => m.Dealer.Id, (d, m) => d) ?? null : null;
+        public IQueryable<Membership> CurrentUserMemberships => _dbContext.Memberships.Where(m => m.User.Id == CurrentUserId);
+        public IQueryable<Dealer> CurrentUserDealers => _dbContext.Dealers.Join(CurrentUserMemberships.Where(x => x.Disabled == false), d => d.Id, m => m.Dealer.Id, (d, m) => d);
 
         #endregion
 
@@ -45,8 +45,8 @@ namespace YZPortal.Core.Domain.Contexts
             .ThenInclude(m => m.ContentAccessLevel)
             .FirstOrDefault(x => x.Dealer.Id == CurrentDealerId && x.User.Id == CurrentUserId)
             : null;
-        public IQueryable<MembershipInvite>? CurrentDealerInvites => _dbContext?.MembershipInvites.Where(i => i.Dealer.Id == CurrentDealerId) ?? null;
-        public IQueryable<Membership>? CurrentDealerMemberships => _dbContext?.Memberships.Where(m => m.Dealer.Id == CurrentDealerId) ?? null;
+        public IQueryable<MembershipInvite> CurrentDealerInvites => _dbContext.MembershipInvites.Where(i => i.Dealer.Id == CurrentDealerId);
+        public IQueryable<Membership> CurrentDealerMemberships => _dbContext.Memberships.Where(m => m.Dealer.Id == CurrentDealerId);
 
         #endregion
     }
