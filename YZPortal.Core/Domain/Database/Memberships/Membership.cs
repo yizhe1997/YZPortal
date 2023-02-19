@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using YZPortal.Core.Domain.Database.Dealers;
-using YZPortal.Core.Domain.Database.EntityTypes;
+using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
 using YZPortal.Core.Domain.Database.Users;
 
 namespace YZPortal.Core.Domain.Database.Memberships

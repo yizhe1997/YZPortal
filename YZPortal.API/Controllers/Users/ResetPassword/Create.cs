@@ -42,6 +42,7 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
 
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
+                // Reset password only for users added in backend directory and not other parties
                 var user = await Database.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
                 if (user == null) throw new RestException(HttpStatusCode.NotFound, "User not found.");
 

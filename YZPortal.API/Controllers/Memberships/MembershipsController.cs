@@ -1,11 +1,14 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using YZPortal.API.Controllers.ControllerTypes;
+using YZPortal.API.Controllers.Memberships;
+using YZPortal.API.Infrastructure.Mediatr;
 
 namespace YZPortal.Api.Controllers.Memberships
 {
-    public class MembershipsController : ApiCurrentDealerScopeController
-    {
+    public class MembershipsController : ApiDealerScopeController
+	{
         // Constructor
         public MembershipsController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         { 
@@ -24,24 +27,6 @@ namespace YZPortal.Api.Controllers.Memberships
 
         [HttpPost("Invite")]
         public async Task<ActionResult<Create.Model>> CreateMembership([FromBody] Create.Request request) =>
-            await _mediator.Send(request);
-
-        [HttpPost("Invite/Bulk")]
-        public async Task<ActionResult<CreateBulk.Model>> ImportInvites([FromQuery] string callbackUrl, [FromForm] IFormFile file)
-        {
-            return await _mediator.Send(new CreateBulk.Request { file = file, CallbackUrl = callbackUrl });
-        }
-
-        [HttpGet("Invite/Sheet")]
-        public async Task<ActionResult<CreateBulkSheet.Model>> GetInvitesExcelSheet([FromBody] CreateBulkSheet.Request request)
-        {
-            var model = await _mediator.Send(request);
-            return File(model.Stream, model.MimeType, model.FileName);
-        }
-
-        [AllowAnonymous]
-        [HttpPost("Invite/Claim")]
-        public async Task<ActionResult<Claim.Model>> ClaimMembership([FromBody] Claim.Request request) =>
             await _mediator.Send(request);
 
         [HttpPut("{id}")]

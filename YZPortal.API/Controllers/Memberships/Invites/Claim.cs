@@ -3,6 +3,13 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using YZPortal.API.Infrastructure.Mediatr;
+using YZPortal.API.Infrastructure.Security.Jwt;
+using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Domain.Database.Memberships;
+using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Error;
+using YZPortal.Core.Extensions;
 
 namespace YZPortal.API.Controllers.Memberships.Invites
 {
@@ -11,43 +18,39 @@ namespace YZPortal.API.Controllers.Memberships.Invites
         public class Request : IRequest<Model>
         {
             public Guid Token { get; set; }
-            public string Password { get; set; }
-            // This will catter both azure ad and azure ad b2c as long its set to true
-            public bool userLoginB2C { get; set; } = true;
+            public string? Password { get; set; }
+            public bool IsExternalIdentity { get; set; }
+            public int IdentityProvider { get; set; } // fluent validate it to be within range
+            public bool ClaimAllInvites { get; set; }
         }
         public class Model
         {
-            public string AuthToken { get; set; }
         }
         public class RequestHandler : BaseRequestHandler<Request, Model>
         {
             UserManager<User> UserManager { get; }
-            JwtTokenGenerator JwtTokenGenerator { get; }
 
-            public RequestHandler(DealerPortalContext dbContext, FunctionApiContext apiContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentUserContext userAccessor, UserManager<User> userManager, JwtTokenGenerator jwtTokenGenerator) : base(dbContext, apiContext, mapper, httpContext, userAccessor)
+            public RequestHandler(PortalContext dbContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor, UserManager<User> userManager) : base(dbContext, mapper, httpContext, userAccessor)
             {
-                JwtTokenGenerator = jwtTokenGenerator;
                 UserManager = userManager;
             }
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
                 #region User
 
-                var invite = await Database.Invites
+                var invite = await Database.MembershipInvites
                     .Include(i => i.Dealer)
                     .FirstOrDefaultAsync(i => i.Token == request.Token);
-
                 if (invite == null) throw new RestException(HttpStatusCode.NotFound, "Invite not found.");
 
                 var user = await UserManager.FindByEmailAsync(invite.Email);
-
                 // Create user with password if it does not exist
                 if (user == null)
                 {
-                    user = new User { Email = invite.Email, Name = invite.Name, EmailConfirmed = true, Admin = false };
+                    user = new User { Email = invite.Email, Name = invite.Name, EmailConfirmed = true, Admin = false, IdentityProvider = request.IdentityProvider };
 
                     // Create the user
-                    var createResult = request.userLoginB2C == false ? await UserManager.CreateAsync(user, request.Password)
+                    var createResult = request.IsExternalIdentity == false ? await UserManager.CreateAsync(user, request.Password)
                         : await UserManager.CreateAsync(user);
 
                     if (!createResult.Succeeded)
@@ -60,7 +63,7 @@ namespace YZPortal.API.Controllers.Memberships.Invites
                     // Mark the user as having the email confirmed
                     user.EmailConfirmed = true;
                     // below condition where user and membership added from the 
-                    if (user.PasswordHash == null && request.userLoginB2C == false)
+                    if (user.PasswordHash == null && request.IsExternalIdentity == false)
                     {
                         user.PasswordHash = UserManager.PasswordHasher.HashPassword(user, request.Password);
                         user.SecurityStamp = Guid.NewGuid().ToString();
@@ -72,59 +75,44 @@ namespace YZPortal.API.Controllers.Memberships.Invites
 
                 #region Membership
 
-                var allInvites = await Database.Invites
-                    .Include(i => i.Dealer)
-                    .Where(i => i.Email == invite.Email)
-                    .ToListAsync();
+                var invites = new List<MembershipInvite>();
+                if (request.ClaimAllInvites)
+                {
+                    invites = await Database.MembershipInvites
+					.Include(i => i.Dealer)
+					.Where(i => i.Email == invite.Email)
+					.ToListAsync();
+				}
+                else
+                {
+                    var inv = await CurrentContext.CurrentDealerInvites.FirstOrDefaultAsync(i => i.Email == invite.Email);
+					if (inv != null)
+						invites.Add(inv);
+				}
 
-
-                var checkMembership = await Database.Memberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == user.Email);
-
+				var checkMembership = await Database.Memberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == user.Email);
                 if (checkMembership == null)
                 {
-                    foreach (var inv in allInvites)
+                    foreach (var inv in invites)
                     {
                         // Create membership
-                        var membership = new Membership { DealerId = inv.DealerId, UserId = user.Id, User = user };
+                        var membership = new Membership { Dealer = inv.Dealer, User = user };
 
-                        // Establish membership in FunctionApi
-                        var nameParts = membership.User.Name.Split(" ");
-                        var firstName = nameParts[0];
-                        var lastName = nameParts.Length > 1 ? nameParts[1] : "";
-
-                        var result = await FunctionApi.Post("CreateMember", body: new
-                        {
-                            FirstName = firstName,
-                            LastName = lastName,
-                            membership.User.Email,
-                            Dealer = inv.Dealer.CustomerAccount
-                        });
-
-                        // string UserRoles = invite.UserRoles;
-                        List<string> UserRoles = inv.UserRoles.Split(',').ToList();
-                        List<string> UserAccessLevels = inv.UserAccessLevels.Split(',').ToList();
-
-                        membership.ContextToken = result.Headers.GetValues("User-Context-Token").First();
-                        user.ExternalId = result.Headers.GetValues("Member-Id").First();
-
-                        membership.UpdateRolesAndAccessLevels(Database, UserRoles, UserAccessLevels);
+                        // Update membership roles and content access levels
+                        membership.UpdateRolesAndContentAccessLevels(Database, inv.UserRole, inv.UserContentAccessLevels.UnfoldBitmask<ContentAccessLevelNames>());
 
                         Database.Memberships.Add(membership);
 
                         // Mark the invite as claimed
-                        inv.Claimed = DateTime.UtcNow;
+                        inv.ClaimedDateTime = DateTime.UtcNow;
                     }
-
-                    Database.Invites.UpdateRange(allInvites);
                 }
 
                 await Database.SaveChangesAsync();
 
                 #endregion
 
-                var jwtToken = await JwtTokenGenerator.CreateToken(user.Id.ToString());
-
-                return new Model { AuthToken = jwtToken };
+                return new Model {};
             }
         }
     }

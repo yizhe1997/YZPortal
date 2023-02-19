@@ -42,7 +42,7 @@
         //#region Etc
 
         //public string PackingSlipContainerName { get; set; }
-        //public string InviteSheetXLSMContainerName { get; set; }
+        public string InviteSheetXLSMContainerName { get; set; }
 
         //#endregion
 

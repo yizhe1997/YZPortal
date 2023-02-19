@@ -2,7 +2,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Error;
 
 namespace YZPortal.Api.Controllers.Memberships
 {

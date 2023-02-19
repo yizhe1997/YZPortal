@@ -1,9 +1,8 @@
-﻿using YZPortal.API.Controllers.ViewModel;
+﻿using YZPortal.API.Controllers.ViewModel.Auditable;
 
 namespace YZPortal.Api.Controllers.DealerRoles
 {
-    public class DealerRolesViewModel : AuditableViewModel
+    public class DealerRolesViewModel : EnumableViewModel
     {
-        public string? Name { get; set; }
     }
 }

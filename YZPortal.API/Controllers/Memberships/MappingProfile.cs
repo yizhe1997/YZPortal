@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using YZPortal.Api.Controllers.ContentAccessLevels;
 using YZPortal.Api.Controllers.DealerRoles;
+using YZPortal.API.Controllers.Memberships;
 using YZPortal.Core.Domain.Database.Memberships;
 
 namespace YZPortal.Api.Controllers.Memberships
@@ -22,17 +23,13 @@ namespace YZPortal.Api.Controllers.Memberships
             CreateMap<Create.Request, MembershipInvite>();
             CreateMap<MembershipInvite, Create.Model>();
 
-            // Create Invite Bulk
-            CreateMap<CreateBulk.Sheet, MembershipInvite>();
-            CreateMap<MembershipInvite, MembershipsCreateViewModel>();
-
             // Update
             CreateMap<Membership, Update.Model>();
 
             // Etc
-            CreateMap<MembershipDealerRole, MembershipDealerRoleViewModel>();
+            CreateMap<MembershipDealerRole, DealerRolesViewModel>();
             CreateMap<DealerRole, DealerRolesViewModel>();
-            CreateMap<MembershipContentAccessLevel, MembershipContentAccessLevelViewModel>();
+            CreateMap<MembershipContentAccessLevel, ContentAccessLevelsViewModel>();
             CreateMap<ContentAccessLevel, ContentAccessLevelsViewModel>();
         }
     }

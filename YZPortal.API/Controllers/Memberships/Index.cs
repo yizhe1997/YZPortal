@@ -20,7 +20,7 @@ namespace YZPortal.Api.Controllers.Memberships
             }
             public override async Task<SearchResponse<Model>> Handle(Request request, CancellationToken cancellationToken)
             {
-                var query = CurrentContext.CurrentDealerMemberships ?? new List<Membership>().AsQueryable();
+                var query = CurrentContext.CurrentDealerMemberships;
 
                 return await CreateIndexResponseAsync<Membership, Model>(
                      request,

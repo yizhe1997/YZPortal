@@ -2,7 +2,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using YZPortal.API.Controllers.Memberships;
+using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Error;
 
 namespace YZPortal.Api.Controllers.Memberships
 {
@@ -13,8 +16,8 @@ namespace YZPortal.Api.Controllers.Memberships
             internal Guid Id { get; set; }
             public bool MasterAdmin { get; set; } = true;
 
-            public string Roles { get; set; } 
-            public List<string> AccessLevels { get; set; } = new List<string> { };
+            public int Role { get; set; } 
+            public List<int> ContentAccessLevels { get; set; } = new List<int>();
         }
 
         public class Model : MembershipsViewModel
@@ -34,19 +37,17 @@ namespace YZPortal.Api.Controllers.Memberships
 
                 if (membership == null) throw new RestException(HttpStatusCode.NotFound);
 
-                membership.UpdateRolesAndContentAccessLevels(Database, request.Roles, request.AccessLevels);
-                
-                Database.Memberships.Update(membership);
+                membership.UpdateRolesAndContentAccessLevels(Database, request.Role, request.ContentAccessLevels);
                 
                 await Database.SaveChangesAsync();
 
-                // Create and Update Master Admin                
-                if (membership.Admin != request.MasterAdmin)
-                {
-                    var dealerList = await Database.Dealers.ToListAsync();
-                    var membershipList = await Database.Memberships.Where(x => x.UserId == membership.UserId).ToListAsync();
-                    MembershipsHelper.CreateUpdateMasterAdmin(membershipList, dealerList, membership.UserId, request.MasterAdmin, Database);
-                }
+                //// Create and Update Master Admin                
+                //if (membership.Admin != request.MasterAdmin)
+                //{
+                //    var dealerList = await Database.Dealers.ToListAsync();
+                //    var membershipList = await Database.Memberships.Where(x => x.UserId == membership.UserId).ToListAsync();
+                //    MembershipsHelper.CreateUpdateMasterAdmin(membershipList, dealerList, membership.UserId, request.MasterAdmin, Database);
+                //}
 
                 var membershipResponse = await CurrentContext.CurrentDealerMemberships
                     .Include(x => x.MembershipDealerRole)

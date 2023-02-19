@@ -23,9 +23,8 @@ namespace YZPortal.API.Controllers.Users.Authorize
             }
         }
 
-        public class Model
-        {
-            public string? AuthToken { get; set; }
+        public class Model : AuthorizeViewModel
+		{
         }
 
         public class RequestHandler : BaseRequestHandler<Request, Model>

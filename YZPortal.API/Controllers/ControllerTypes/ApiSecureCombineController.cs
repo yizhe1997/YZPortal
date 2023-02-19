@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace YZPortal.API.Controllers.ControllerTypes
 {
-    [Authorize(Policy = "CombinedScheme")]
+    [Authorize(Policy = "AllAuthenSchemes")]
     public class ApiSecureCombineController : ApiBaseController
     {
         public ApiSecureCombineController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)

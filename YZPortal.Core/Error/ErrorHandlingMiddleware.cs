@@ -57,28 +57,28 @@ namespace YZPortal.Core.Error
 
                             logger.LogError($"RestException thrown for method {methodPathString}.\r\nStatusCode:\r\n{(int)ex.Code}\r\nError message:\r\n{ex.Error}");
                         }
-                        // FunctionApiException
-                        else if (typeof(FunctionApiException) == contextFeature.Error.GetType() || typeof(FunctionApiException) == innerException?.GetType())
-                        {
-                            var ex = innerException == null ? (FunctionApiException)contextFeature.Error : (FunctionApiException)innerException;
-                            context.Response.StatusCode = ex.Code == HttpStatusCode.NotFound || ex.Code == HttpStatusCode.NoContent ?
-                                context.Response.StatusCode :
-                                (int)ex.Code;
+                        //// FunctionApiException
+                        //else if (typeof(FunctionApiException) == contextFeature.Error.GetType() || typeof(FunctionApiException) == innerException?.GetType())
+                        //{
+                        //    var ex = innerException == null ? (FunctionApiException)contextFeature.Error : (FunctionApiException)innerException;
+                        //    context.Response.StatusCode = ex.Code == HttpStatusCode.NotFound || ex.Code == HttpStatusCode.NoContent ?
+                        //        context.Response.StatusCode :
+                        //        (int)ex.Code;
 
-                            var message = ex.Error;
-                            foreach (var str in _)
-                            {
-                                message = message.Replace(str, "");
-                            }
+                        //    var message = ex.Error;
+                        //    foreach (var str in _)
+                        //    {
+                        //        message = message.Replace(str, "");
+                        //    }
 
-                            await context.Response.WriteAsync(new ErrorDetails()
-                            {
-                                StatusCode = context.Response.StatusCode,
-                                Message = message
-                            }.ToString());
+                        //    await context.Response.WriteAsync(new ErrorDetails()
+                        //    {
+                        //        StatusCode = context.Response.StatusCode,
+                        //        Message = message
+                        //    }.ToString());
 
-                            logger.LogError($"FunctionApiException thrown for method {methodPathString}.\r\nStatusCode:\r\n{(int)ex.Code}\r\nError message:\r\n{ex.Error}");
-                        }
+                        //    logger.LogError($"FunctionApiException thrown for method {methodPathString}.\r\nStatusCode:\r\n{(int)ex.Code}\r\nError message:\r\n{ex.Error}");
+                        //}
                         else
                         {
                             await context.Response.WriteAsync(new ErrorDetails()

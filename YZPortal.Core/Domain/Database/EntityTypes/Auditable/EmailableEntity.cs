@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace YZPortal.Core.Domain.Database.EntityTypes
+namespace YZPortal.Core.Domain.Database.EntityTypes.Auditable
 {
     public abstract class EmailableEntity : AuditableEntity
     {

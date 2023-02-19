@@ -1,4 +1,4 @@
-﻿using YZPortal.API.Controllers.ViewModel;
+﻿using YZPortal.API.Controllers.ViewModel.Auditable;
 
 namespace YZPortal.Api.Controllers.Dealers
 {

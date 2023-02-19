@@ -88,7 +88,7 @@ namespace YZPortal.Core.Domain.Database
 
         public void EnumValues()
         {
-            var DealerRoleTypes = TypeExtension.GetEnumDataTypeValues<DealerRoleNames>();
+            var DealerRoleTypes = typeof(DealerRoleNames).GetEnumDataTypeValues();
 
             foreach (var type in DealerRoleTypes)
             {
@@ -98,7 +98,7 @@ namespace YZPortal.Core.Domain.Database
                 }
             }
 
-            var ContentAccessLevelTypes = TypeExtension.GetEnumDataTypeValues<ContentAccessLevelNames>();
+            var ContentAccessLevelTypes = typeof(DealerRoleNames).GetEnumDataTypeValues();
 
             foreach (var type in ContentAccessLevelTypes)
             {
@@ -125,7 +125,7 @@ namespace YZPortal.Core.Domain.Database
             syncStatusTypeDevice.CreateSyncStatuses();
 
             // To delete obsolete sync statuses
-            foreach (var syncStatus in TypeExtension.GetEnumDataTypeValues<SyncStatusTypeObsoleteNames>())
+            foreach (var syncStatus in typeof(DealerRoleNames).GetEnumDataTypeValues())
             {
                 var checkSyncStatus = _dbContext.SyncStatuses.FirstOrDefault(x => x.Name == syncStatus);
                 if (checkSyncStatus != null)

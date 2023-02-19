@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using static YZPortal.API.Controllers.Memberships.Invites.Import;
+using YZPortal.Core.Domain.Database.Memberships;
 
 namespace YZPortal.API.Controllers.Memberships.Invites
 {
@@ -8,18 +8,14 @@ namespace YZPortal.API.Controllers.Memberships.Invites
         public MappingProfile()
         {
             // Index
-            CreateMap<Invite, Index.Model>();
+            CreateMap<MembershipInvite, Index.Model>();
 
             // Create
-            CreateMap<Invite, Create.Model>();
-            CreateMap<Invite, InviteViewModel>();
-            CreateMap<Sheet, Invite>();
-            CreateMap<Create.Request, Invite>(MemberList.Source);
-            CreateMap<Sheet, Sheet>()
-                .ForMember(x => x.Dealership, opt => opt.Ignore());
+            CreateMap<MembershipInvite, Create.Model>();
+            CreateMap<Create.Request, MembershipInvite>(MemberList.Source);
 
             // Index
-            CreateMap<Invite, Delete.Model>();
+            CreateMap<MembershipInvite, Delete.Model>();
         }
     }
 }

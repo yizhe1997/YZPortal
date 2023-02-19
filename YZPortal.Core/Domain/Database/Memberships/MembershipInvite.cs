@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using YZPortal.Core.Domain.Database.Dealers;
-using YZPortal.Core.Domain.Database.EntityTypes;
+using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
 
 namespace YZPortal.Core.Domain.Database.Memberships
 {
@@ -14,8 +14,8 @@ namespace YZPortal.Core.Domain.Database.Memberships
         public DateTime? ClaimedDateTime { get; set; }
         public DateTime? ValidUntilDateTime { get; set; } = DateTime.UtcNow.AddMonths(7);
         public Guid Token { get; set; } = Guid.NewGuid();
-        public string? UserRole { get; set; }
-        public string? UserContentAccessLevels { get; set; }
+        public int UserRole { get; set; }
+        public int UserContentAccessLevels { get; set; }
         // TO DO: might need to remove this since its redundant..? or
         // add membership invite to the membership entity rmbr about principal and dependent
         // https://stackoverflow.com/questions/60076109/one-to-one-to-many-causes-cycles-or-multiple-cascade-paths-error

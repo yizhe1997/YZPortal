@@ -1,5 +1,6 @@
 ﻿using YZPortal.Core.Domain.Contexts;
-using YZPortal.Core.Domain.Database.EntityTypes;
+using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
+using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Extensions;
 
 namespace YZPortal.Core.Domain.Database.Sync
@@ -26,7 +27,7 @@ namespace YZPortal.Core.Domain.Database.Sync
 
         public virtual void CreateSyncStatuses<T>(int syncStatusType)
         {
-            List<int> syncStatusTypeNames = TypeExtension.GetEnumDataTypeValues<T>();
+            List<int> syncStatusTypeNames = typeof(T).GetEnumDataTypeValues();
 
             var synStatusesBasedOnType = Database.SyncStatuses.Where(x => x.Type == syncStatusType).Select(x => x.Name).ToList();
 

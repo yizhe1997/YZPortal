@@ -8,7 +8,7 @@ using System.Data;
 using System.Reflection;
 using System.Security.Claims;
 using YZPortal.Core.Domain.Database.Dealers;
-using YZPortal.Core.Domain.Database.EntityTypes;
+using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
 using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Domain.Database.Sync;
 using YZPortal.Core.Domain.Database.Users;
@@ -41,6 +41,7 @@ namespace YZPortal.Core.Domain.Contexts
         public DbSet<MembershipDealerRole> MembershipDealerRoles { get; set; }
         public DbSet<MembershipContentAccessLevel> MembershipContentAccessLevels { get; set; }
         public DbSet<MembershipInvite> MembershipInvites { get; set; }
+        public DbSet<MembershipNotification> MembershipNotifications { get; set; }
 
         #endregion
 

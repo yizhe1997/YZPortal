@@ -1,4 +1,4 @@
-﻿namespace YZPortal.Core.Domain.Database.EntityTypes
+﻿namespace YZPortal.Core.Domain.Database.EntityTypes.Auditable
 {
     public class TranslatableEntity : AuditableEntity
     {

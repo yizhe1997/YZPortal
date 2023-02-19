@@ -8,9 +8,9 @@ namespace YZPortal.Core.Attributes
         [AttributeUsage(AttributeTargets.Property)]
         public sealed class ListRequired : RequiredAttribute
         {
-            public override bool IsValid(object value)
+            public override bool IsValid(object? value)
             {
-                var list = value as IEnumerable;
+                var list = value != null ? value as IEnumerable : default;
                 return list != null && list.GetEnumerator().MoveNext();
             }
         }

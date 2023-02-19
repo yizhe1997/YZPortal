@@ -22,10 +22,22 @@ namespace YZPortal.Core.Domain.Database.Users
         public bool Admin { get; set; } = false;
         // To resolve Microsoft.AspNetCore.Identity.UserManager[13] User validation failed: InvalidUserName.
         public override string UserName { get { return Email; } set { Email = value; } }
-        public Guid AzureAdB2CTokenSubClaim { get; set; }
-        public Guid AzureAdTokenSubClaim { get; set; }
         public DateTime? LastLoggedIn { get; set; }
         public List<Membership> Memberships { get; set; } = new List<Membership>();
         public List<UserPasswordReset> UserPasswordResets { get; set; } = new List<UserPasswordReset>();
-    }
+
+		#region Identity Provider
+
+		public Guid TokenSubClaim { get; set; }
+		public int IdentityProvider { get; set; }
+
+		#endregion
+	}
+	[Flags]
+	public enum IdentityProviderNames
+	{
+		None = 0,
+		AzureAd = 1,
+		AzureAdB2C = 2
+	}
 }

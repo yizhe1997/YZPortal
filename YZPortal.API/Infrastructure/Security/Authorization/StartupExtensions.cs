@@ -13,6 +13,7 @@ namespace YZPortal.API.Infrastructure.Security.Authorization
             {
                 var swaggerOptions = configuration.GetSection("Swagger").Get<SwaggerOptions>() ?? new();
 
+                // TODO: properly implement this
                 // Dealer roles
                 opts.AddPolicy("dealer", policy => policy.RequireClaim("dealerId"));
                 opts.AddPolicy("representative", policy => policy.RequireClaim("representative", "1"));
@@ -37,25 +38,22 @@ namespace YZPortal.API.Infrastructure.Security.Authorization
                 opts.AddPolicy("WarrantyClaims", policy => policy.RequireClaim("WarrantyClaims", "1"));
                 opts.AddPolicy("None", policy => policy.RequireClaim("None", "1"));
 
-                if (swaggerOptions.IsAzureAdOAuth2Provider == true)
-                {
-                    var combinedAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
-                        JwtBearerDefaults.AuthenticationScheme,
-                        Constants.AzureAd);
-                    opts.AddPolicy("CombinedScheme", combinedAuthorizationPolicyBuilder
-                        .RequireAuthenticatedUser()
-                        .Build());
-                }
-                else
-                {
-                    var combinedAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
-                        JwtBearerDefaults.AuthenticationScheme,
-                        Constants.AzureAdB2C);
-                    opts.AddPolicy("CombinedScheme", combinedAuthorizationPolicyBuilder
-                        .RequireAuthenticatedUser()
-                        .Build());
-                }
-            });
+				var allAuthenSchemes = new AuthorizationPolicyBuilder(
+						JwtBearerDefaults.AuthenticationScheme,
+						Constants.AzureAdB2C,
+						Constants.AzureAd);
+				opts.AddPolicy("AllAuthenSchemes", allAuthenSchemes
+					.RequireAuthenticatedUser()
+					.Build());
+
+				var allExternalAuthSchemes = new AuthorizationPolicyBuilder(
+						JwtBearerDefaults.AuthenticationScheme,
+						Constants.AzureAdB2C,
+						Constants.AzureAd);
+				opts.AddPolicy("AllExternalAuthSchemes", allExternalAuthSchemes
+					.RequireAuthenticatedUser()
+					.Build());
+			});
             services.AddRequiredScopeAuthorization();
         }
     }

@@ -4,9 +4,9 @@ using YZPortal.API.Controllers.ControllerTypes;
 
 namespace YZPortal.API.Controllers.Users.AuthorizeAzureAd
 {
-    public class AuthorizeAzureAdController : ApiAzureAdSecureController
+    public class AuthorizeExternalProviderController : ApiSecureExternalController
     {
-        public AuthorizeAzureAdController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
+        public AuthorizeExternalProviderController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {
         }
 

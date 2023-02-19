@@ -1,9 +1,8 @@
-﻿using YZPortal.API.Controllers.ViewModel;
+﻿using YZPortal.API.Controllers.ViewModel.Auditable;
 
 namespace YZPortal.Api.Controllers.ContentAccessLevels
 {
-    public class ContentAccessLevelsViewModel : AuditableViewModel
+    public class ContentAccessLevelsViewModel : EnumableViewModel
     {
-        public string? Name { get; set; }
     }
 }

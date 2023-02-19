@@ -1,6 +1,6 @@
-﻿namespace YZPortal.API.Controllers.ViewModel
+﻿namespace YZPortal.Core.Domain.Database.EntityTypes.Auditable
 {
-    public class AuditableViewModel : BaseViewModel
+    public abstract class AuditableEntity : BaseEntity
     {
         public DateTime CreatedDate { get; set; }
         public string? CreatedBy { get; set; }
