@@ -46,7 +46,7 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
                 var user = await Database.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
                 if (user == null) throw new RestException(HttpStatusCode.NotFound, "User not found.");
 
-                var passwordReset = new UserPasswordReset { Id = Guid.NewGuid(), Email = request.Email, User = user, ValidUntilDateTime = DateTime.UtcNow + TimeSpan.FromDays(3), CallbackUrl = request.CallbackUrl };
+                var passwordReset = new UserPasswordReset { Id = Guid.NewGuid(), Email = request.Email, UserId = user.Id, ValidUntilDateTime = DateTime.UtcNow + TimeSpan.FromDays(3), CallbackUrl = request.CallbackUrl };
                 passwordReset.CallbackUrl = string.Format(passwordReset.CallbackUrl, passwordReset.Token);
 
                 Database.UserPasswordResets.Add(passwordReset);

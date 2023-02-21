@@ -88,16 +88,7 @@ namespace YZPortal.Core.Domain.Contexts
             #region Sync
 
             builder.Entity<SyncStatus>()
-                .HasKey(x => new { k1 = x.Type, k2 = x.Name });
-
-            #endregion
-
-            #region Users
-
-            builder.Entity<UserPasswordReset>()
-                .HasOne(bc => bc.User)
-                .WithMany(b => b.UserPasswordResets)
-                .HasForeignKey(bc => bc.User.Id);
+                .HasKey(x => new { x.Type, x.Name });
 
             #endregion
 
@@ -106,16 +97,17 @@ namespace YZPortal.Core.Domain.Contexts
             #region Membership Dealer Role
 
             builder.Entity<MembershipDealerRole>()
-                .HasKey(bc => new { k1 = bc.DealerRole.Id, k2 = bc.Membership.Id });
+                .HasKey(bc => new { bc.DealerRoleId, bc.MembershipId });
             builder.Entity<MembershipDealerRole>()
                 .HasOne(bc => bc.DealerRole)
                 .WithMany(b => b.MembershipDealerRoles)
-                .HasForeignKey(bc => bc.DealerRole.Id);
+                .HasForeignKey(bc => bc.DealerRoleId);
             builder.Entity<MembershipDealerRole>()
                 .HasOne(bc => bc.Membership)
                 .WithOne(c => c.MembershipDealerRole)
-                .HasForeignKey<MembershipDealerRole>(bc => bc.Membership.Id);
+                .HasForeignKey<MembershipDealerRole>(bc => bc.MembershipId);
 
+            // restrict deletion of dealer role when membership dealer role deleted or for statuses just dont cr8 a relationship..... omg
             #endregion
 
             #region Dealer Role
@@ -129,15 +121,15 @@ namespace YZPortal.Core.Domain.Contexts
             #region Membership Access Level
 
             builder.Entity<MembershipContentAccessLevel>()
-                .HasKey(bc => new { k1 = bc.ContentAccessLevel.Id, k2 = bc.Membership.Id });
+                .HasKey(bc => new { bc.ContentAccessLevelpId, bc.MembershipId });
             builder.Entity<MembershipContentAccessLevel>()
                 .HasOne(bc => bc.ContentAccessLevel)
                 .WithMany(b => b.MembershipContentAccessLevels)
-                .HasForeignKey(bc => bc.ContentAccessLevel.Id);
+                .HasForeignKey(bc => bc.ContentAccessLevelpId);
             builder.Entity<MembershipContentAccessLevel>()
                 .HasOne(bc => bc.Membership)
                 .WithMany(c => c.MembershipContentAccessLevels)
-                .HasForeignKey(bc => bc.Membership.Id);
+                .HasForeignKey(bc => bc.MembershipId);
 
             #endregion
 

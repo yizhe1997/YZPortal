@@ -4,24 +4,24 @@ using YZPortal.Core.Domain.Database.Memberships;
 
 namespace YZPortal.Core.Domain.Database.Users
 {
-    // FYI:
-    //+------------------+------------------+
-    //|      Table       |   Description    |
-    //+------------------+------------------+
-    //| AspNetUsers      | The users.       | USING
-    //| AspNetRoles      | The roles.       | INTERFACE MESSING UP THE PROCESS
-    //| AspNetUserRoles  | Roles of users.  | CANT USE BECAUSE OF DIFF ROLE FOR DIFF DEALER
-    //| AspNetUserClaims | Claims by users. |
-    //| AspNetRoleClaims | Claims by roles. |
-    //+------------------+------------------+
+	// Microsoft.AspNetCore.Identity Tables:
+	//+------------------+------------------+------------------+
+	//|      Table       |   Description    |       Used       |
+	//+------------------+------------------+------------------+
+	//| AspNetUsers      | The users.       | Yes              | 
+	//| AspNetRoles      | The roles.       | No               | 
+	//| AspNetUserRoles  | Roles of users.  | No               | 
+	//| AspNetUserClaims | Claims by users. | No               | 
+	//| AspNetRoleClaims | Claims by roles. | No               | 
+	//+------------------+------------------+------------------+
 
-    public class User : IdentityUser<Guid>
+	public class User : IdentityUser<Guid>
     {
         [Required]
         public string? Name { get; set; }
         public bool Admin { get; set; } = false;
-        // To resolve Microsoft.AspNetCore.Identity.UserManager[13] User validation failed: InvalidUserName.
-        public override string UserName { get { return Email; } set { Email = value; } }
+		// Ref: https://stackoverflow.com/questions/26430094/asp-net-identity-provider-signinmanager-keeps-returning-failure
+		public override string? UserName { get { return Email; } set { Email = value; } }
         public DateTime? LastLoggedIn { get; set; }
         public List<Membership> Memberships { get; set; } = new List<Membership>();
         public List<UserPasswordReset> UserPasswordResets { get; set; } = new List<UserPasswordReset>();

@@ -8,9 +8,9 @@ namespace YZPortal.Core.Domain.Database.Memberships
     {
         [Required]
         public string? Name { get; set; }
-        [Required]
-        public Dealer? Dealer { get; set; }
-        public string CallbackUrl { get; set; } = "{0}";
+		[Required]
+		public Guid DealerId { get; set; }
+		public string CallbackUrl { get; set; } = "{0}";
         public DateTime? ClaimedDateTime { get; set; }
         public DateTime? ValidUntilDateTime { get; set; } = DateTime.UtcNow.AddMonths(7);
         public Guid Token { get; set; } = Guid.NewGuid();

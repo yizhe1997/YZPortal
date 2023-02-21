@@ -94,14 +94,14 @@ namespace YZPortal.API.Controllers.Memberships
             var checkRole = database.DealerRoles.FirstOrDefault(x => x.Name == role);
 
             if (checkRole != null)
-                membership.MembershipDealerRole = new MembershipDealerRole() { DealerRole = checkRole };
+                membership.MembershipDealerRole = new MembershipDealerRole() { DealerRoleId = checkRole.Id };
 
             foreach (var userAccess in contentAccessLevels)
             {
                 var accessLevel = database.ContentAccessLevels.FirstOrDefault(x => x.Name == userAccess);
 
                 if (accessLevel != null)
-                    membership.MembershipContentAccessLevels.Add(new MembershipContentAccessLevel { ContentAccessLevel = accessLevel });
+                    membership.MembershipContentAccessLevels.Add(new MembershipContentAccessLevel { ContentAccessLevelpId = accessLevel.Id });
             }
         }
     }

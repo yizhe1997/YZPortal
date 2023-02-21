@@ -17,10 +17,6 @@ namespace YZPortal.API.Infrastructure.Security.Authentication
     {
         public static void AddAuthentications(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddIdentity<User, IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<PortalContext>()
-                .AddDefaultTokenProviders();
-
             var jwtOptions = configuration.GetSection("Jwt").Get<JwtIssuerOptions>();
             var swaggerOptions = configuration.GetSection("Swagger").Get<SwaggerOptions>() ?? new();
             var azureAdApiOptions = configuration.GetSection("AzureAdApi").Get<AzureAdApiOptions>() ?? new();

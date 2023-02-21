@@ -61,14 +61,14 @@ namespace YZPortal.API.Controllers.Memberships.Invites
                     if (membership == null && user.EmailConfirmed)
                     {
                         // Create new membership and track
-                        membership = new Membership { Dealer = CurrentContext.CurrentDealer, User = user , Id = new Guid()};
+                        membership = new Membership { DealerId = CurrentContext.CurrentDealerId, UserId = user.Id , Id = new Guid()};
                         membership.UpdateRolesAndContentAccessLevels(Database, request.Role, request.ContentAccessLevels);
                         Database.Memberships.Add(membership);
 
                         // Create membership notification
                         MembershipNotification membershipNotification = new MembershipNotification();
                         membershipNotification.Email = request.Email;
-                        membershipNotification.Membership = membership;
+                        membershipNotification.MembershipId = membership.Id;
                         Database.MembershipNotifications.Add(membershipNotification);
 
                         await Database.SaveChangesAsync();
@@ -86,7 +86,7 @@ namespace YZPortal.API.Controllers.Memberships.Invites
                     if (invite == null)
                     {
 						invite = Mapper.Map<MembershipInvite>(request);
-                        invite.Dealer = CurrentContext.CurrentDealer;
+                        invite.DealerId = CurrentContext.CurrentDealerId;
                         invite.CallbackUrl = string.Format(invite.CallbackUrl, invite.Token);
                         invite.UserRole = request.Role;
                         invite.UserContentAccessLevels = request.ContentAccessLevels.Aggregate(0, (current, n) => current | (int)(ContentAccessLevelNames)n); 

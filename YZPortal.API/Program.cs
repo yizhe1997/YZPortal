@@ -28,9 +28,17 @@ using YZPortal.Core.StorageConnection;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+var logger = new LoggerConfiguration()
+					   .ReadFrom.Configuration(builder.Configuration)
+					   .Enrich.FromLogContext()
+					   .CreateLogger();
 
 #region Adding services to container
 
+// Serilog
+builder.Host.UseSerilog(logger);
+
+// Add cross-origin resource sharing to IServiceCollection
 builder.Services.AddCors();
 
 builder.Services.AddMvc(opts =>
@@ -52,8 +60,8 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
 
 // Api Versioning
-builder.Services.AddApiVersioning(opts => { opts.AssumeDefaultVersionWhenUnspecified = true; opts.ReportApiVersions = true; opts.DefaultApiVersion = new ApiVersion(2, 0); });
-builder.Services.AddVersionedApiExplorer(opts => { opts.GroupNameFormat = "'v'VV"; opts.SubstituteApiVersionInUrl = true; opts.DefaultApiVersion = new ApiVersion(2, 0); });
+builder.Services.AddApiVersioning(opts => { opts.AssumeDefaultVersionWhenUnspecified = true; opts.ReportApiVersions = true; opts.DefaultApiVersion = new ApiVersion(1, 0); });
+builder.Services.AddVersionedApiExplorer(opts => { opts.GroupNameFormat = "'v'VV"; opts.SubstituteApiVersionInUrl = true; opts.DefaultApiVersion = new ApiVersion(1, 0); });
 
 // MediatR
 builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies().Where(assembly => !assembly.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal)).ToArray());
@@ -76,7 +84,7 @@ builder.Services.AddDatabaseService(configuration);
 builder.Services.AddTransient<CurrentContext>();
 
 // Prereq for Iidentity... and to use usermanager
-builder.Services.AddIdentity<User, IdentityRole<Guid>>()
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<PortalContext>()
     .AddDefaultTokenProviders();
 
@@ -152,6 +160,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.ConfigureExceptionHandler();
+
+Log.Information("Initializing..."); // not sure why not working need to work on this
 
 app.UseSerilogRequestLogging();
 

@@ -28,8 +28,8 @@ namespace YZPortal.Core.Domain.Contexts
         public User? CurrentUser => _dbContext.Users.FirstOrDefault(u => u.Id == CurrentUserId);
         //public string ContextToken => CurrentMembership?.ContextToken;
 
-        public IQueryable<Membership> CurrentUserMemberships => _dbContext.Memberships.Where(m => m.User.Id == CurrentUserId);
-        public IQueryable<Dealer> CurrentUserDealers => _dbContext.Dealers.Join(CurrentUserMemberships.Where(x => x.Disabled == false), d => d.Id, m => m.Dealer.Id, (d, m) => d);
+        public IQueryable<Membership> CurrentUserMemberships => _dbContext.Memberships.Where(m => m.UserId == CurrentUserId);
+        public IQueryable<Dealer> CurrentUserDealers => _dbContext.Dealers.Join(CurrentUserMemberships.Where(x => x.Disabled == false), d => d.Id, m => m.DealerId, (d, m) => d);
 
         #endregion
 
@@ -43,10 +43,10 @@ namespace YZPortal.Core.Domain.Contexts
             .ThenInclude(x => x.DealerRole)
             .Include(m => m.MembershipContentAccessLevels)
             .ThenInclude(m => m.ContentAccessLevel)
-            .FirstOrDefault(x => x.Dealer.Id == CurrentDealerId && x.User.Id == CurrentUserId)
+            .FirstOrDefault(x => x.DealerId == CurrentDealerId && x.UserId == CurrentUserId)
             : null;
-        public IQueryable<MembershipInvite> CurrentDealerInvites => _dbContext.MembershipInvites.Where(i => i.Dealer.Id == CurrentDealerId);
-        public IQueryable<Membership> CurrentDealerMemberships => _dbContext.Memberships.Where(m => m.Dealer.Id == CurrentDealerId);
+        public IQueryable<MembershipInvite> CurrentDealerInvites => _dbContext.MembershipInvites.Where(i => i.DealerId == CurrentDealerId);
+        public IQueryable<Membership> CurrentDealerMemberships => _dbContext.Memberships.Where(m => m.DealerId == CurrentDealerId);
 
         #endregion
     }

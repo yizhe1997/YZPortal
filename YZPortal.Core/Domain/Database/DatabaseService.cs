@@ -15,12 +15,12 @@ namespace YZPortal.Core.Domain.Database
     {
         private readonly PortalContext _dbContext;
         private readonly CurrentContext _userContext;
-        private readonly SeedOptions _options;
+        private readonly DatabaseOptions _options;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<DatabaseService> _logger;
 
         // Constructor
-        public DatabaseService(PortalContext dbContext, CurrentContext userContext, UserManager<User> userManager, IOptions<SeedOptions> options, ILogger<DatabaseService> logger)
+        public DatabaseService(PortalContext dbContext, CurrentContext userContext, UserManager<User> userManager, IOptions<DatabaseOptions> options, ILogger<DatabaseService> logger)
         {
             _dbContext = dbContext;
             _userManager = userManager;

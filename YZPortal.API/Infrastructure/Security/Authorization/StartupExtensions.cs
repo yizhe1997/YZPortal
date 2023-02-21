@@ -47,7 +47,6 @@ namespace YZPortal.API.Infrastructure.Security.Authorization
 					.Build());
 
 				var allExternalAuthSchemes = new AuthorizationPolicyBuilder(
-						JwtBearerDefaults.AuthenticationScheme,
 						Constants.AzureAdB2C,
 						Constants.AzureAd);
 				opts.AddPolicy("AllExternalAuthSchemes", allExternalAuthSchemes

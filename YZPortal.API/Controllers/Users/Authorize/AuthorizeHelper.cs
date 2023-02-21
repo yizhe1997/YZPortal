@@ -25,7 +25,7 @@ namespace YZPortal.API.Controllers.Users.Authorize
 
             var claims = new List<Claim>
             {
-                new Claim("dealerId", membership.Dealer.Id.ToString())
+                new Claim("dealerId", membership.DealerId.ToString())
             };
 
             if (membership.Admin || CurrentContext?.CurrentUser?.Admin == true)

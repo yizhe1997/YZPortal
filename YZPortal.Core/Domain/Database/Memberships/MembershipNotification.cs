@@ -5,7 +5,8 @@ namespace YZPortal.Core.Domain.Database.Memberships
 {
     public class MembershipNotification : EmailableEntity
     {
-        [Required]
         public Membership? Membership { get; set; }
-    }
+		[Required]
+		public Guid MembershipId { get; set; }
+	}
 }

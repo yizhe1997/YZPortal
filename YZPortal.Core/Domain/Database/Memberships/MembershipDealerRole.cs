@@ -8,9 +8,11 @@ namespace YZPortal.Core.Domain.Database.Memberships
     /// </summary>
     public class MembershipDealerRole : AuditableEntity
     {
-        [Required]
         public DealerRole? DealerRole { get; set; }
-        [Required]
-        public Membership? Membership { get; set; }
-    }
+		[Required]
+		public Guid DealerRoleId { get; set; }
+		public Membership? Membership { get; set; }
+		[Required]
+		public Guid MembershipId { get; set; }
+	}
 }

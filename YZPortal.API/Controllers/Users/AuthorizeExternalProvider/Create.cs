@@ -46,12 +46,12 @@ namespace YZPortal.API.Controllers.Users.AuthorizeAzureAd
 					.ThenInclude(x => x.DealerRole)
 					.Include(x => x.MembershipContentAccessLevels)
 					.ThenInclude(m => m.ContentAccessLevel)
-					.Where(x => x.User.TokenSubClaim == request.TokenSubClaim && x.Dealer.Id == request.DealerId)
+					.Where(x => x.User.TokenSubClaim == request.TokenSubClaim && x.DealerId == request.DealerId)
 					.FirstOrDefaultAsync();
 
 				var claims = await membership.CreateClaimsForMembership(Database, CurrentContext);
 
-				var token = await JwtTokenGenerator.CreateToken(membership?.User?.Id.ToString() ?? string.Empty, claims);
+				var token = await JwtTokenGenerator.CreateToken(membership?.UserId.ToString() ?? string.Empty, claims);
 
 				return new Model { AuthToken = token };
 			}

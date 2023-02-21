@@ -11,6 +11,7 @@ namespace YZPortal.Api.Controllers.Dealers
     {
         public class Request : SearchRequest<SearchResponse<Model>>
         {
+            public Guid TokenSubClaim { get; set; }
         }
 
         public class Model : DealersViewModel
@@ -27,7 +28,14 @@ namespace YZPortal.Api.Controllers.Dealers
             {
                 var query = CurrentContext.CurrentUserDealers;
 
-                return await CreateIndexResponseAsync<Dealer, Model>(
+                if (request.TokenSubClaim != Guid.Empty)
+                {
+					query = query.Join(
+						Database.Memberships.Where(m => m.User.TokenSubClaim == request.TokenSubClaim && m.Disabled == false),
+						d => d.Id, m => m.DealerId, (d, m) => d);
+				}
+
+				return await CreateIndexResponseAsync<Dealer, Model>(
                     request,
                     query,
                      x => x.Name.Contains(request.SearchString));

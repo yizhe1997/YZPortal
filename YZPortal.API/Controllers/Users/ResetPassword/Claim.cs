@@ -41,7 +41,7 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
                 var passwordReset = await Database.UserPasswordResets.FirstOrDefaultAsync(pr => pr.Token == request.Token && pr.ClaimedDateTime == null && pr.ValidUntilDateTime > DateTime.UtcNow);
                 if (passwordReset == null) throw new RestException(HttpStatusCode.NotFound, "Password reset request not found or expired.");
 
-                var user = await Database.Users.FirstOrDefaultAsync(u => u.Id == passwordReset.User.Id);
+                var user = await Database.Users.FirstOrDefaultAsync(u => u.Id == passwordReset.UserId);
                 if (user == null) throw new RestException(HttpStatusCode.NotFound, "User not found.");
 
                 if (user.SecurityStamp == null)

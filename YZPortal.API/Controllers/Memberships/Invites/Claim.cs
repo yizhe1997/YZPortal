@@ -38,9 +38,7 @@ namespace YZPortal.API.Controllers.Memberships.Invites
             {
                 #region User
 
-                var invite = await Database.MembershipInvites
-                    .Include(i => i.Dealer)
-                    .FirstOrDefaultAsync(i => i.Token == request.Token);
+                var invite = await Database.MembershipInvites.FirstOrDefaultAsync(i => i.Token == request.Token);
                 if (invite == null) throw new RestException(HttpStatusCode.NotFound, "Invite not found.");
 
                 var user = await UserManager.FindByEmailAsync(invite.Email);
@@ -78,10 +76,7 @@ namespace YZPortal.API.Controllers.Memberships.Invites
                 var invites = new List<MembershipInvite>();
                 if (request.ClaimAllInvites)
                 {
-                    invites = await Database.MembershipInvites
-					.Include(i => i.Dealer)
-					.Where(i => i.Email == invite.Email)
-					.ToListAsync();
+                    invites = await Database.MembershipInvites.Where(i => i.Email == invite.Email).ToListAsync();
 				}
                 else
                 {
@@ -96,7 +91,7 @@ namespace YZPortal.API.Controllers.Memberships.Invites
                     foreach (var inv in invites)
                     {
                         // Create membership
-                        var membership = new Membership { Dealer = inv.Dealer, User = user };
+                        var membership = new Membership { DealerId = inv.DealerId, UserId = user.Id };
 
                         // Update membership roles and content access levels
                         membership.UpdateRolesAndContentAccessLevels(Database, inv.UserRole, inv.UserContentAccessLevels.UnfoldBitmask<ContentAccessLevelNames>());
