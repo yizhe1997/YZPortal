@@ -17,7 +17,6 @@ namespace YZPortal.API.Controllers.Memberships
     {
         public class Request : IRequest<Model>
         {
-            public string? Email { get; set; }
             public string? Name { get; set; }
             public string? CallbackUrl { get; set; } = "{0}";
             public int Role { get; set; }
@@ -28,7 +27,6 @@ namespace YZPortal.API.Controllers.Memberships
 		{
 			public Validator()
 			{
-				RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress();
 				RuleFor(x => x.Name).NotNull().NotEmpty();
 				RuleFor(x => x.Role).NotNull().NotEmpty();
 				var dealerRoles = typeof(DealerRoleNames).GetEnumDataTypeValues();
@@ -47,15 +45,12 @@ namespace YZPortal.API.Controllers.Memberships
             {
 				MembershipInvite? invite = null;
 
-				// Truncate Emails with whitespace
-				request.Email = request.Email.Trim();
-
-				var user = await Database.Users.Include(x => x.Memberships).FirstOrDefaultAsync(u => u.Email == request.Email);
+				var user = await Database.Users.Include(x => x.Memberships).FirstOrDefaultAsync(u => u.Email == CurrentContext.CurrentUser.Email);
 
 				// User already exists, just add to dealer and mark the invite as claimed
 				if (user != null)
 				{
-					var membership = await CurrentContext.CurrentDealerMemberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == request.Email);
+					var membership = await CurrentContext.CurrentDealerMemberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == CurrentContext.CurrentUser.Email);
 
 					invite = Mapper.Map<MembershipInvite>(request);
 
@@ -68,7 +63,7 @@ namespace YZPortal.API.Controllers.Memberships
 
 						// Create membership notification
 						MembershipNotification membershipNotification = new MembershipNotification();
-						membershipNotification.Email = request.Email;
+						membershipNotification.Email = CurrentContext.CurrentUser.Email;
 						membershipNotification.MembershipId = membership.Id;
 						Database.MembershipNotifications.Add(membershipNotification);
 
@@ -82,7 +77,7 @@ namespace YZPortal.API.Controllers.Memberships
 				else
 				{
 					// For new user added from dealer portal and without membership
-					invite = await CurrentContext.CurrentDealerInvites.FirstOrDefaultAsync(i => i.Email == request.Email);
+					invite = await CurrentContext.CurrentDealerInvites.FirstOrDefaultAsync(i => i.Email == CurrentContext.CurrentUser.Email);
 
 					if (invite == null)
 					{

@@ -1,6 +1,6 @@
 ﻿namespace YZPortal.Worker.Infrastructure.ScheduledTasks
 {
-    public abstract class BackgroundService : IHostedService
+    public abstract class HostedService : IHostedService
     {
         private Task ExecutingTask;
 

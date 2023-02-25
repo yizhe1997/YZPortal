@@ -25,7 +25,7 @@ namespace YZPortal.Api.Controllers.Memberships
             return await _mediator.Send(request);
         }
 
-        [HttpPost("Invite")]
+        [HttpPost]
         public async Task<ActionResult<Create.Model>> CreateMembership([FromBody] Create.Request request) =>
             await _mediator.Send(request);
 

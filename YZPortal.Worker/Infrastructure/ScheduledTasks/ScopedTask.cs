@@ -1,6 +1,6 @@
 ﻿namespace YZPortal.Worker.Infrastructure.ScheduledTasks
 {
-    public abstract class ScopedTask : BackgroundService
+    public abstract class ScopedTask : HostedService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
 

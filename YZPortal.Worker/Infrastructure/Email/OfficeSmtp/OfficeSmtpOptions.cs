@@ -1,4 +1,4 @@
-﻿namespace YZPortal.Worker.Infrastructure.OfficeSmtp
+﻿namespace YZPortal.Worker.Infrastructure.Email.OfficeSmtp
 {
     public class OfficeSmtpOptions
     {

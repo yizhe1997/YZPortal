@@ -33,7 +33,7 @@ var logger = new LoggerConfiguration()
 					   .Enrich.FromLogContext()
 					   .CreateLogger();
 
-#region Adding services to container
+#region Add services to container
 
 // Serilog
 builder.Host.UseSerilog(logger);
@@ -137,19 +137,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-#region WebApp scoped services
-
-// Scoped services
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    // Database Service
-    services.UseDatabaseService();
-}
-
-#endregion
-
 #region WebApp MiddleWare
 
 // Configure the HTTP request pipeline.
@@ -169,6 +156,8 @@ app.UseCors(x => x
     .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
+
+app.UseDatabaseService();
 
 app.UseRouting();
 

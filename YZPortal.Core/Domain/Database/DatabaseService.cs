@@ -98,7 +98,7 @@ namespace YZPortal.Core.Domain.Database
                 }
             }
 
-            var ContentAccessLevelTypes = typeof(DealerRoleNames).GetEnumDataTypeValues();
+            var ContentAccessLevelTypes = typeof(ContentAccessLevelNames).GetEnumDataTypeValues();
 
             foreach (var type in ContentAccessLevelTypes)
             {

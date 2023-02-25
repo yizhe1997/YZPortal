@@ -1,4 +1,6 @@
-﻿namespace YZPortal.Worker.Infrastructure.ScheduledTasks
+﻿using YZPortal.Worker.Tasks.Sync.Users;
+
+namespace YZPortal.Worker.Infrastructure.ScheduledTasks
 {
     public static class StartupExtensions
     {
@@ -16,7 +18,7 @@
             //services.AddSingleton<IHostedService, SyncClassifiersTask>();
             //services.AddSingleton<IHostedService, SyncDealersTask>();
             //services.AddSingleton<IHostedService, SyncDevicesTask>();
-            //services.AddSingleton<IHostedService, SyncAdminInitializer>();
+            services.AddSingleton<IHostedService, SyncAdminInitializer>();
 
             //// BYOD
             //services.AddSingleton<IHostedService, Tasks.Sync.BYOD.SyncUsersTask>();
