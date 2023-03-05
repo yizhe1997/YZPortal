@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using YZPortal.API.Controllers.Memberships;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Memberships;
@@ -10,7 +11,7 @@ using YZPortal.Core.Error;
 using YZPortal.Core.Extensions;
 using static YZPortal.Core.Attributes.Attribute;
 
-namespace YZPortal.API.Controllers.Memberships.Invites
+namespace YZPortal.API.Controllers.Dealers.DealerInvites
 {
     public class Create
     {
@@ -28,12 +29,11 @@ namespace YZPortal.API.Controllers.Memberships.Invites
         {
             public Validator()
             {
-				RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress();
+                RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress();
                 RuleFor(x => x.Name).NotNull().NotEmpty();
-                RuleFor(x => x.Role).NotNull().NotEmpty();
-				var dealerRoles = typeof(DealerRoleNames).GetEnumDataTypeValues();
-				RuleFor(x => x.Role).NotEmpty().GreaterThan(dealerRoles.Min()).LessThanOrEqualTo(dealerRoles.Max());
-			}
+                var dealerRoles = typeof(DealerRoleNames).GetEnumDataTypeValues();
+                RuleFor(x => x.Role).NotNull().NotEmpty().GreaterThan(dealerRoles.Min()).LessThanOrEqualTo(dealerRoles.Max());
+            }
         }
 
         public class Model : InviteViewModel
@@ -47,7 +47,7 @@ namespace YZPortal.API.Controllers.Memberships.Invites
             }
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
-                MembershipInvite? invite = null;
+                DealerInvite? invite = null;
 
                 var user = await Database.Users.Include(x => x.Memberships).FirstOrDefaultAsync(u => u.Email == request.Email);
 
@@ -56,12 +56,12 @@ namespace YZPortal.API.Controllers.Memberships.Invites
                 {
                     var membership = await CurrentContext.CurrentDealerMemberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == request.Email);
 
-                    invite = Mapper.Map<MembershipInvite>(request);
+                    invite = Mapper.Map<DealerInvite>(request);
 
                     if (membership == null && user.EmailConfirmed)
                     {
                         // Create new membership and track
-                        membership = new Membership { DealerId = CurrentContext.CurrentDealerId, UserId = user.Id , Id = new Guid()};
+                        membership = new Membership { DealerId = CurrentContext.CurrentDealerId, UserId = user.Id, Id = Guid.NewGuid() };
                         membership.UpdateRolesAndContentAccessLevels(Database, request.Role, request.ContentAccessLevels);
                         Database.Memberships.Add(membership);
 
@@ -85,12 +85,12 @@ namespace YZPortal.API.Controllers.Memberships.Invites
 
                     if (invite == null)
                     {
-						invite = Mapper.Map<MembershipInvite>(request);
+                        invite = Mapper.Map<DealerInvite>(request);
                         invite.DealerId = CurrentContext.CurrentDealerId;
                         invite.CallbackUrl = string.Format(invite.CallbackUrl, invite.Token);
                         invite.UserRole = request.Role;
-                        invite.UserContentAccessLevels = request.ContentAccessLevels.Aggregate(0, (current, n) => current | (int)(ContentAccessLevelNames)n); 
-                        Database.MembershipInvites.Add(invite);
+                        invite.UserContentAccessLevels = request.ContentAccessLevels.Aggregate(0, (current, n) => current | (int)(ContentAccessLevelNames)n);
+                        Database.DealerInvites.Add(invite);
                     }
                     // If it hasn't been claimed sent the email again
                     else

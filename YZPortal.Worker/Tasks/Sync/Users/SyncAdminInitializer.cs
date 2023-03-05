@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Domain.Database.Memberships;
@@ -38,22 +39,17 @@ namespace YZPortal.Worker.Tasks.Sync.Users
                     throw new ArgumentException("Admin email/password cannot be null");
 
                 var Admin = userManager.FindByEmailAsync(options.AdminEmail).Result;
-                string contextToken = Guid.Empty.ToString();
-                var adminMembershipDealerGuids = await dbContext.Memberships.Where(x => x.UserId == Admin.Id && x.DealerId != Guid.Empty).Select(x => x.DealerId).ToListAsync(cancellationToken);
+                var dealerIds = Admin != null ? await dbContext.Dealers.Select(x => x.Id).ToListAsync() : new List<Guid>();
+                var adminMembershipDealerIds = dealerIds.Any() ? await dbContext.Memberships.Where(x => x.UserId == Admin.Id && x.DealerId != Guid.Empty).Select(x => x.DealerId).ToListAsync(cancellationToken) : new List<Guid>();
+                var adminMissingMembershipDealerIds = dealerIds.Any() ? dealerIds.Except(adminMembershipDealerIds) : new List<Guid>();
 
-                // Periodically check missing membership for admin
-                if (Admin != null && adminMembershipDealerGuids.Count != await dbContext.Dealers.CountAsync(cancellationToken))
+                if (adminMissingMembershipDealerIds.Any())
                 {
-                    var dealerGuids = await dbContext.Dealers.Select(x => x.Id).ToListAsync(cancellationToken);
-
-                    var missingAdminMembershipDealerGuids = dealerGuids.Where(d => !adminMembershipDealerGuids.Contains(d)).ToList();
-
-                    if (missingAdminMembershipDealerGuids.Any())
-                        foreach (var guid in missingAdminMembershipDealerGuids)
-                            dbContext.Memberships.Add(new Membership { DealerId = guid, UserId = Admin.Id, User = Admin});
-
-                    if ((missingAdminMembershipDealerGuids?.Count() ?? 0) + adminMembershipDealerGuids.Count() != dealerGuids.Count)
-                        logger.LogError("Mismatch between number of admin membership(s) and number of existing dealer(s)! Consider deleting admin membership(s) which are duplicate or do not have existing dealer.");
+                    var dealers = await dbContext.Dealers.Where(x => adminMissingMembershipDealerIds.Contains(x.Id)).ToListAsync();
+                    foreach (var dealer in dealers)
+                    {
+                        dbContext.Memberships.Add(new Membership { DealerId = dealer.Id, UserId = Admin.Id, User = Admin, Admin = true }); ;
+                    }
 
                     await dbContext.SaveChangesAsync();
                 }

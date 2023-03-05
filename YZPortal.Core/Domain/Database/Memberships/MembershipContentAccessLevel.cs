@@ -7,7 +7,7 @@ namespace YZPortal.Core.Domain.Database.Memberships
     {
         public ContentAccessLevel? ContentAccessLevel { get; set; }
 		[Required]
-		public Guid ContentAccessLevelpId { get; set; }
+		public Guid ContentAccessLevelId { get; set; }
 		public Membership? Membership { get; set; }
 		[Required]
 		public Guid MembershipId { get; set; }

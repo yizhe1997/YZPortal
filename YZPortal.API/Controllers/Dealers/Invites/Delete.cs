@@ -6,7 +6,7 @@ using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Error;
 
-namespace YZPortal.API.Controllers.Memberships.Invites
+namespace YZPortal.API.Controllers.Dealers.DealerInvites
 {
     public class Delete
     {
@@ -25,10 +25,10 @@ namespace YZPortal.API.Controllers.Memberships.Invites
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
                 var invite = await CurrentContext.CurrentDealerInvites.FirstOrDefaultAsync(dr => dr.Id == request.Id);
-                if (invite == null) 
+                if (invite == null)
                     throw new RestException(HttpStatusCode.NoContent, "Invite not found.");
 
-                Database.MembershipInvites.Remove(invite);
+                Database.DealerInvites.Remove(invite);
                 await Database.SaveChangesAsync();
 
                 return Mapper.Map<Model>(invite);

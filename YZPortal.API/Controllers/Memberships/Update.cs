@@ -20,7 +20,7 @@ namespace YZPortal.Api.Controllers.Memberships
             public List<int> ContentAccessLevels { get; set; } = new List<int>();
         }
 
-        public class Model : MembershipsViewModel
+        public class Model : MembershipViewModel
         {
         }
         public class CommandHandler : BaseRequestHandler<Request, Model>

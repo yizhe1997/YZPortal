@@ -2,7 +2,7 @@
 
 namespace YZPortal.Api.Controllers.Dealers
 {
-    public class DealersViewModel : AuditableViewModel
+    public class DealerViewModel : AuditableViewModel
     {
         public string? Name { get; set; }
     }

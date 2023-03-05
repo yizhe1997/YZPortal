@@ -15,7 +15,7 @@ namespace YZPortal.Api.Controllers.Memberships
             public Guid Id { get; set; }
         }
 
-        public class Model : MembershipsViewModel
+        public class Model : MembershipViewModel
         {
         }
 

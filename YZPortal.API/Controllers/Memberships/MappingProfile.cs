@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using YZPortal.Api.Controllers.ContentAccessLevels;
-using YZPortal.Api.Controllers.DealerRoles;
 using YZPortal.API.Controllers.Memberships;
+using YZPortal.API.Controllers.Memberships.ContentAccessLevels;
+using YZPortal.API.Controllers.Memberships.DealerRoles;
 using YZPortal.Core.Domain.Database.Memberships;
 
 namespace YZPortal.Api.Controllers.Memberships
@@ -20,17 +20,21 @@ namespace YZPortal.Api.Controllers.Memberships
             CreateMap<Membership, Delete.Model>();
 
             // Create Invite
-            CreateMap<Create.Request, MembershipInvite>();
-            CreateMap<MembershipInvite, Create.Model>();
+            CreateMap<Create.Request, DealerInvite>();
+            CreateMap<DealerInvite, Create.Model>();
 
             // Update
             CreateMap<Membership, Update.Model>();
 
             // Etc
-            CreateMap<MembershipDealerRole, DealerRolesViewModel>();
-            CreateMap<DealerRole, DealerRolesViewModel>();
-            CreateMap<MembershipContentAccessLevel, ContentAccessLevelsViewModel>();
-            CreateMap<ContentAccessLevel, ContentAccessLevelsViewModel>();
+            CreateMap<MembershipDealerRole, MembershipDealerRoleViewModel>();
+            CreateMap<DealerRole, DealerRoleViewModel>()
+                .ForMember(c => c.Name, opt => opt.MapFrom(src => ((DealerRoleNames)src.Name).ToString()))
+                .ForMember(c => c.Code, opt => opt.MapFrom(src => src.Name));
+            CreateMap<MembershipContentAccessLevel, MembershipContentAccessLevelViewModel>();
+            CreateMap<ContentAccessLevel, ContentAccessLevelViewModel>()
+                .ForMember(c => c.Name, opt => opt.MapFrom(src => ((ContentAccessLevelNames)src.Name).ToString()))
+                .ForMember(c => c.Code, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

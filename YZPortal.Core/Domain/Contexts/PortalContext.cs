@@ -35,12 +35,10 @@ namespace YZPortal.Core.Domain.Contexts
 
         #region Memberships
 
-        public DbSet<DealerRole> DealerRoles { get; set; }
         public DbSet<ContentAccessLevel> ContentAccessLevels { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<MembershipDealerRole> MembershipDealerRoles { get; set; }
         public DbSet<MembershipContentAccessLevel> MembershipContentAccessLevels { get; set; }
-        public DbSet<MembershipInvite> MembershipInvites { get; set; }
         public DbSet<MembershipNotification> MembershipNotifications { get; set; }
 
         #endregion
@@ -48,6 +46,8 @@ namespace YZPortal.Core.Domain.Contexts
         #region Dealers
 
         public DbSet<Dealer> Dealers { get; set; }
+        public DbSet<DealerInvite> DealerInvites { get; set; }
+        public DbSet<DealerRole> DealerRoles { get; set; }
 
         #endregion
 
@@ -121,11 +121,11 @@ namespace YZPortal.Core.Domain.Contexts
             #region Membership Access Level
 
             builder.Entity<MembershipContentAccessLevel>()
-                .HasKey(bc => new { bc.ContentAccessLevelpId, bc.MembershipId });
+                .HasKey(bc => new { bc.ContentAccessLevelId, bc.MembershipId });
             builder.Entity<MembershipContentAccessLevel>()
                 .HasOne(bc => bc.ContentAccessLevel)
                 .WithMany(b => b.MembershipContentAccessLevels)
-                .HasForeignKey(bc => bc.ContentAccessLevelpId);
+                .HasForeignKey(bc => bc.ContentAccessLevelId);
             builder.Entity<MembershipContentAccessLevel>()
                 .HasOne(bc => bc.Membership)
                 .WithMany(c => c.MembershipContentAccessLevels)

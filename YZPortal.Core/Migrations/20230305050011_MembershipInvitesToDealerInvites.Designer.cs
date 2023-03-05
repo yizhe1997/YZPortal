@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YZPortal.Core.Domain.Contexts;
 
@@ -11,9 +12,11 @@ using YZPortal.Core.Domain.Contexts;
 namespace YZPortal.Core.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    partial class PortalContextModelSnapshot : ModelSnapshot
+    [Migration("20230305050011_MembershipInvitesToDealerInvites")]
+    partial class MembershipInvitesToDealerInvites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -400,7 +403,7 @@ namespace YZPortal.Core.Migrations
 
             modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.MembershipContentAccessLevel", b =>
                 {
-                    b.Property<Guid>("ContentAccessLevelId")
+                    b.Property<Guid>("ContentAccessLevelpId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("MembershipId")
@@ -431,7 +434,7 @@ namespace YZPortal.Core.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getutcdate()");
 
-                    b.HasKey("ContentAccessLevelId", "MembershipId");
+                    b.HasKey("ContentAccessLevelpId", "MembershipId");
 
                     b.HasIndex("MembershipId");
 
@@ -821,7 +824,7 @@ namespace YZPortal.Core.Migrations
                 {
                     b.HasOne("YZPortal.Core.Domain.Database.Memberships.ContentAccessLevel", "ContentAccessLevel")
                         .WithMany("MembershipContentAccessLevels")
-                        .HasForeignKey("ContentAccessLevelId")
+                        .HasForeignKey("ContentAccessLevelpId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

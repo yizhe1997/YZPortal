@@ -14,16 +14,7 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
     {
         public class Request : IRequest<Model>
         {
-            public string? Email { get; set; }
             public string CallbackUrl { get; set; } = "{0}";
-        }
-
-        public class Validator : AbstractValidator<Request>
-        {
-            public Validator()
-            {
-                RuleFor(c => c.Email).NotNull().NotEmpty().EmailAddress();
-            }
         }
 
         public class Model
@@ -43,10 +34,10 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
                 // Reset password only for users added in backend directory and not other parties
-                var user = await Database.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+                var user = await Database.Users.FirstOrDefaultAsync(u => u.Email == CurrentContext.CurrentUser.Email);
                 if (user == null) throw new RestException(HttpStatusCode.NotFound, "User not found.");
 
-                var passwordReset = new UserPasswordReset { Id = Guid.NewGuid(), Email = request.Email, UserId = user.Id, ValidUntilDateTime = DateTime.UtcNow + TimeSpan.FromDays(3), CallbackUrl = request.CallbackUrl };
+                var passwordReset = new UserPasswordReset { Id = Guid.NewGuid(), Email = CurrentContext.CurrentUser.Email, UserId = user.Id, ValidUntilDateTime = DateTime.UtcNow + TimeSpan.FromDays(3), CallbackUrl = request.CallbackUrl };
                 passwordReset.CallbackUrl = string.Format(passwordReset.CallbackUrl, passwordReset.Token);
 
                 Database.UserPasswordResets.Add(passwordReset);

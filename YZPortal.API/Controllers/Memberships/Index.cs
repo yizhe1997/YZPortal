@@ -11,7 +11,7 @@ namespace YZPortal.Api.Controllers.Memberships
         public class Request : SearchRequest<SearchResponse<Model>>
         {
         }
-        public class Model : MembershipsViewModel
+        public class Model : MembershipViewModel
         {
         }
         public class RequestHandler : SearchRequestHandler<Request, SearchResponse<Model>>

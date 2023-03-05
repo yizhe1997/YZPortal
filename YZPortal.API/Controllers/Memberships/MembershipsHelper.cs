@@ -101,7 +101,7 @@ namespace YZPortal.API.Controllers.Memberships
                 var accessLevel = database.ContentAccessLevels.FirstOrDefault(x => x.Name == userAccess);
 
                 if (accessLevel != null)
-                    membership.MembershipContentAccessLevels.Add(new MembershipContentAccessLevel { ContentAccessLevelpId = accessLevel.Id });
+                    membership.MembershipContentAccessLevels.Add(new MembershipContentAccessLevel { ContentAccessLevelId = accessLevel.Id });
             }
         }
     }

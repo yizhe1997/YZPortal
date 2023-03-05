@@ -15,7 +15,7 @@ namespace YZPortal.Api.Controllers.Dealers
             public string? Name { get; set; }
         }
 
-        public class Model : DealersViewModel
+        public class Model : DealerViewModel
         {
         }
 

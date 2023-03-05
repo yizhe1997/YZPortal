@@ -18,7 +18,6 @@ namespace YZPortal.Core.Domain.Database.Memberships
 		// User admin and membership admin is different!
 		public bool Admin { get; set; } = false;
         public bool Disabled { get; set; } = false;
-        public List<MembershipInvite> MembershipInvites { get; set; } = new List<MembershipInvite>();
         public List<MembershipContentAccessLevel> MembershipContentAccessLevels { get; set; } = new List<MembershipContentAccessLevel>();
         public MembershipDealerRole? MembershipDealerRole { get; set; }
     }

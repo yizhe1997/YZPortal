@@ -1,17 +1,18 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using YZPortal.API.Controllers.Memberships;
 using YZPortal.API.Infrastructure.Mediatr;
-using YZPortal.API.Infrastructure.Security.Jwt;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.Core.Error;
 using YZPortal.Core.Extensions;
 
-namespace YZPortal.API.Controllers.Memberships.Invites
+namespace YZPortal.API.Controllers.Dealers.DealerInvites
 {
     public class Claim
     {
@@ -20,12 +21,23 @@ namespace YZPortal.API.Controllers.Memberships.Invites
             public Guid Token { get; set; }
             public string? Password { get; set; }
             public bool IsExternalIdentity { get; set; }
-            public int IdentityProvider { get; set; } // fluent validate it to be within range
+            public int IdentityProvider { get; set; }
             public bool ClaimAllInvites { get; set; }
         }
+
+        public class Validator : AbstractValidator<Request>
+        {
+            public Validator()
+            {
+                var identityProviders = typeof(IdentityProviderNames).GetEnumDataTypeValues();
+                RuleFor(x => x.IdentityProvider).NotNull().NotEmpty().GreaterThan(identityProviders.Min()).LessThanOrEqualTo(identityProviders.Max());
+            }
+        }
+
         public class Model
         {
         }
+
         public class RequestHandler : BaseRequestHandler<Request, Model>
         {
             UserManager<User> UserManager { get; }
@@ -38,7 +50,7 @@ namespace YZPortal.API.Controllers.Memberships.Invites
             {
                 #region User
 
-                var invite = await Database.MembershipInvites.FirstOrDefaultAsync(i => i.Token == request.Token);
+                var invite = await Database.DealerInvites.FirstOrDefaultAsync(i => i.Token == request.Token);
                 if (invite == null) throw new RestException(HttpStatusCode.NotFound, "Invite not found.");
 
                 var user = await UserManager.FindByEmailAsync(invite.Email);
@@ -73,19 +85,19 @@ namespace YZPortal.API.Controllers.Memberships.Invites
 
                 #region Membership
 
-                var invites = new List<MembershipInvite>();
+                var invites = new List<DealerInvite>();
                 if (request.ClaimAllInvites)
                 {
-                    invites = await Database.MembershipInvites.Where(i => i.Email == invite.Email).ToListAsync();
-				}
+                    invites = await Database.DealerInvites.Where(i => i.Email == invite.Email).ToListAsync();
+                }
                 else
                 {
                     var inv = await CurrentContext.CurrentDealerInvites.FirstOrDefaultAsync(i => i.Email == invite.Email);
-					if (inv != null)
-						invites.Add(inv);
-				}
+                    if (inv != null)
+                        invites.Add(inv);
+                }
 
-				var checkMembership = await Database.Memberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == user.Email);
+                var checkMembership = await Database.Memberships.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.User.Email == user.Email);
                 if (checkMembership == null)
                 {
                     foreach (var inv in invites)
@@ -107,7 +119,7 @@ namespace YZPortal.API.Controllers.Memberships.Invites
 
                 #endregion
 
-                return new Model {};
+                return new Model { };
             }
         }
     }

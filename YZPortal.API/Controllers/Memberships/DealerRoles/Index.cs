@@ -4,7 +4,7 @@ using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Memberships;
 
-namespace YZPortal.Api.Controllers.DealerRoles
+namespace YZPortal.API.Controllers.Memberships.DealerRoles
 {
     public class Index
     {
@@ -12,7 +12,7 @@ namespace YZPortal.Api.Controllers.DealerRoles
         {
         }
 
-        public class Model : DealerRolesViewModel
+        public class Model : DealerRoleViewModel
         {
         }
 

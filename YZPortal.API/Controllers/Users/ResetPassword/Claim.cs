@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,14 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
         {
             public Guid Token { get; set; }
             public string? Password { get; set; }
+        }
+
+        public class Validator : AbstractValidator<Request>
+        {
+            public Validator()
+            {
+                RuleFor(x => x.Password).NotNull().NotEmpty();
+            }
         }
 
         public class Model

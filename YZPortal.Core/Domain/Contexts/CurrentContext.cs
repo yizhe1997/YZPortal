@@ -45,7 +45,7 @@ namespace YZPortal.Core.Domain.Contexts
             .ThenInclude(m => m.ContentAccessLevel)
             .FirstOrDefault(x => x.DealerId == CurrentDealerId && x.UserId == CurrentUserId)
             : null;
-        public IQueryable<MembershipInvite> CurrentDealerInvites => _dbContext.MembershipInvites.Where(i => i.DealerId == CurrentDealerId);
+        public IQueryable<DealerInvite> CurrentDealerInvites => _dbContext.DealerInvites.Where(i => i.DealerId == CurrentDealerId);
         public IQueryable<Membership> CurrentDealerMemberships => _dbContext.Memberships.Where(m => m.DealerId == CurrentDealerId);
 
         #endregion

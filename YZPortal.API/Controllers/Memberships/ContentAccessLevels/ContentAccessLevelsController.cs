@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using YZPortal.API.Controllers.ControllerTypes;
 using YZPortal.API.Controllers.Pagination;
 
-namespace YZPortal.Api.Controllers.ContentAccessLevels
+namespace YZPortal.API.Controllers.Memberships.ContentAccessLevels
 {
     public class ContentAccessLevelsController : ApiSecureController
     {
@@ -11,10 +11,10 @@ namespace YZPortal.Api.Controllers.ContentAccessLevels
         {
         }
 
-		/// <summary>
-		///     Returns a list of plausible content access level for membership.
-		/// </summary>
-		[HttpGet]
+        /// <summary>
+        ///     Returns a list of plausible content access level for membership.
+        /// </summary>
+        [HttpGet]
         public async Task<ActionResult<SearchResponse<Index.Model>>> GetContentAccessLevels([FromQuery] Index.Request request) =>
             await _mediator.Send(request);
     }
