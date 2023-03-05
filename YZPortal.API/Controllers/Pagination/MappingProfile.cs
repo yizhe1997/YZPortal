@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using YZPortal.API.Infrastructure.Mediatr;
 
 namespace YZPortal.API.Controllers.Pagination
 {

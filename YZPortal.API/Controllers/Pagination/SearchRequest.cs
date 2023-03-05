@@ -1,4 +1,4 @@
-﻿namespace YZPortal.API.Infrastructure.Mediatr
+﻿namespace YZPortal.API.Controllers.Pagination
 {
     public abstract class SearchRequest<T> : PagedRequest<T>
     {

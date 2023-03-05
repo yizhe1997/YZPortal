@@ -41,15 +41,15 @@ namespace YZPortal.API.Infrastructure.Swagger
                     opts.SwaggerDoc(description.GroupName, new OpenApiInfo
                     {
                         Title = $"A365 DealerPortal API {description.ApiVersion}",
-                        Description = description.IsDeprecated ? $"A365 DealerPortal API {description.ApiVersion} - DEPRECATED" : $"A365 DealerPortal API",
+                        Description = description.IsDeprecated ? $"YZPortal API {description.ApiVersion} - DEPRECATED" : $"A365 DealerPortal API",
                         Version = description.ApiVersion.ToString()
                     });
                     opts.DocInclusionPredicate((version, apiDescription) => true);
                 }
 
-                #region AddSecurityDefinition
+				#region Add Security Definition
 
-                opts.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+				opts.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
                 {
                     Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",
@@ -77,7 +77,7 @@ namespace YZPortal.API.Infrastructure.Swagger
                                 {
                                     {
                                         azureAdSwaggerOptions.Scope,
-                                        "Provides authorization token for Dealer Portal WebAPI"
+                                        "Provides authorization token for YZPortal API"
                                     }
                                 }
                             }
@@ -111,9 +111,11 @@ namespace YZPortal.API.Infrastructure.Swagger
                     });
                 }
 
-                #endregion
+				#endregion
 
-                var openApiSecurityRequirement = new OpenApiSecurityRequirement()
+				#region Add Security Requirements
+
+				var openApiSecurityRequirement = new OpenApiSecurityRequirement()
                 {
                     {
                         new OpenApiSecurityScheme {
@@ -163,14 +165,22 @@ namespace YZPortal.API.Infrastructure.Swagger
 
                 opts.AddSecurityRequirement(openApiSecurityRequirement);
 
-                opts.CustomSchemaIds(s => s.FullName.Replace("+", "."));
+				#endregion
+
+				opts.CustomSchemaIds(s => s.FullName.Replace("+", "."));
                 opts.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                 opts.DescribeAllParametersInCamelCase();
 
                 opts.OperationFilter<SecurityRequirementsOperationFilter>(configuration);
-                //opts.AddFluentValidationRules();
-                //opts.IncludeXmlComments(xmlPath);
-            });
+
+				#region Swagger XML documentation file
+
+				// Ref: https://learn.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-7.0&tabs=visual-studio
+				var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+				opts.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+				#endregion
+			});
 
             return services;
         }

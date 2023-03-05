@@ -14,7 +14,7 @@ namespace YZPortal.API.Controllers.Users.AuthorizeAzureAd
 		public class Request : IRequest<Model>
 		{
 			public Guid DealerId { get; set; }
-			public Guid TokenSubClaim { get; set; }
+			public Guid TokenSubClaim { get; set; } // maybe try get from claim instead of asking for it
 		}
 
 		public class Validator : AbstractValidator<Request>

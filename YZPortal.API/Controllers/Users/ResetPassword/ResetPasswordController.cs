@@ -10,11 +10,17 @@ namespace YZPortal.API.Controllers.Users.ResetPassword
         {
         }
 
-        [HttpPost]
+		/// <summary>
+		///     Creates an emailable password reset item for a user
+		/// </summary>
+		[HttpPost]
         public async Task<ActionResult<Create.Model>> PostResetPassword([FromBody] Create.Request request) =>
             await _mediator.Send(request);
 
-        [HttpPost("claim")]
+		/// <summary>
+		///     Claim the password reset item emailed to a user.
+		/// </summary>
+		[HttpPost("claim")]
         public async Task<ActionResult<Claim.Model>> ClaimResetPassword([FromBody] Claim.Request request) =>
             await _mediator.Send(request);
     }

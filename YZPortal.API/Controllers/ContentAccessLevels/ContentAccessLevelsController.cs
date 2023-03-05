@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using YZPortal.API.Controllers.ControllerTypes;
-using YZPortal.API.Infrastructure.Mediatr;
+using YZPortal.API.Controllers.Pagination;
 
 namespace YZPortal.Api.Controllers.ContentAccessLevels
 {
@@ -11,7 +11,10 @@ namespace YZPortal.Api.Controllers.ContentAccessLevels
         {
         }
 
-        [HttpGet]
+		/// <summary>
+		///     Returns a list of plausible content access level for membership.
+		/// </summary>
+		[HttpGet]
         public async Task<ActionResult<SearchResponse<Index.Model>>> GetContentAccessLevels([FromQuery] Index.Request request) =>
             await _mediator.Send(request);
     }

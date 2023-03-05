@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using Serilog;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using YZPortal.API.Infrastructure.AzureStorage;
-using YZPortal.API.Infrastructure.Mediatr;
+using YZPortal.API.Infrastructure.Mediatr.PipelineBehavior;
 using YZPortal.API.Infrastructure.Mvc;
 using YZPortal.API.Infrastructure.Security.Authentication;
 using YZPortal.API.Infrastructure.Security.Authorization;

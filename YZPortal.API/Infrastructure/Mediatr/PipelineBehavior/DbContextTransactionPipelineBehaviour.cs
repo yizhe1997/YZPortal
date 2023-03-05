@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using YZPortal.Core.Domain.Contexts;
 
-namespace YZPortal.API.Infrastructure.Mediatr
+namespace YZPortal.API.Infrastructure.Mediatr.PipelineBehavior
 {
     /// <summary>
     /// Adds transaction to the processing pipeline

@@ -1,7 +1,6 @@
 ﻿using MediatR;
-using YZPortal.API.Controllers.Pagination;
 
-namespace YZPortal.API.Infrastructure.Mediatr
+namespace YZPortal.API.Controllers.Pagination
 {
     public class PagedRequest<T> : IPaginationParams, IRequest<T>
     {

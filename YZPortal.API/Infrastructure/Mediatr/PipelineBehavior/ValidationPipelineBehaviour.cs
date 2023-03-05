@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 
-namespace YZPortal.API.Infrastructure.Mediatr
+namespace YZPortal.API.Infrastructure.Mediatr.PipelineBehavior
 {
     public class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
