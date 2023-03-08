@@ -3,9 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-# Untrack appsettings.json ref: https://stackoverflow.com/questions/45400361/why-is-gitignore-not-ignoring-my-files
-appsettings.json
-
 # User-specific files
 *.rsuser
 *.suo
