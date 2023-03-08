@@ -36,17 +36,15 @@ namespace YZPortal.Core.Domain.Contexts
         #region Current Dealer Context
 
         public Guid CurrentDealerId => Claims != null ? Guid.TryParse(Claims.FirstOrDefault(x => x.Type == "dealerId")?.Value, out Guid result) ? result : Guid.Empty : Guid.Empty;
-        public Dealer? CurrentDealer => CurrentDealerId != Guid.Empty ? _dbContext?.Dealers.FirstOrDefault(u => u.Id == CurrentDealerId) : null;
-        public Membership? UserDealerMembership => CurrentUserId != Guid.Empty ? _dbContext?.Memberships.Include(x => x.User)
+        public Dealer? CurrentDealer => CurrentDealerId != Guid.Empty ? _dbContext.Dealers.FirstOrDefault(u => u.Id == CurrentDealerId) : null;
+        public IQueryable<DealerInvite> CurrentDealerInvites => _dbContext.DealerInvites.Where(i => i.DealerId == CurrentDealerId);
+        public IQueryable<Membership> CurrentDealerMemberships => _dbContext.Memberships
+            .Include(x => x.User)
             .Include(x => x.Dealer)
             .Include(x => x.MembershipDealerRole)
             .ThenInclude(x => x.DealerRole)
             .Include(m => m.MembershipContentAccessLevels)
-            .ThenInclude(m => m.ContentAccessLevel)
-            .FirstOrDefault(x => x.DealerId == CurrentDealerId && x.UserId == CurrentUserId)
-            : null;
-        public IQueryable<DealerInvite> CurrentDealerInvites => _dbContext.DealerInvites.Where(i => i.DealerId == CurrentDealerId);
-        public IQueryable<Membership> CurrentDealerMemberships => _dbContext.Memberships.Where(m => m.DealerId == CurrentDealerId);
+            .ThenInclude(m => m.ContentAccessLevel).Where(m => m.DealerId == CurrentDealerId);
 
         #endregion
     }

@@ -30,11 +30,7 @@ namespace YZPortal.Api.Controllers.Memberships
             }
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
-                var membership = await CurrentContext.CurrentDealerMemberships
-                    .Include(x => x.MembershipDealerRole)
-                    .Include(x => x.MembershipContentAccessLevels)
-                    .FirstOrDefaultAsync(m => m.Id == request.Id);
-
+                var membership = await CurrentContext.CurrentDealerMemberships.FirstOrDefaultAsync(m => m.Id == request.Id);
                 if (membership == null) throw new RestException(HttpStatusCode.NotFound);
 
                 membership.UpdateRolesAndContentAccessLevels(Database, request.Role, request.ContentAccessLevels);

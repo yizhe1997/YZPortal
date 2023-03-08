@@ -51,4 +51,8 @@
 		<ProjectReference Include="..\YZPortal.Core\YZPortal.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Controllers\Dealers\Orders\" />
+	</ItemGroup>
+
 </Project>
