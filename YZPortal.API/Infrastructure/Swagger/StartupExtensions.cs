@@ -40,8 +40,8 @@ namespace YZPortal.API.Infrastructure.Swagger
 
                     opts.SwaggerDoc(description.GroupName, new OpenApiInfo
                     {
-                        Title = $"A365 DealerPortal API {description.ApiVersion}",
-                        Description = description.IsDeprecated ? $"YZPortal API {description.ApiVersion} - DEPRECATED" : $"A365 DealerPortal API",
+                        Title = $"YZ Portal API {description.ApiVersion}",
+                        Description = description.IsDeprecated ? $"YZPortal API {description.ApiVersion} - DEPRECATED" : $"YZ Portal API",
                         Version = description.ApiVersion.ToString()
                     });
                     opts.DocInclusionPredicate((version, apiDescription) => true);
