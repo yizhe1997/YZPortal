@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 using Newtonsoft.Json;
 using Serilog;
 using SixLabors.ImageSharp.Web.DependencyInjection;
@@ -32,6 +33,10 @@ var logger = new LoggerConfiguration()
 					   .ReadFrom.Configuration(builder.Configuration)
 					   .Enrich.FromLogContext()
 					   .CreateLogger();
+
+// Ref: https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/PII
+// https://stackoverflow.com/questions/54435551/invalidoperationexception-idx20803-unable-to-obtain-configuration-from-pii
+IdentityModelEventSource.ShowPII = true;
 
 #region Add services to container
 
