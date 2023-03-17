@@ -29,16 +29,29 @@ using YZPortal.Core.StorageConnection;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+// Ref: https://www.codeproject.com/Articles/5344667/Logging-with-Serilog-in-ASP-NET-Core-Web-API#:~:text=Create%20ASP.NET%20Core%20Web%20API%20Project&text=Choose%20.,then%20choose%20to%20install%20Serilog.
 var logger = new LoggerConfiguration()
 					   .ReadFrom.Configuration(builder.Configuration)
 					   .Enrich.FromLogContext()
-					   .CreateLogger();
+                       .WriteTo.Console()
+                       .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 // Ref: https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/PII
 // https://stackoverflow.com/questions/54435551/invalidoperationexception-idx20803-unable-to-obtain-configuration-from-pii
 IdentityModelEventSource.ShowPII = true;
 
 #region Add services to container
+
+// The ConfigureServices method is used to configure the application's services,
+// which are components that can be used throughout the application to provide functionality.
+// In this method, you can register and configure services such as databases, authentication,
+// authorization, logging, and more. These services are typically registered with the dependency injection (DI) container,
+// which makes them available to other parts of the application.
+
+logger.Information("Configuring and registering services to DI container...");
 
 // Serilog
 builder.Host.UseSerilog(logger);
@@ -144,16 +157,19 @@ var app = builder.Build();
 
 #region WebApp MiddleWare
 
-// Configure the HTTP request pipeline.
+// The Configure method is used to configure the application's request pipeline,
+// which is the sequence of middleware components that process incoming HTTP requests
+// and generate outgoing responses. In this method, you can add middleware components
+// to the pipeline, such as authentication middleware, routing middleware, error handling middleware,
+// and more. Middleware components are executed in the order in which they are added to the pipeline.
+
+logger.Information("Configuring request pipeline via middleware...");
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
 app.ConfigureExceptionHandler();
-
-Log.Information("Initializing..."); // not sure why not working need to work on this
 
 app.UseSerilogRequestLogging();
 
