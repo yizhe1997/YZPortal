@@ -17,7 +17,7 @@ namespace YZPortal.Worker.Infrastructure.ScheduledTasks
             //services.AddSingleton<IHostedService, SendMembershipNotificationsTask>();
 
             // Start Sync Services in the background
-            //services.AddSingleton<IHostedService, SyncAdminInitializer>();
+            services.AddSingleton<IHostedService, SyncAdminInitializer>();
         }
     }
 }
