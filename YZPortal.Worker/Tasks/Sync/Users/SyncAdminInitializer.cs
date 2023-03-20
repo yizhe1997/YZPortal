@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Domain.Database.Memberships;

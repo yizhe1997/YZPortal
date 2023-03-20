@@ -2,10 +2,16 @@
 {
     public class EmailOptions
     {
-        public string WebServiceUrl { get; set; } = "http://example.com";
-        public string WebServiceSecret { get; set; }
-        public string Client { get; set; } = "WebService";
+        public int Client { get; set; } = (int)EmailClientNames.None;
         public int SendAttempts { get; set; } = 3;
         public TimeSpan AttemptInterval { get; set; } = TimeSpan.FromHours(1);
+    }
+
+    [Flags]
+    public enum EmailClientNames
+    {
+        None = 0,
+        SendGrid = 1,
+        OfficeSmtp = 2
     }
 }

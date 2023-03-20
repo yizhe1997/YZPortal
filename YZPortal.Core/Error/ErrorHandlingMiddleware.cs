@@ -9,11 +9,6 @@ namespace YZPortal.Core.Error
 {
     public static class ExceptionMiddlewareExtensions
     {
-        private static readonly string[] _ = new string[2] {
-                "An exception occured when invoking the operation - ",
-                "\"Message\":"
-            };
-
         /// <summary>
         ///     This middleware configures the execption handler to provide clean status and meaningful error msg 
         ///     for frontend UI as well as logging
@@ -57,28 +52,6 @@ namespace YZPortal.Core.Error
 
                             logger.LogError($"RestException thrown for method {methodPathString}.\r\nStatusCode:\r\n{(int)ex.Code}\r\nError message:\r\n{ex.Error}");
                         }
-                        //// FunctionApiException
-                        //else if (typeof(FunctionApiException) == contextFeature.Error.GetType() || typeof(FunctionApiException) == innerException?.GetType())
-                        //{
-                        //    var ex = innerException == null ? (FunctionApiException)contextFeature.Error : (FunctionApiException)innerException;
-                        //    context.Response.StatusCode = ex.Code == HttpStatusCode.NotFound || ex.Code == HttpStatusCode.NoContent ?
-                        //        context.Response.StatusCode :
-                        //        (int)ex.Code;
-
-                        //    var message = ex.Error;
-                        //    foreach (var str in _)
-                        //    {
-                        //        message = message.Replace(str, "");
-                        //    }
-
-                        //    await context.Response.WriteAsync(new ErrorDetails()
-                        //    {
-                        //        StatusCode = context.Response.StatusCode,
-                        //        Message = message
-                        //    }.ToString());
-
-                        //    logger.LogError($"FunctionApiException thrown for method {methodPathString}.\r\nStatusCode:\r\n{(int)ex.Code}\r\nError message:\r\n{ex.Error}");
-                        //}
                         else
                         {
                             await context.Response.WriteAsync(new ErrorDetails()

@@ -1,19 +1,25 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Serilog;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.Worker.Infrastructure.Email;
 using YZPortal.Worker.Infrastructure.Email.OfficeSmtp;
 using YZPortal.Worker.Infrastructure.Email.SendGrid;
-using YZPortal.Worker.Infrastructure.RazorLight;
 using YZPortal.Worker.Infrastructure.ScheduledTasks;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 #region Add services to the container.
+
+// The ConfigureServices method is used to configure the application's services,
+// which are components that can be used throughout the application to provide functionality.
+// In this method, you can register and configure services such as databases, authentication,
+// authorization, logging, and more. These services are typically registered with the dependency injection (DI) container,
+// which makes them available to other parts of the application.
+
+Log.Information("Configuring and registering services to DI container...");
 
 builder.Services.AddControllersWithViews();
 
@@ -26,7 +32,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies().Where(ass
 builder.Services.AddEmailNotifications(configuration);
 builder.Services.AddSendGridNotifications(configuration);
 builder.Services.AddOfficeSmtpNotifications(configuration);
-builder.Services.AddEmailTemplates();
 
 // EFCore
 var conn = configuration.GetConnectionString("Primary");
@@ -53,6 +58,16 @@ builder.Services.AddDatabaseService(configuration);
 
 var app = builder.Build();
 
+#region WebApp MiddleWare
+
+// The Configure method is used to configure the application's request pipeline,
+// which is the sequence of middleware components that process incoming HTTP requests
+// and generate outgoing responses. In this method, you can add middleware components
+// to the pipeline, such as authentication middleware, routing middleware, error handling middleware,
+// and more. Middleware components are executed in the order in which they are added to the pipeline.
+
+Log.Information("Configuring request pipeline via middleware...");
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -73,5 +88,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+#endregion
 
 app.Run();
