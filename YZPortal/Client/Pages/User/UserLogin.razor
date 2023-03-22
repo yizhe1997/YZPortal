@@ -1,0 +1,45 @@
+﻿@page "/user/login"
+@using YZPortal.Client.Models.Users;
+@inject HttpClient HttpClient
+@inject IJSRuntime jsr
+
+<h3>Login</h3>
+
+<EditForm Model="user" OnValidSubmit="OnValid" style="max-width:500px;">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div class="mb-2">
+		<InputText class="form-control" @bind-Value="user.Email" placeholder="Enter Email"></InputText>
+	</div>
+	<div class="mb-2">
+		<InputText type="password" class="form-control" @bind-Value="user.Password" placeholder="Enter Password"></InputText>
+	</div>
+	<div class="mb-2 text-right">
+		<button class="btn btn-secondary" disabled="@isDisabled">login</button>
+	</div>
+</EditForm>
+
+@code {
+	YZPortal.Client.Models.Users.UserLogin user = new YZPortal.Client.Models.Users.UserLogin();
+	string AuthToken = string.Empty;
+	bool isDisabled = false;
+
+	private async Task OnValid()
+	{
+		isDisabled = true;
+		using (var response = await HttpClient.PostAsJsonAsync<YZPortal.Client.Models.Users.UserLogin>("/api/v1/Authenticate", user, System.Threading.CancellationToken.None))
+		{
+			if (response.IsSuccessStatusCode)
+			{
+				UserLoginResult? userLoginResult = await response.Content.ReadFromJsonAsync<UserLoginResult>();
+				AuthToken = userLoginResult?.AuthToken ?? string.Empty;
+				isDisabled = false;
+
+				await jsr.InvokeVoidAsync("localStorage.setItem", "userAuthToken", AuthToken).ConfigureAwait(false);
+				// need to decipher he authtoken at this point....
+				await jsr.InvokeVoidAsync("localStorage.setItem", "userDisplayName", "testdisplayname").ConfigureAwait(false);
+				await jsr.InvokeVoidAsync("localStorage.setItem", "userEmail", user.Email).ConfigureAwait(false);
+			}
+		}
+	}
+}
