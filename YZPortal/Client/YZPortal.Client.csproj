@@ -1,18 +1,28 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>4c2d706c-b305-4826-b352-b02c988f726a</UserSecretsId>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.15" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.15" PrivateAssets="all" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Content Include="Clients\YZPortalApi\StartupExtensions.cs" />
+	  <Content Include="Clients\YZPortalApi\YZPortalApiHttpClient.cs" />
+	  <Content Include="Clients\YZPortalApi\YZPortalApiOptions.cs" />
+	  <Content Include="Services\LocalStorage\ILocalStorageService.cs" />
+	  <Content Include="Services\LocalStorage\LocalStorageService.cs" />
+	  <Content Include="Services\LocalStorage\StartupExtensions.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.15" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="3.1.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.15" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.15" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0-preview.2.23128.3" />
+	</ItemGroup>
 
 </Project>

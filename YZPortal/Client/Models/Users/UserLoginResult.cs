@@ -1,7 +1,9 @@
-﻿namespace YZPortal.Client.Models.Users
+﻿using YZPortal.Client.Models.Abstracts;
+
+namespace YZPortal.Client.Models.Users
 {
-    public class UserLoginResult
-    {
+    public class UserLoginResult : BaseResultModel
+	{
         public string? AuthToken { get; set; }
     }
 }

@@ -1,84 +1,48 @@
 ﻿@page "/fetchDealers"
+@using Microsoft.AspNetCore.Authorization;
+@using YZPortal.Client.Clients.YZPortalApi;
 @using YZPortal.Client.Models.Dealers;
-@using YZPortal.Client.Models.Users;
-@using YZPortal.Client.Pages.User
-
-@inject HttpClient Http
-@inject IJSRuntime jsr
+@inject YZPortalApiHttpClient YZPortalApiClient
+@attribute [Authorize]
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
-@if (string.IsNullOrEmpty(user.AuthToken))
+
+@if (Dealers == null)
 {
-	<UserComponent></UserComponent>
+	<p><em>Loading...</em></p>
 }
 else
 {
-	if (Dealers == null)
-	{
-		<p><em>Loading...</em></p>
-	}
-	else
-	{
-		<p><a href="javascript:;" @onclick="GetDealers">TODAY'S FORECAST</a></p>
-		<table class="table">
-			<thead>
+	<p><a href="javascript:;" @onclick="GetDealers">TODAY'S FORECAST</a></p>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>DueDate</th>
+				<th>Name</th>
+				<th>Description</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var Todo in Dealers.Results)
+			{
 				<tr>
-					<th>DueDate</th>
-					<th>Name</th>
-					<th>Description</th>
-					<th>Status</th>
+					<td>@Todo.Name</td>
 				</tr>
-			</thead>
-			<tbody>
-				@foreach (var Todo in Dealers.Results)
-				{
-					<tr>
-						<td>@Todo.Name</td>
-					</tr>
-				}
-			</tbody>
-		</table>
-	}
+			}
+		</tbody>
+	</table>
 }
 
 @code {
 
 	private Dealers? Dealers;
-	UserDetail user =  new UserDetail();
-
-	private async Task<string?> GetJWT()
-	{
-		user.AuthToken = await jsr.InvokeAsync<string>("localStorage.getItem", "userAuthToken").ConfigureAwait(false);
-		if (!string.IsNullOrWhiteSpace(user.AuthToken))
-		{
-			return user.AuthToken;
-		}
-		return null;
-	}
 
 	private async Task GetDealers()
 	{
-		try
-		{
-			var requestMsg = new HttpRequestMessage(HttpMethod.Get, $"/api/v1/Dealers");
-			requestMsg.Headers.Add("Authorization", "Bearer " + await GetJWT());
-			var response = await Http.SendAsync(requestMsg);
-			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-			{
-				await jsr.InvokeVoidAsync("localStorage.removeItem", "userAuthToken").ConfigureAwait(false);
-				user.AuthToken = null;
-			}
-			else if (response.IsSuccessStatusCode)
-			{
-				Dealers = await response.Content.ReadFromJsonAsync<Dealers>();
-			}
-		}
-		catch (Exception ex)
-		{
-
-		}
+		Dealers = await YZPortalApiClient.GetDealers();
 	}
 
 	protected override async Task OnInitializedAsync()

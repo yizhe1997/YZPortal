@@ -1,15 +1,16 @@
 ﻿@page "/user/logout"
-@inject IJSRuntime jsr
+@using YZPortal.Client.Clients.YZPortalApi;
 @inject NavigationManager nav
+@inject YZPortalApiHttpClient YZPortalApiClient
 
 @code {
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
-		await jsr.InvokeVoidAsync("localStorage.removeItem", "userAuthToken").ConfigureAwait(false);
-		await jsr.InvokeVoidAsync("localStorage.removeItem", "userEmail").ConfigureAwait(false);
-		await jsr.InvokeVoidAsync("localStorage.removeItem", "userDisplayName").ConfigureAwait(false);
+
+		await YZPortalApiClient.LogoutUser();
+
 		nav.NavigateTo("/");
 	}
 }

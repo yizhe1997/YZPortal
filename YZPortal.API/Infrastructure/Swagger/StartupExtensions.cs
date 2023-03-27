@@ -12,17 +12,14 @@ namespace YZPortal.API.Infrastructure.Swagger
 {
     public static class StartupExtensions
     {
-        public static void AddSwaggerOption(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.Configure<SwaggerOptions>(configuration.GetSection("Swagger"));
-        }
-
         public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services, IConfiguration configuration)
         {
-            //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+			services.Configure<SwaggerOptions>(configuration.GetSection("Swagger"));
 
-            services.AddSwaggerGen(opts =>
+			//var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+			//var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+			services.AddSwaggerGen(opts =>
             {
                 var swaggerOptions = configuration.GetSection("Swagger").Get<SwaggerOptions>() ?? new();
 

@@ -115,9 +115,6 @@ builder.Services.AddAzureAd(configuration);
 // AzureAdB2C            
 builder.Services.AddAzureAdB2C(configuration);
 
-// Swagger             
-builder.Services.AddSwaggerOption(configuration);
-
 // Authentication
 builder.Services.AddAuthentications(configuration);
 

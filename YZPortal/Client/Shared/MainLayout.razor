@@ -1,11 +1,30 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using YZPortal.Client.Models.Users;
+@using YZPortal.Client.Pages.User
+@using YZPortal.Client.Services.LocalStorage;
+@using YZPortal.Client.Clients.YZPortalApi;
+
+@inject YZPortalApiHttpClient YZPortalApiClient
+@inject ILocalStorageService localStorageService
+
+@inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
-
     <main>
+        <AuthorizeView>
+            <Authorized>
+                <text>Hello, @context.User.Identity.Name</text>
+                <a href="/user/logout">Logout</a>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/user/login">Login</a>
+                @*<a href="/register">Register</a>*@
+            </NotAuthorized>
+        </AuthorizeView>
+
         <div class="top-row px-4">
             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
         </div>
@@ -15,3 +34,24 @@
         </article>
     </main>
 </div>
+
+@code {
+
+    UserDetail user = new UserDetail();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        user = await YZPortalApiClient.GetUserDetails();
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        // Check if user authen code is still valid after render
+        user.AuthToken = await localStorageService.GetUserAuthenToken().ConfigureAwait(false);
+    }
+}
