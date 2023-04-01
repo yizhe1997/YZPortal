@@ -18,7 +18,7 @@ namespace YZPortal.Client.Services.LocalStorage
 
 		Task<Guid> GetUserId();
 		Task RemoveUserId();
-		Task SetUserId(Guid userId);
+		Task SetUserId(Guid Id);
 
 		#endregion
 
@@ -26,7 +26,7 @@ namespace YZPortal.Client.Services.LocalStorage
 
 		Task<string> GetUserDisplayName();
         Task RemoveUserDisplayName();
-        Task SetUserDisplayName(string userDisplayName);
+        Task SetUserDisplayName(string DisplayName);
 
         #endregion
 
@@ -34,7 +34,15 @@ namespace YZPortal.Client.Services.LocalStorage
 
         Task<string> GetUserEmail();
         Task RemoveUserEmail();
-        Task SetUserEmail(string userEmail);
+        Task SetUserEmail(string email);
+
+        #endregion
+
+        #region DealerId
+
+        Task<Guid> GetUserDealerId();
+        Task RemoveUserDealerId();
+        Task SetUserDealerId(Guid dealerId);
 
         #endregion
 

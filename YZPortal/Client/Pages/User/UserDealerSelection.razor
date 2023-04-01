@@ -1,0 +1,62 @@
+﻿@page "/user/dealerSelect"
+@using Microsoft.AspNetCore.Authorization;
+@using YZPortal.Client.Clients.YZPortalApi;
+@using YZPortal.Client.Models.Dealers;
+@using YZPortal.Client.Models.Users;
+@inject YZPortalApiHttpClient YZPortalApiClient
+@inject NavigationManager Nav
+@attribute [Authorize]
+
+@if (dealers != null)
+{
+    @if (dealers.Results.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dealer in dealers.Results)
+                {
+                    <tr>
+                        <td>@dealer.Name</td>
+                        <td><button class="btn btn-primary" @onclick="(() => OnSelectDealer(dealer))">Select</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h3>No dealer has been assigned to you</h3>
+    }
+}
+else
+{
+    <h3>Fetching dealers...</h3>
+}
+
+
+@code {
+    public Dealers? dealers { get; set; }
+
+    private async Task OnSelectDealer(Dealer dealer)
+    {
+        UserDealerAuthorizeResult userDealerAuthorizeResult = await YZPortalApiClient.UserAuthorize(dealer.Id);
+
+        // Redirect to the homepage if authorization is successful
+        if (userDealerAuthorizeResult.IsSuccessStatusCode)
+        {
+            Nav.NavigateTo("/");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        dealers = await YZPortalApiClient.GetDealers();
+    }
+}

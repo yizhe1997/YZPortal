@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using YZPortal.Client;
 using YZPortal.Client.Clients.YZPortalApi;
 using YZPortal.Client.Services.LocalStorage;
+using YZPortal.Client.Pages.User;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var configuration = builder.Configuration;
@@ -18,6 +19,8 @@ builder.Services.AddLocalStorageService();
 builder.Services.AddAuthentication();
 
 builder.Services.AddYZPortalApi(configuration);
+
+//builder.Services.AddScoped<UserDealerSelectionState>();
 
 #endregion
 

@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<AuthorizeView>
+    <Authorized>
+@*        <a href="Identity/Account/Manage">Hello, @context.User.Identity?.Name!</a>
+        <form method="post" action="Identity/Account/LogOut">
+            <button type="submit" class="nav-link btn btn-link">Log out</button>
+        </form>*@
+
+        <text>Hello, @context.User.FindFirst("userDisplayName")?.Value</text>
+        <a href="/user/logout">Logout</a>
+
+    </Authorized>
+    <NotAuthorized>
+        @*<a href="/user/register">Register</a>*@
+        <a href="/user/login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
