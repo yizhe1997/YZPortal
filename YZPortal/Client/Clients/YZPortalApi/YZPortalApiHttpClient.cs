@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text;
@@ -7,6 +6,7 @@ using YZPortal.Client.Models.Dealers;
 using YZPortal.Client.Models.Users;
 using YZPortal.Client.Services.Authentication;
 using YZPortal.Client.Services.LocalStorage;
+using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
@@ -32,9 +32,10 @@ namespace YZPortal.Client.Clients.YZPortalApi
 			using var response = await _http.PostAsJsonAsync("/api/v1/Authenticate", user);
 			try
 			{
-				if (response.IsSuccessStatusCode)
+                var output = await response.Content.ReadFromJsonAsync<UserLoginResult>() ?? new();
+
+                if (response.IsSuccessStatusCode)
 				{
-					var output = await response.Content.ReadFromJsonAsync<UserLoginResult>() ?? new();
 					output.IsSuccessStatusCode = true;
 
 					// Store token in cache
@@ -44,16 +45,16 @@ namespace YZPortal.Client.Clients.YZPortalApi
 					if (!string.IsNullOrEmpty(output.AuthToken))
 					{
 						var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(output.AuthToken);
-						var subClaimValue = claims.FirstOrDefault(c => c.Type == LocalStorageService.userId)?.Value;
+						var subClaimValue = claims.FirstOrDefault(c => c.Type == Claims.UserId)?.Value;
 						var userId = subClaimValue == null ? Guid.Empty : Guid.Parse(subClaimValue);
 						await _localStorageService.SetUserId(userId);
 					}
 
 					_authenticationStateProvider.StateChanged();
-
-					return output;
 				}
-			}
+
+                return output;
+            }
 			catch (Exception ex)
 			{
 				_logger.LogError(ex.Message);
@@ -71,34 +72,34 @@ namespace YZPortal.Client.Clients.YZPortalApi
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             requestMsg.Content = content;
 
-            //using var response = await _http.SendAsync(requestMsg);
+            using var response = await _http.SendAsync(requestMsg);
             try
             {
-                var response = await _http.SendAsync(requestMsg);
-
-                var wtf = response.Content.ReadAsStringAsync().Result;
+                var output = await response.Content.ReadFromJsonAsync<UserDealerAuthorizeResult>() ?? new();
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var output = await response.Content.ReadFromJsonAsync<UserDealerAuthorizeResult>() ?? new();
                     output.IsSuccessStatusCode = true;
 
                     // Store token in cache
                     await _localStorageService.SetUserAuthenToken(output);
 
-                    // Parse claims from jwt and set user's dealerId in local storage
+                    // Parse claims from jwt and obtain user's dealerId, content access levels, dealer roles
+                    // to be stored in local storage
                     if (!string.IsNullOrEmpty(output.AuthToken))
                     {
                         var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(output.AuthToken);
-                        var dealerIdClaimValue = claims.FirstOrDefault(c => c.Type == LocalStorageService.userdealerId)?.Value;
+
+                        // should create a function for this repetitive code
+                        var dealerIdClaimValue = claims.FirstOrDefault(c => c.Type == Claims.UserdealerId)?.Value;
                         var userDealerId = dealerIdClaimValue == null ? Guid.Empty : Guid.Parse(dealerIdClaimValue);
                         await _localStorageService.SetUserDealerId(userDealerId);
                     }
 
                     _authenticationStateProvider.StateChanged();
-
-                    return output;
                 }
+
+                return output;
             }
             catch (Exception ex)
             {
@@ -111,6 +112,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
         // these should be in another place if not calling runtime.. but for now it's ok cause going to add new details soon
         public async Task<UserDetail> GetUserDetails()
         {
+            // for runtime... this should be used from local storage service
             var userDetail = new UserDetail
             {
                 AuthToken = await _localStorageService.GetUserAuthenToken(),
@@ -121,6 +123,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return userDetail;
         }
 
+        // these should be in another place if not calling runtime.. but for now it's ok cause going to add new details soon
 		public async Task LogoutUser()
 		{
 			await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
@@ -144,16 +147,14 @@ namespace YZPortal.Client.Clients.YZPortalApi
 			using var response = await _http.SendAsync(requestMsg);
 			try
             {
+                var output = await response.Content.ReadFromJsonAsync<Dealers>() ?? new();
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
                     await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
                 }
-                else if (response.IsSuccessStatusCode)
-                {
-                    var dealers = await response.Content.ReadFromJsonAsync<Dealers>() ?? new();
 
-                    return dealers;
-                }
+                return output;
             }
             catch (Exception ex)
             {

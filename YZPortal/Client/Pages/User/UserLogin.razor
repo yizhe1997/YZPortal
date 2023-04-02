@@ -9,6 +9,7 @@
 
 <h3>Login</h3>
 <EditForm Model="user" OnValidSubmit="OnValidSubmit" style="max-width:500px;">
+    <CustomValidation @ref="customValidation" />
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="mb-2">
@@ -34,12 +35,20 @@
 
         UserLoginResult userLoginResult = await YZPortalApiClient.UserAuthenticate(user);
 
-        isLoginDisabled = userLoginResult.IsSuccessStatusCode ? false : true;
+        isLoginDisabled = userLoginResult.IsSuccessStatusCode ? true : false;
 
         // Fetch dealers if authentication is successful and render the dealer selection dialog
         if (userLoginResult.IsSuccessStatusCode)
         {
             Nav.NavigateTo("/user/dealerSelect");
         }
+        else
+        {
+            customValidation?.ClearErrors();
+            var errors = new Dictionary<string, List<string>>();
+            errors.Add(string.Empty, new List<string>() { userLoginResult.Message });
+            customValidation?.DisplayErrors(errors);
+        }
+
     }
 }

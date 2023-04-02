@@ -6,8 +6,6 @@ namespace YZPortal.Client.Services.Authentication
 	{
 		public static void AddAuthentication(this IServiceCollection services) 
 		{
-			services.AddAuthorizationCore();
-
 			services.AddScoped<CustomAuthenticationStateProvider>();
 			services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthenticationStateProvider>());
 		}

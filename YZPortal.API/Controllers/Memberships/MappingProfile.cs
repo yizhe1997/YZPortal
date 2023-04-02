@@ -3,6 +3,7 @@ using YZPortal.API.Controllers.Memberships;
 using YZPortal.API.Controllers.Memberships.ContentAccessLevels;
 using YZPortal.API.Controllers.Memberships.DealerRoles;
 using YZPortal.Core.Domain.Database.Memberships;
+using YZPortal.FullStackCore.Enums.Memberships;
 
 namespace YZPortal.Api.Controllers.Memberships
 {

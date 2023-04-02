@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Identity.Web;
 using Microsoft.Net.Http.Headers;
@@ -8,8 +7,6 @@ using YZPortal.API.Infrastructure.Swagger;
 using YZPortal.API.Infrastructure.Security.AzureAd;
 using YZPortal.API.Infrastructure.Security.AzureAdB2C;
 using YZPortal.API.Infrastructure.Security.Jwt;
-using YZPortal.Core.Domain.Database.Users;
-using YZPortal.Core.Domain.Contexts;
 
 namespace YZPortal.API.Infrastructure.Security.Authentication
 {

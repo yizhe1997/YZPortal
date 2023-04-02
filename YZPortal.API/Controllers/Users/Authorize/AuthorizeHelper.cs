@@ -4,6 +4,8 @@ using System.Security.Claims;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Error;
+using YZPortal.FullStackCore.Enums.Memberships;
+using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
 
 namespace YZPortal.API.Controllers.Users.Authorize
 {
@@ -25,59 +27,39 @@ namespace YZPortal.API.Controllers.Users.Authorize
 
             var claims = new List<Claim>
             {
-                new Claim("dealerId", membership.DealerId.ToString())
+                new Claim(Claims.UserdealerId, membership.DealerId.ToString())
             };
 
             if (membership.Admin || CurrentContext?.CurrentUser?.Admin == true)
             {
-                // set all roles
-                foreach (var role in await Database.DealerRoles.Where(x => x.Name == (int)DealerRoleNames.Admin).ToListAsync())
-                {
-                    claims.Add(new Claim(DealerRoleNames.Admin.ToString(), "1"));
-                }
-                // set all accessLevels
+                // Assign admin role
+                claims.Add(new Claim(ClaimTypes.Role, ((int)DealerRoleNames.Admin).ToString()));
+
+                // Assign all access levels
                 foreach (var accessLevel in await Database.ContentAccessLevels.ToListAsync())
                 {
-                    claims.Add(new Claim(((ContentAccessLevelNames)accessLevel.Name).ToString(), "1"));
+                    claims.Add(new Claim(Claims.MembershipAccessLevel, (accessLevel.Name).ToString()));
                 }
             }
-            else if (membership.MembershipDealerRole?.DealerRole != null)
+            else if (membership.MembershipDealerRole?.DealerRole != null && membership.MembershipContentAccessLevels.Any())
             {
-                claims.Add(new Claim(((DealerRoleNames)membership.MembershipDealerRole.DealerRole.Name).ToString(), "1"));
+                // Assign Role
+                claims.Add(new Claim(ClaimTypes.Role, (membership.MembershipDealerRole.DealerRole.Name).ToString()));
 
-                // Access Levels
-
-                foreach (var mAccessLevel in membership.MembershipContentAccessLevels)
+                // Assign access Levels
+                foreach (var memAccessLevel in membership.MembershipContentAccessLevels)
                 {
-                    claims.Add(new Claim(((ContentAccessLevelNames)mAccessLevel.ContentAccessLevel.Name).ToString(), "1"));
-                }
-
-                // Roles
-                foreach (var role in await Database.DealerRoles.Where(x => x.Name != membership.MembershipDealerRole.DealerRole.Name).ToListAsync())
-                {
-                    claims.Add(new Claim(((DealerRoleNames)membership.MembershipDealerRole.DealerRole.Name).ToString(), "0"));
-                }
-
-                // Access Levels
-                var currentAccessLevels = membership.MembershipContentAccessLevels.Select(y => y.ContentAccessLevel.Name).ToList();
-                foreach (var accessLevel in await Database.ContentAccessLevels.Where(x => currentAccessLevels.Contains(x.Name) == false).ToListAsync())
-                {
-                    claims.Add(new Claim(((ContentAccessLevelNames)membership.MembershipDealerRole.DealerRole.Name).ToString(), "0"));
+                    if (memAccessLevel.ContentAccessLevel != null)
+                        claims.Add(new Claim(Claims.MembershipAccessLevel, (memAccessLevel.ContentAccessLevel.Name).ToString()));
                 }
             }
             else
             {
-                // Roles
-                foreach (var role in await Database.DealerRoles.ToListAsync())
-                {
-                    claims.Add(new Claim(((DealerRoleNames)role.Name).ToString(), "0"));
-                }
+                // Assign empty role
+                claims.Add(new Claim(ClaimTypes.Role, string.Empty));
 
-                // Access Levels
-                foreach (var accessLevel in await Database.ContentAccessLevels.ToListAsync())
-                {
-                    claims.Add(new Claim(((ContentAccessLevelNames)accessLevel.Name).ToString(), "0"));
-                }
+                // Assign empty access Levels
+                claims.Add(new Claim(Claims.MembershipAccessLevel, string.Empty));
             }
 
             #endregion

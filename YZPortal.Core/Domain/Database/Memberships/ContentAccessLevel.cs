@@ -11,11 +11,4 @@ namespace YZPortal.Core.Domain.Database.Memberships
         public List<MembershipContentAccessLevel> MembershipContentAccessLevels { get; set; } = new List<MembershipContentAccessLevel>();
         // do a new table for the translation e.g eng/bob, cn/bobby uk/bobbie
     }
-
-    [Flags]
-    public enum ContentAccessLevelNames
-    {
-        None = 0,
-        All = 1
-    }
 }

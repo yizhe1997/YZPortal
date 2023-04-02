@@ -11,6 +11,7 @@ using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.Core.Error;
 using YZPortal.Core.Extensions;
+using YZPortal.FullStackCore.Enums.Memberships;
 
 namespace YZPortal.API.Controllers.Dealers.DealerInvites
 {

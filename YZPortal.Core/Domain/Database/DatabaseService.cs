@@ -8,25 +8,24 @@ using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Domain.Database.Sync;
 using YZPortal.Core.Extensions;
 using YZPortal.Core.Domain.Contexts;
+using YZPortal.FullStackCore.Enums.Memberships;
 
 namespace YZPortal.Core.Domain.Database
 {
     public class DatabaseService
     {
         private readonly PortalContext _dbContext;
-        private readonly CurrentContext _userContext;
         private readonly DatabaseOptions _options;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<DatabaseService> _logger;
 
         // Constructor
-        public DatabaseService(PortalContext dbContext, CurrentContext userContext, UserManager<User> userManager, IOptions<DatabaseOptions> options, ILogger<DatabaseService> logger)
+        public DatabaseService(PortalContext dbContext, UserManager<User> userManager, IOptions<DatabaseOptions> options, ILogger<DatabaseService> logger)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _options = options.Value;
             _logger = logger;
-            _userContext = userContext;
         }
 
         #region Create and update admin user on startup

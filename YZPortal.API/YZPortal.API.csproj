@@ -49,6 +49,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\YZPortal.Core\YZPortal.Core.csproj" />
+		<ProjectReference Include="..\YZPortal.FullStackCore\YZPortal.FullStackCore.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

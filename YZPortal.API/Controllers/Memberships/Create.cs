@@ -9,6 +9,7 @@ using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Error;
 using YZPortal.Core.Extensions;
+using YZPortal.FullStackCore.Enums.Memberships;
 using static YZPortal.Core.Attributes.Attribute;
 
 namespace YZPortal.API.Controllers.Memberships

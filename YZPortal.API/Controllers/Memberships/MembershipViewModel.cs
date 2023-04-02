@@ -1,7 +1,6 @@
 ﻿using YZPortal.API.Controllers.Memberships.ContentAccessLevels;
 using YZPortal.API.Controllers.Memberships.DealerRoles;
 using YZPortal.API.Controllers.ViewModel.Auditable;
-using YZPortal.Core.Domain.Database.Memberships;
 
 namespace YZPortal.Api.Controllers.Memberships
 {

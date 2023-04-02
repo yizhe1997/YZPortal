@@ -3,12 +3,11 @@ using Azure.Storage.Sas;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net;
 using YZPortal.API.Controllers.ViewModel.Auditable;
-using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Error;
 
 namespace YZPortal.API.Infrastructure.AzureStorage
 {
-	public static class AzureStorageExtensions
+    public static class AzureStorageExtensions
 	{
 		#region Azure Blob
 

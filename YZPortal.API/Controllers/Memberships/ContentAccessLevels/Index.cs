@@ -3,6 +3,7 @@ using YZPortal.API.Controllers.Pagination;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Memberships;
+using YZPortal.FullStackCore.Enums.Memberships;
 
 namespace YZPortal.API.Controllers.Memberships.ContentAccessLevels
 {

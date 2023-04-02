@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YZPortal.API.Controllers.ControllerTypes;
 using YZPortal.API.Controllers.Memberships;

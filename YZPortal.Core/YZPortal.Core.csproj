@@ -27,4 +27,8 @@
 	  <Folder Include="FluentValidation\FluentValidators\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\YZPortal.FullStackCore\YZPortal.FullStackCore.csproj" />
+	</ItemGroup>
+
 </Project>

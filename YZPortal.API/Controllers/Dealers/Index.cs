@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using System.Net;
 using YZPortal.API.Controllers.Pagination;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Dealers;
-using YZPortal.Core.Error;
 
 namespace YZPortal.Api.Controllers.Dealers
 {
