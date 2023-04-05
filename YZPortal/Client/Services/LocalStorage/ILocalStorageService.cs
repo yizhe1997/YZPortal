@@ -11,14 +11,15 @@ namespace YZPortal.Client.Services.LocalStorage
         Task<string> GetUserAuthenToken();
         Task RemoveUserAuthenToken();
         Task SetUserAuthenToken(UserLoginResult userLoginResult);
+		Task ClearLocalStorage();
 
-        #endregion
+		#endregion
 
-        #region General Info
+		#region General Info
 
-        #region Id
+		#region Id
 
-        Task<Guid> GetUserId();
+		Task<Guid> GetUserId();
 		Task RemoveUserId();
 		Task SetUserId(Guid Id);
 

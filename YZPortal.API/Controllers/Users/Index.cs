@@ -2,16 +2,16 @@
 using YZPortal.API.Controllers.Pagination;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
-using YZPortal.Core.Domain.Database.Memberships;
+using YZPortal.Core.Domain.Database.Users;
 
-namespace YZPortal.API.Controllers.Dealers.Invites
+namespace YZPortal.API.Controllers.Users
 {
 	public class Index
 	{
 		public class Request : SearchRequest<SearchResponse<Model>>
 		{
 		}
-		public class Model : InviteViewModel
+		public class Model : UserViewModel
 		{
 		}
 		public class RequestHandler : SearchRequestHandler<Request, SearchResponse<Model>>
@@ -21,10 +21,14 @@ namespace YZPortal.API.Controllers.Dealers.Invites
 			}
 			public override async Task<SearchResponse<Model>> Handle(Request request, CancellationToken cancellationToken)
 			{
-				return await CreateIndexResponseAsync<DealerInvite, Model>(
+				// Only get non-admin users to prevent self-deletion from client app
+				var query = Database.Users.Where(x => x.Admin == false).AsQueryable();
+
+				return await CreateIndexResponseAsync<User, Model>(
 					request,
-					CurrentContext.CurrentDealerInvites.Where(y => y.ClaimedDateTime == null),
-					x => x.Email.Contains(request.SearchString));
+					query,
+					x => x.Name.Contains(request.SearchString) ||
+					x.UserName.Contains(request.SearchString));
 			}
 		}
 	}

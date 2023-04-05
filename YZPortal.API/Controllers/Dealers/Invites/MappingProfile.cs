@@ -1,21 +1,21 @@
 ﻿using AutoMapper;
 using YZPortal.Core.Domain.Database.Memberships;
 
-namespace YZPortal.API.Controllers.Dealers.DealerInvites
+namespace YZPortal.API.Controllers.Dealers.Invites
 {
-    public class MappingProfile : Profile
-    {
-        public MappingProfile()
-        {
-            // Index
-            CreateMap<DealerInvite, Index.Model>();
+	public class MappingProfile : Profile
+	{
+		public MappingProfile()
+		{
+			// Index
+			CreateMap<DealerInvite, Index.Model>();
 
-            // Create
-            CreateMap<DealerInvite, Create.Model>();
-            CreateMap<Create.Request, DealerInvite>(MemberList.Source);
+			// Create
+			CreateMap<DealerInvite, Create.Model>();
+			CreateMap<Create.Request, DealerInvite>(MemberList.Source);
 
-            // Index
-            CreateMap<DealerInvite, Delete.Model>();
-        }
-    }
+			// Index
+			CreateMap<DealerInvite, Delete.Model>();
+		}
+	}
 }

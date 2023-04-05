@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-using System.Security.Claims;
 using System.Text.Json;
 using System.Text;
 using YZPortal.Client.Models.Dealers;
@@ -7,10 +6,11 @@ using YZPortal.Client.Models.Users;
 using YZPortal.Client.Services.Authentication;
 using YZPortal.Client.Services.LocalStorage;
 using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
+using YZPortal.FullStackCore.Extensions;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
-    public class YZPortalApiHttpClient
+	public class YZPortalApiHttpClient
     {
         private readonly ILogger<YZPortalApiHttpClient> _logger;
         private readonly HttpClient _http;
@@ -25,7 +25,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
             _authenticationStateProvider = myAuthenticationStateProvider;
         }
 
-        #region User
+        #region Users
 
         public async Task<UserLoginResult> UserAuthenticate(UserLogin user)
         {
@@ -66,9 +66,9 @@ namespace YZPortal.Client.Clients.YZPortalApi
         public async Task<UserDealerAuthorizeResult> UserAuthorize(Guid dealerId)
         {
             var requestMsg = new HttpRequestMessage(HttpMethod.Post, $"/api/v1/Authorize");
-            requestMsg.Headers.Add("Authorization", "Bearer " + await _localStorageService.GetUserAuthenToken());
+			requestMsg.AddBearerToken(await _localStorageService.GetUserAuthenToken());
 
-            var json = JsonSerializer.Serialize(new { dealerId = dealerId.ToString() }) ?? "{}";
+			var json = JsonSerializer.Serialize(new { dealerId = dealerId.ToString() }) ?? "{}";
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             requestMsg.Content = content;
 
@@ -123,26 +123,39 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return userDetail;
         }
 
-        // these should be in another place if not calling runtime.. but for now it's ok cause going to add new details soon
-		public async Task LogoutUser()
+		public async Task<Dealers> GetUsers()
 		{
-			await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
-			await _localStorageService.RemoveUserEmail().ConfigureAwait(false);
-			await _localStorageService.RemoveUserDisplayName().ConfigureAwait(false);
-			await _localStorageService.RemoveUserId().ConfigureAwait(false);
-            await _localStorageService.RemoveUserDealerId().ConfigureAwait(false);
+			var requestMsg = new HttpRequestMessage(HttpMethod.Get, $"/api/v1/Dealers");
+			requestMsg.AddBearerToken(await _localStorageService.GetUserAuthenToken());
 
-            _authenticationStateProvider.StateChanged();
+			using var response = await _http.SendAsync(requestMsg);
+			try
+			{
+				var output = await response.Content.ReadFromJsonAsync<Dealers>() ?? new();
+
+				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+				{
+					await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
+				}
+
+				return output;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex.Message);
+			}
+
+			return new Dealers();
 		}
 
 		#endregion
 
-		#region Dealer
+		#region Dealers
 
 		public async Task<Dealers> GetDealers()
         {
 			var requestMsg = new HttpRequestMessage(HttpMethod.Get, $"/api/v1/Dealers");
-			requestMsg.Headers.Add("Authorization", "Bearer " + await _localStorageService.GetUserAuthenToken());
+			requestMsg.AddBearerToken(await _localStorageService.GetUserAuthenToken());
 
 			using var response = await _http.SendAsync(requestMsg);
 			try
@@ -164,6 +177,6 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new Dealers();
         }
 
-        #endregion
-    }
+		#endregion
+	}
 }

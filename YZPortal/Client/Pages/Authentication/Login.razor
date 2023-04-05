@@ -1,4 +1,4 @@
-﻿@page "/user/login"
+﻿@page "/Authentication/Login"
 @using Microsoft.AspNetCore.Components.Authorization
 @using YZPortal.Client.Models.Users;
 @using YZPortal.Client.Clients.YZPortalApi;
@@ -40,7 +40,7 @@
         // Fetch dealers if authentication is successful and render the dealer selection dialog
         if (userLoginResult.IsSuccessStatusCode)
         {
-            Nav.NavigateTo("/user/dealerSelect");
+            Nav.NavigateTo("/Authorization/SelectDealer");
         }
         else
         {

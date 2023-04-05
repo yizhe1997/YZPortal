@@ -1,13 +1,14 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using YZPortal.Client.Services.LocalStorage
 
 <AuthorizeView>
     <Authorized>
-        <text>Hello, @context.User.FindFirst("userDisplayName")?.Value</text>
-        <a href="/user/logout">Logout</a>
+        <text>Hello, @context.User.FindFirst(LocalStorageProperties.UserDisplayName)?.Value</text>
+        <a href="/Authentication/Logout">Logout</a>
 
     </Authorized>
     <NotAuthorized>
         @*<a href="/user/register">Register</a>*@
-        <a href="/user/login">Log in</a>
+        <a href="/Authentication/Login">Login</a>
     </NotAuthorized>
 </AuthorizeView>

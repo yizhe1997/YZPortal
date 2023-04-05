@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace YZPortal.Core.Extensions
 {
-    public static class TypeExtension
+    public static class TypeExtensions
     {
         /// <summary>
         ///     Helper method to get constant values of a class
@@ -13,12 +13,12 @@ namespace YZPortal.Core.Extensions
             ArrayList constants = new ArrayList();
 
             FieldInfo[] fieldInfos = type.GetFields(
-                // Gets all public and static fields
+                // Gets all public and static fields and non public e.g internal
 
-                BindingFlags.Public | BindingFlags.Static |
-                // This tells it to get the fields from all base types as well
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic |
+				// This tells it to get the fields from all base types as well
 
-                BindingFlags.FlattenHierarchy);
+				BindingFlags.FlattenHierarchy);
 
             // Go through the list and only pick out the constants
             foreach (FieldInfo fi in fieldInfos)

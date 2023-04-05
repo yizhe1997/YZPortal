@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace YZPortal.Core.Extensions
 {
-    public static class ClassExtension
+    public static class ClassExtensions
     {
         // Not tested yet
         public static Tuple<bool, string, string> GetDataAnotationDetail<T>(T item) where T : class

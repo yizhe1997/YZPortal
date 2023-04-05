@@ -1,0 +1,21 @@
+﻿@page "/Authentication/Logout"
+@using YZPortal.Client.Clients.YZPortalApi;
+@using YZPortal.Client.Services.Authentication;
+@using YZPortal.Client.Services.LocalStorage;
+@inject NavigationManager Nav
+@inject ILocalStorageService LocalStorageService
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LocalStorageService.ClearLocalStorage();
+
+		AuthenticationStateProvider.StateChanged();
+
+		Nav.NavigateTo("/");
+	}
+}

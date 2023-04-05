@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YZPortal.API.Controllers.ControllerTypes;
 using YZPortal.API.Controllers.Pagination;
+using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
 
 namespace YZPortal.Api.Controllers.Dealers
 {
@@ -14,10 +15,9 @@ namespace YZPortal.Api.Controllers.Dealers
         }
 
 		/// <summary>
-		///     Creates a new dealer.
-		///     Requires admin scope.
+		///     Creates a new dealer
 		/// </summary>
-		[Authorize(Policy = "Dealer", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		[Authorize(Policy = Policies.IsAdmin, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 		[HttpPost]
         public async Task<ActionResult<Create.Model>> CreateDealer([FromBody] Create.Request request) =>
             await _mediator.Send(request);

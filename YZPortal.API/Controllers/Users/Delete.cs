@@ -2,19 +2,20 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using YZPortal.API.Controllers.Users;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Error;
 
-namespace YZPortal.API.Controllers.Dealers.Invites
+namespace YZPortal.API.Controllers.Users
 {
 	public class Delete
 	{
 		public class Request : IRequest<Model>
 		{
-			public Guid Id { get; set; }
+			internal Guid Id { get; set; }
 		}
-		public class Model : InviteViewModel
+		public class Model : UserViewModel
 		{
 		}
 		public class RequestHandler : BaseRequestHandler<Request, Model>
@@ -24,14 +25,19 @@ namespace YZPortal.API.Controllers.Dealers.Invites
 			}
 			public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
 			{
-				var invite = await CurrentContext.CurrentDealerInvites.FirstOrDefaultAsync(dr => dr.Id == request.Id);
-				if (invite == null)
-					throw new RestException(HttpStatusCode.NoContent, "Invite not found.");
+				var user = await Database.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
+				if (user == null)
+					throw new RestException(HttpStatusCode.NotFound, "User not found.");
 
-				Database.DealerInvites.Remove(invite);
+				// Forbid deletion of admin user
+				if (user.Admin == true)
+					throw new RestException(HttpStatusCode.NotFound, "Admin user not allowed for deletion.");
+
+				// Remove from users table if record exit
+				Database.Users.Remove(user);
 				await Database.SaveChangesAsync();
 
-				return Mapper.Map<Model>(invite);
+				return Mapper.Map<Model>(user);
 			}
 		}
 	}
