@@ -1,55 +1,85 @@
-﻿@page "/Users"
+﻿@page "/users"
 @using Microsoft.AspNetCore.Authorization;
 @using YZPortal.Client.Clients.YZPortalApi;
-@using YZPortal.Client.Models.Dealers;
+@using YZPortal.Client.Models.Users;
+@using YZPortal.Client.Pages.Users;
 @using YZPortal.FullStackCore.Infrastructure.Security.Authorization
 @inject YZPortalApiHttpClient YZPortalApiClient
+@inject IModalService Modal
 @attribute [Authorize(Policy = Policies.IsAdmin)]
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (Dealers == null)
+<button @onclick="OpenInviteUserDialog" class="btn btn-primary">Invite User</button>
+
+@if (Users == null)
 {
-	<p><em>Loading...</em></p>
+    <p><em>Loading...</em></p>
 }
 else
 {
-	<p><a href="javascript:;" @onclick="GetDealers">TODAY'S FORECAST</a></p>
-	<table class="table">
-		<thead>
-			<tr>
-				<th>DueDate</th>
-				<th>Name</th>
-				<th>Description</th>
-				<th>Status</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var Todo in Dealers.Results)
-			{
-				<tr>
-					<td>@Todo.Name</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><button @onclick="()=>SortBy(nameof(User.UserName))">Email</button></th>
+                <th><button @onclick="()=>SortBy(nameof(User.Name))">Name</button></th>
+                <th><button @onclick="()=>SortBy(nameof(User.Admin))">Admin</button></th>
+                <th><button @onclick="()=>SortBy(nameof(User.LastLoggedIn))">Last logged in</button></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Users.Results)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>@user.Name</td>
+                    <td>@user.Admin</td>
+                    <td>@user.LastLoggedIn</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        <button disabled="@Users.PageNumber <= 1" @onclick="()=>ChangePage(-1)">Previous</button>
+        <button disabled="@Users.PageNumber >= TotalPages" @onclick="()=>ChangePage(1)">Next</button>
+        <span>Page @Users.PageNumber of @Users.TotalPages</span>
+        <select @onchange="async e => await ChangePage(int.Parse(e.Value.ToString()))">
+            @for (int i = 1; i <= @Users.TotalPages; i++)
+            {
+                <option value="@i" @(i= =@Users.PageNumber ? "selected" : "" )>@i</option>
+            }
+        </select>
+    </div>
 }
 
 @code {
 
-	private Dealers? Dealers;
+    private Users? Users;
 
-	private async Task GetDealers()
-	{
-		Dealers = await YZPortalApiClient.GetDealers();
-	}
+    private void OpenInviteUserDialog()
+    {
+        var moviesModal = Modal.Show<UserInviteDialog>();
+    }
 
-	protected override async Task OnInitializedAsync()
-	{
-		await base.OnInitializedAsync();
+    private async Task SortBy(string sortBy)
+    {
+        Users = await YZPortalApiClient.GetUsers(orderBy: sortBy);
+        StateHasChanged();
+    }
 
-		await GetDealers();
-	}
+    private async Task ChangePage(int offset)
+    {
+        Users.PageNumber += offset;
+        Users = await YZPortalApiClient.GetUsers(pageNumber: Users.PageNumber, pageSize: Users.PageSize, orderBy: Users.OrderBy);
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        Users = await YZPortalApiClient.GetUsers();
+    }
 }

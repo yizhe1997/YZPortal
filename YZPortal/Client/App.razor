@@ -1,23 +1,28 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using BootstrapBlazor.Components
 
 <CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <Authorizing>
-                    <text>Authorizing user, please wait...</text>
-                </Authorizing>
-                <NotAuthorized>
-                    <text>Sorry, you are not authorized to access this page.</text>
-                </NotAuthorized>
-            </AuthorizeRouteView>
-            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </Found>
-        <NotFound>
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
-            </LayoutView>
-        </NotFound>
-    </Router>
+    <BootstrapBlazorRoot>
+        <CascadingBlazoredModal>
+            <Router AppAssembly="@typeof(App).Assembly">
+                <Found Context="routeData">
+                    <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                        <Authorizing>
+                            <text>Authorizing user, please wait...</text>
+                        </Authorizing>
+                        <NotAuthorized>
+                            <text>Sorry, you are not authorized to access this page.</text>
+                        </NotAuthorized>
+                    </AuthorizeRouteView>
+                    <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                </Found>
+                <NotFound>
+                    <PageTitle>Not found</PageTitle>
+                    <LayoutView Layout="@typeof(MainLayout)">
+                        <p role="alert">Sorry, there's nothing at this address.</p>
+                    </LayoutView>
+                </NotFound>
+            </Router>
+        </CascadingBlazoredModal>
+    </BootstrapBlazorRoot>
 </CascadingAuthenticationState>

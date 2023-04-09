@@ -5,9 +5,9 @@ using YZPortal.API.Controllers.Pagination;
 
 namespace YZPortal.API.Controllers.Users
 {
-	public class UserController : ApiAdminScopeControllerClass
+	public class UsersController : ApiAdminScopeControllerClass
 	{
-		public UserController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
+		public UsersController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
 		{
 		}
 

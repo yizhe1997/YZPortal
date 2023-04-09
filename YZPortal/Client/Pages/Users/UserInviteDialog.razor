@@ -1,0 +1,96 @@
+﻿@using BootstrapBlazor.Components
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using YZPortal.Client.Clients.YZPortalApi
+@using YZPortal.Client.Models.Memberships;
+@using YZPortal.Client.Models.Users
+@using YZPortal.FullStackCore.Infrastructure.Security.Authorization
+
+@inject YZPortalApiHttpClient YZPortalApiClient
+
+<h3>Invite User</h3>
+<EditForm Model="@UserInvite" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />Dialog
+    <div class="form-group">
+        <label for="UserName">Email address:</label>
+        <InputText id="UserName" class="form-control" @bind-Value="@UserInvite.Email" />
+        <ValidationMessage For="@(() => UserInvite.Email)" />
+    </div>
+    <div class="form-group">
+        <label for="Name">Full name:</label>
+        <InputText id="Name" class="form-control" @bind-Value="@UserInvite.Name" />
+        <ValidationMessage For="@(() => UserInvite.Name)" />
+    </div>
+    <div class="form-group">
+        <label for="DealerRoles">Roles:</label>
+        <InputSelect id="DealerRoles" class="form-control" @bind-Value="@UserInvite.Role">
+            @foreach (var level in DealerRoles.Results)
+            {
+                <option value="@level.Code">@level.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => UserInvite.Role)" />
+    </div>
+    <div class="form-group">
+        <label for="ContentAccessLevels">Content access levels:</label>
+        <div class="col-12 col-sm-6">
+            <MultiSelect Items="@LongItems" @bind-Value="@SelectedContentAccessLevels" />
+        </div>
+        <div class="mt-3">@(string.Join(",", SelectedContentAccessLevels))</div>
+        <InputSelect id="ContentAccessLevels" class="form-control" multiple="true" @bind-Value="@SelectedContentAccessLevels">
+            @foreach (var level in ContentAccessLevels.Results)
+            {
+                <option value="@level.Code">@level.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => SelectedContentAccessLevels)" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Invite</button>
+    </div>
+</EditForm>
+<button @onclick="Cancel">Cancel</button>
+
+@code {
+    private UserInvite UserInvite = new UserInvite();
+    private DealerRoles DealerRoles = new DealerRoles();
+    private ContentAccessLevels ContentAccessLevels { get; set; } = new ContentAccessLevels();
+    private List<SelectedItem> LongItems = new List<SelectedItem>();
+    private int[] SelectedContentAccessLevels { get; set; } = Array.Empty<int>();
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnInvite { get; set; }
+
+    private static List<SelectedItem> GenerateDataSource(ContentAccessLevels source) => source.Results.Select(i => new SelectedItem(i.Code.ToString(), i.Name ?? string.Empty)).ToList();
+
+    private async Task OnValidSubmit()
+    {
+        UserInvite.ContentAccessLevels.AddRange(SelectedContentAccessLevels);
+        var result = await YZPortalApiClient.UserInvite(UserInvite);
+
+        if (result.IsStatusCodeSucess)
+        {
+            await OnInvite.InvokeAsync();
+
+
+        }
+        else
+        {
+            // Handle error
+        }
+        await BlazoredModal.CloseAsync();
+    }
+
+    private async Task Cancel() => await BlazoredModal.CancelAsync();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        DealerRoles = await YZPortalApiClient.GetDealerRoles();
+        ContentAccessLevels = await YZPortalApiClient.GetContentAccessLevels();
+
+        LongItems = GenerateDataSource(ContentAccessLevels);
+    }
+}

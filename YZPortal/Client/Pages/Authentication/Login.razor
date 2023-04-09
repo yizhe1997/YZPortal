@@ -35,10 +35,10 @@
 
         UserLoginResult userLoginResult = await YZPortalApiClient.UserAuthenticate(user);
 
-        isLoginDisabled = userLoginResult.IsSuccessStatusCode ? true : false;
+        isLoginDisabled = userLoginResult.IsStatusCodeSucess ? true : false;
 
         // Fetch dealers if authentication is successful and render the dealer selection dialog
-        if (userLoginResult.IsSuccessStatusCode)
+        if (userLoginResult.IsStatusCodeSucess)
         {
             Nav.NavigateTo("/Authorization/SelectDealer");
         }

@@ -47,7 +47,7 @@ else
         UserDealerAuthorizeResult userDealerAuthorizeResult = await YZPortalApiClient.UserAuthorize(dealer.Id);
 
         // Redirect to the homepage if authorization is successful
-        if (userDealerAuthorizeResult.IsSuccessStatusCode)
+        if (userDealerAuthorizeResult.IsStatusCodeSucess)
         {
             Nav.NavigateTo("/");
         }

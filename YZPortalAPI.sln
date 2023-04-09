@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YZPortal.Worker", "YZPortal
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YZPortal.Client", "YZPortal\Client\YZPortal.Client.csproj", "{B4104470-A481-45E1-A87D-BEBFD8BF775F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YZPortal.FullStackCore", "YZPortal.FullStackCore\YZPortal.FullStackCore.csproj", "{F4C7CF1D-3BE1-47F5-80CC-7EE1C1B0979B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YZPortal.FullStackCore", "YZPortal.FullStackCore\YZPortal.FullStackCore.csproj", "{F4C7CF1D-3BE1-47F5-80CC-7EE1C1B0979B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
