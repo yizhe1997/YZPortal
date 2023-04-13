@@ -5,81 +5,60 @@
 @using YZPortal.Client.Pages.Users;
 @using YZPortal.FullStackCore.Infrastructure.Security.Authorization
 @inject YZPortalApiHttpClient YZPortalApiClient
-@inject IModalService Modal
+@inject DialogService DialogService
 @attribute [Authorize(Policy = Policies.IsAdmin)]
 
-<h1>Weather forecast</h1>
+<h1>Users</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+<Button OnClick="@OpenInviteUserDialog" Text="Invite User" />
 
-<button @onclick="OpenInviteUserDialog" class="btn btn-primary">Invite User</button>
-
-@if (Users == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th><button @onclick="()=>SortBy(nameof(User.UserName))">Email</button></th>
-                <th><button @onclick="()=>SortBy(nameof(User.Name))">Name</button></th>
-                <th><button @onclick="()=>SortBy(nameof(User.Admin))">Admin</button></th>
-                <th><button @onclick="()=>SortBy(nameof(User.LastLoggedIn))">Last logged in</button></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Users.Results)
-            {
-                <tr>
-                    <td>@user.UserName</td>
-                    <td>@user.Name</td>
-                    <td>@user.Admin</td>
-                    <td>@user.LastLoggedIn</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <div>
-        <button disabled="@Users.PageNumber <= 1" @onclick="()=>ChangePage(-1)">Previous</button>
-        <button disabled="@Users.PageNumber >= TotalPages" @onclick="()=>ChangePage(1)">Next</button>
-        <span>Page @Users.PageNumber of @Users.TotalPages</span>
-        <select @onchange="async e => await ChangePage(int.Parse(e.Value.ToString()))">
-            @for (int i = 1; i <= @Users.TotalPages; i++)
-            {
-                <option value="@i" @(i= =@Users.PageNumber ? "selected" : "" )>@i</option>
-            }
-        </select>
-    </div>
-}
+<Table PageItemsSource="@PageItemsSource"
+       TItem="User" 
+       IsPagination="true"
+       IsBordered="true"
+       ShowToolbar="true"
+       ShowDefaultButtons="false"
+       ShowExtendButtons="true"
+       ClickToSelect="true"
+       TableSize="TableSize.Compact"
+       OnDeleteAsync="@OnDeleteAsync"
+       OnQueryAsync="@OnQueryAsync">
+    <TableColumns>
+        <TableColumn @bind-Field="@context.UserName" Sortable="true" />
+        <TableColumn @bind-Field="@context.Name" Sortable="true" />
+        <TableColumn @bind-Field="@context.Admin" Sortable="true" />
+        <TableColumn @bind-Field="@context.LastLoggedIn" Sortable="true" FormatString="yyyy-MM-dd" />
+    </TableColumns>
+</Table>
 
 @code {
-
+    private static IEnumerable<int> PageItemsSource => new int[] { 4, 10, 20 };
     private Users? Users;
 
-    private void OpenInviteUserDialog()
+    private void OpenInviteUserDialog() => DialogService.Show(new DialogOption()
+        {
+            Title = "Invite User",
+            Component = BootstrapDynamicComponent.CreateComponent<UserInviteDialog>()
+        });
+
+    private async Task<QueryData<User>> OnQueryAsync(QueryPageOptions options)
     {
-        var moviesModal = Modal.Show<UserInviteDialog>();
+        var orderby = ((SortOrder)options.SortOrder == SortOrder.Unset) ? string.Empty : options.SortName + " " + options.SortOrder.ToString();
+
+        Users = await YZPortalApiClient.GetUsers(pageNumber: options.PageIndex, orderBy: orderby);
+
+        return await Task.FromResult(new QueryData<User>()
+            {
+                Items = Users?.Results ?? new List<User>(),
+                TotalCount = Users?.TotalItems ?? 0,
+                IsSorted = !string.IsNullOrEmpty(orderby)
+            });
     }
 
-    private async Task SortBy(string sortBy)
+    private Task<bool> OnDeleteAsync(IEnumerable<User> items)
     {
-        Users = await YZPortalApiClient.GetUsers(orderBy: sortBy);
-        StateHasChanged();
-    }
-
-    private async Task ChangePage(int offset)
-    {
-        Users.PageNumber += offset;
-        Users = await YZPortalApiClient.GetUsers(pageNumber: Users.PageNumber, pageSize: Users.PageSize, orderBy: Users.OrderBy);
-        StateHasChanged();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        Users = await YZPortalApiClient.GetUsers();
+        var idsOfDltedUsers = Users?.Results.Select(x => x.Id).ToList();
+        Users?.Results.RemoveAll(p => idsOfDltedUsers.Contains(p.Id));
+        return Task.FromResult(true);
     }
 }

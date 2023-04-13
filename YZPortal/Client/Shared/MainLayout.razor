@@ -1,31 +1,60 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@using Microsoft.AspNetCore.Authorization;
+@using YZPortal.Client.Services.Authentication;
+@using YZPortal.Client.Services.LocalStorage;
+@using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
 @inherits LayoutComponentBase
+@inject CustomAuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthorizationService _authorizationService
+@inject ILocalStorageService LocalStorageService
+<PageTitle>YZPortal</PageTitle>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-    <main>
-        <div class="top-row px-4 auth">
-            <UserNavMenu />
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+<Layout SideWidth="0" IsPage="true" ShowGotoTop="true" ShowCollapseBar="true"
+        IsFullSide="@IsFullSide" IsFixedHeader="@IsFixedHeader" IsFixedFooter="@IsFixedFooter" ShowFooter="@ShowFooter"
+        TabDefaultUrl="/" UseTabSet="@UseTabSet" AdditionalAssemblies="new[] { GetType().Assembly }" class="@Theme">
+    <Header>
+        <span class="ms-3 flex-sm-fill d-none d-sm-block"></span>
+        <div class="flex-fill d-sm-none">
         </div>
-        <article class="content px-4">
+        <AuthorizeView>
+            <Authorized>
+                <Logout ImageUrl="_content/Reference.Shared/images/Argo.png" DisplayName="超级管理员" UserName="Admin">
+                    <LinkTemplate>
+                        <a href="/fetchDealers"><i class="fa-solid fa-suitcase"></i>Edit User Details</a>
+                        <a href="#" @onclick="OnLogout"><i class="fa-solid fa-suitcase"></i>Logout</a>
+                    </LinkTemplate>
+                </Logout>
+                @*<Widget></Widget>*@
+                @*<div class="layout-drawer" @onclick="@(e => IsOpen = !IsOpen)"><i class="fa fa-gears"></i></div>*@
+            </Authorized>
+            <NotAuthorized>
+                @*<a href="/user/register">Register</a>*@
+                <a class="logout-text" href="/Authentication/Login">Login</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </Header>
+    <Side>
+        <div class="layout-banner">
+            <img class="layout-logo" src="_content/Reference.Shared/images/brand.png" />
+            <div class="layout-title">
+                <span>YZPortal</span>
+            </div>
+        </div>
+        <AuthorizeView Policy="@Policies.IsAdmin">
+            <div class="layout-menu">
+                <div class="scroll">
+                    <Menu Items="@Menus" IsVertical="true" class="menu is-vertical is-collapsed" />
+                </div>
+            </div>
+        </AuthorizeView>
+    </Side>
+    <Main>
+        <CascadingValue Value="this" IsFixed="true">
             @Body
-        </article>
-    </main>
-</div>
-
-@code {
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-    }
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-    }
-}
+        </CascadingValue>
+    </Main>
+    <Footer>
+        <div class="text-center flex-fill">
+            <a class="page-layout-demo-footer-link" href="https://gitee.com/LongbowEnterprise/BootstrapAdmin" target="_blank">Bootstrap Admin</a>
+        </div>
+    </Footer>
+</Layout>

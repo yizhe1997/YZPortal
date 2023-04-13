@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+<Menu IsVertical="true">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
@@ -48,7 +48,7 @@
             </div>
         </AuthorizeView>
     </nav>
-</div>
+</Menu>
 
 @code {
     private bool collapseNavMenu = true, expandSubNav;

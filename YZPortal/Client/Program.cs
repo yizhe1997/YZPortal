@@ -6,7 +6,6 @@ using YZPortal.Client.Clients.YZPortalApi;
 using YZPortal.Client.Services.LocalStorage;
 using YZPortal.Client.Services.Authorization;
 using YZPortal.Client.Pages.Users;
-using Blazored.Modal;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var configuration = builder.Configuration;
@@ -29,8 +28,6 @@ builder.Services.AddBootstrapBlazor();
 #region Dialogs
 
 builder.Services.AddScoped<UserInviteDialog>();
-
-builder.Services.AddBlazoredModal();
 
 #endregion
 

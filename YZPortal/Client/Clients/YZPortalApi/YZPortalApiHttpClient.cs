@@ -166,7 +166,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
 		public async Task<Users> GetUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
 		{
-            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, orderBy, searchString);
+            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
 
 			using var response = await _http.SendAsync(requestMsg);
 			try
@@ -228,11 +228,11 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Dealers
 
-        public async Task<Dealers> GetDealers()
+        public async Task<Dealers> GetDealers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
         {
-			var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/Dealers");
+			var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/Dealers", pageSize, pageNumber, searchString, orderBy);
 
-			using var response = await _http.SendAsync(requestMsg);
+            using var response = await _http.SendAsync(requestMsg);
 			try
             {
                 var output = await response.Content.ReadFromJsonAsync<Dealers>() ?? new();
@@ -261,7 +261,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
         // TODO: make it such that each dealer has its own set of content access levels
         public async Task<ContentAccessLevels> GetContentAccessLevels(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
         {
-            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/ContentAccessLevels", pageSize, pageNumber, orderBy, searchString);
+            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/ContentAccessLevels", pageSize, pageNumber, searchString, orderBy);
 
             using var response = await _http.SendAsync(requestMsg);
             try
@@ -289,7 +289,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         public async Task<DealerRoles> GetDealerRoles(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
         {
-            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/DealerRoles", pageSize, pageNumber, orderBy, searchString);
+            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/DealerRoles", pageSize, pageNumber, searchString, orderBy);
 
             using var response = await _http.SendAsync(requestMsg);
             try
