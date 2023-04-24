@@ -25,10 +25,11 @@ namespace YZPortal.Core.Domain.Database.Users
         public DateTime? LastLoggedIn { get; set; }
         public List<Membership> Memberships { get; set; } = new List<Membership>();
         public List<UserPasswordReset> UserPasswordResets { get; set; } = new List<UserPasswordReset>();
+        public UserInvite? UserInvite { get; set; }
 
-		#region Identity Provider
+        #region Identity Provider
 
-		public Guid TokenSubClaim { get; set; }
+        public Guid TokenSubClaim { get; set; }
 		public int IdentityProvider { get; set; }
 
 		#endregion

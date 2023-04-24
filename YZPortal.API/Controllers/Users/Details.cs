@@ -2,14 +2,13 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using YZPortal.API.Controllers.Users;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Error;
 
 namespace YZPortal.API.Controllers.Users
 {
-	public class Details
+    public class Details
 	{
 		public class Request : IRequest<Model>
 		{

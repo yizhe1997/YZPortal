@@ -224,6 +224,13 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new UserLoginResult();
         }
 
+        public async Task<HttpResponseMessage> DeleteUser(Guid userId)
+        {
+            var requestMsg = await CreateAuthHttpRequestMessage($"api/v1/users/{userId}", HttpMethod.Delete);
+            var response = await _http.SendAsync(requestMsg);
+            return response;
+        }
+
         #endregion
 
         #region Dealers

@@ -3,6 +3,7 @@ using YZPortal.API.Controllers.Memberships;
 using YZPortal.API.Controllers.Memberships.ContentAccessLevels;
 using YZPortal.API.Controllers.Memberships.DealerRoles;
 using YZPortal.Core.Domain.Database.Memberships;
+using YZPortal.Core.Domain.Database.Users;
 using YZPortal.FullStackCore.Enums.Memberships;
 
 namespace YZPortal.Api.Controllers.Memberships
@@ -21,8 +22,8 @@ namespace YZPortal.Api.Controllers.Memberships
             CreateMap<Membership, Delete.Model>();
 
             // Create Invite
-            CreateMap<Create.Request, DealerInvite>();
-            CreateMap<DealerInvite, Create.Model>();
+            CreateMap<Create.Request, UserInvite>();
+            CreateMap<UserInvite, Create.Model>();
 
             // Update
             CreateMap<Membership, Update.Model>();

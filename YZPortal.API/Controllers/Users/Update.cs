@@ -1,17 +1,15 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
-using YZPortal.Core.Domain.Database.Users;
 using YZPortal.Core.Error;
 
 namespace YZPortal.API.Controllers.Users
 {
-	public class Update
+    public class Update
 	{
 		public class Request : IRequest<Model>
 		{

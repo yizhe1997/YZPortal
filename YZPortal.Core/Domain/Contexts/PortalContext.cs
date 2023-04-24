@@ -30,6 +30,8 @@ namespace YZPortal.Core.Domain.Contexts
         #region Users
 
         public DbSet<UserPasswordReset> UserPasswordResets { get; set; }
+        public DbSet<UserInvite> UserInvites { get; set; }
+        public DbSet<UserInviteDealerSelection> UserInviteDealerSelections { get; set; }
 
         #endregion
 
@@ -46,7 +48,7 @@ namespace YZPortal.Core.Domain.Contexts
         #region Dealers
 
         public DbSet<Dealer> Dealers { get; set; }
-        public DbSet<DealerInvite> DealerInvites { get; set; }
+        // should add dealerId to dealerRole, and contentaccesslevel is dealer specific also
         public DbSet<DealerRole> DealerRoles { get; set; }
 
         #endregion

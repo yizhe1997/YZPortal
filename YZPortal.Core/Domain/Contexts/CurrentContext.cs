@@ -37,7 +37,6 @@ namespace YZPortal.Core.Domain.Contexts
 
         public Guid CurrentDealerId => Claims != null ? Guid.TryParse(Claims.FirstOrDefault(x => x.Type == "dealerId")?.Value, out Guid result) ? result : Guid.Empty : Guid.Empty;
         public Dealer? CurrentDealer => CurrentDealerId != Guid.Empty ? _dbContext.Dealers.FirstOrDefault(u => u.Id == CurrentDealerId) : null;
-        public IQueryable<DealerInvite> CurrentDealerInvites => _dbContext.DealerInvites.Where(i => i.DealerId == CurrentDealerId);
         public IQueryable<Membership> CurrentDealerMemberships => _dbContext.Memberships
             .Include(x => x.User)
             .Include(x => x.Dealer)

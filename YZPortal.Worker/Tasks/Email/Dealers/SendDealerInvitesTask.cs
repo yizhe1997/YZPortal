@@ -1,6 +1,7 @@
 ﻿using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Linq;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
 using YZPortal.Worker.Helpers.Scriban;
@@ -38,8 +39,9 @@ namespace YZPortal.Worker.Tasks.Email.Dealers
 
                 // Query
                 var lastAttempted = DateTime.UtcNow.Subtract(emailOptions.AttemptInterval);
-                var dbInvites = await dbContext.DealerInvites
-                    .Include(i => i.Dealer)
+                var dbInvites = await dbContext.UserInvites
+                    .Include(i => i.UserInviteDealerSelections)
+                    .ThenInclude(x => x.Dealer)
                     .Where(x =>
                         (x.SentDateTime == null && (x.ValidUntilDateTime > DateTime.UtcNow || x.ValidUntilDateTime == null)) || // (has not been sent AND is still valid) OR
                         (
@@ -51,12 +53,13 @@ namespace YZPortal.Worker.Tasks.Email.Dealers
 
                 // Prepare template input
                 var models = dbInvites
-                    .GroupBy(x => x.Email)
                     .Select(x => new SendInviteHtmlInput
                     {
-                        callbackurl = x.ToList().Select(x => x.CallbackUrl).First(),
-                        dealername = string.Join(", ", x.ToList().Select(x => x.Dealer.Name).ToList()),
-                        Notifications = x.ToList()
+                        callbackurl = x.CallbackUrl,
+                        dealername = (x.UserInviteDealerSelections.Any()) ? 
+                        string.Join(", ", x.UserInviteDealerSelections.Select(x => x.Dealer.Name).ToList()) :
+                        "aaaaaa",
+                        Notification = x
                     }).ToList();
 
                 // Send notifications and update emailable entities
@@ -64,7 +67,7 @@ namespace YZPortal.Worker.Tasks.Email.Dealers
                 {
                     Content = template.Render(x),
                     Subject = "YZ Portal Invite",
-                    Notifications = x.Notifications
+                    Notifications = new List<EmailableEntity>() { x.Notification }
                 }).ToList(), cancellationToken);
 
                 await dbContext.BulkUpdateAsync(dbInvites, cancellationToken: cancellationToken);
@@ -81,7 +84,7 @@ namespace YZPortal.Worker.Tasks.Email.Dealers
         {
             public string? callbackurl { get; set; }
             public string? dealername { get; set; }
-            public IEnumerable<EmailableEntity> Notifications { get; set; } = new List<EmailableEntity>();
+            public EmailableEntity? Notification { get; set; }
         }
     }
 }

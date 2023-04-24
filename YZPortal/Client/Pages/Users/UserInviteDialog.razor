@@ -1,8 +1,11 @@
 ﻿@using BootstrapBlazor.Components
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Diagnostics.CodeAnalysis;
 @using YZPortal.Client.Clients.YZPortalApi
+@using YZPortal.Client.Models.Abstracts;
 @using YZPortal.Client.Models.Memberships;
+@using YZPortal.Client.Models.Dealers;
 @using YZPortal.Client.Models.Users
 @using YZPortal.FullStackCore.Infrastructure.Security.Authorization
 
@@ -12,58 +15,73 @@
     <DataAnnotationsValidator />Dialog
     <div class="form-group">
         <label for="UserName">Email address:</label>
-        <InputText id="UserName" class="form-control" @bind-Value="@UserInvite.Email" />
+        <div class="col-6">
+            <BootstrapInput @bind-Value="@UserInvite.Email" />
+        </div>
         <ValidationMessage For="@(() => UserInvite.Email)" />
     </div>
-    <div class="form-group">
-        <label for="Name">Full name:</label>
-        <InputText id="Name" class="form-control" @bind-Value="@UserInvite.Name" />
-        <ValidationMessage For="@(() => UserInvite.Name)" />
-    </div>
-    <div class="form-group">
-        <label for="DealerRoles">Roles:</label>
-        <InputSelect id="DealerRoles" class="form-control" @bind-Value="@UserInvite.Role">
-            @foreach (var level in DealerRoles.Results)
-            {
-                <option value="@level.Code">@level.Name</option>
-            }
-        </InputSelect>
-        <ValidationMessage For="@(() => UserInvite.Role)" />
-    </div>
-    <div class="form-group">
-        <label for="ContentAccessLevels">Content access levels:</label>
-        <div class="col-12 col-sm-6">
-            <MultiSelect Items="@LongItems" @bind-Value="@SelectedContentAccessLevels" />
-        </div>
-        <ValidationMessage For="@(() => SelectedContentAccessLevels)" />
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Invite</button>
-    </div>
+    <Table TItem="UserInviteDealerSelection"
+           IsBordered="true"
+           ShowToolbar="true"
+           ShowDefaultButtons="true"
+           ShowDeleteButton="true"
+           ShowAddButton="true"
+           ShowEditButton="false"
+           ShowRefresh="false"
+           ShowExtendButtons="true"
+           ClickToSelect="true"
+           AddModalTitle="增加测试数据窗口" EditModalTitle="编辑测试数据窗口"
+           OnAddAsync="@OnAddAsync"
+           EditMode="EditMode.InCell"
+           InsertRowMode="InsertRowMode.First"
+           TableSize="TableSize.Normal"
+           @bind-Items="@UserInvite.UserInviteDealerSelections"
+           OnSaveAsync="@OnSaveAsync">
+        <TableColumns Context="userInviteDealerSelection">
+            <TableColumn @bind-Field="@userInviteDealerSelection.DealerId" Items="@Dealers" Width="160" Editable>
+                <EditTemplate Context="value">
+                    <Select Items="@Dealers" @bind-Value="value.DealerId" />
+                </EditTemplate>
+            </TableColumn>
+            <TableColumn @bind-Field="@userInviteDealerSelection.Role" Items="@DealerRoles" Width="160">
+                <EditTemplate Context="value">
+                    <Select Items="@DealerRoles" @bind-Value="value.Role" />
+                </EditTemplate>
+            </TableColumn>
+            <TableColumn @bind-Field="@userInviteDealerSelection.Role" Items="@ContentAccessLevels" Width="160">
+                <EditTemplate Context="value">
+                    <MultiSelect Items="@ContentAccessLevels" @bind-Value="value.ContentAccessLevels" />
+                </EditTemplate>
+            </TableColumn>
+        </TableColumns>
+    </Table>
+    <button type="submit" class="btn btn-primary">Invite</button>
 </EditForm>
 
+
+
 @code {
+    private List<UserInviteDealerSelection> Items { get; set; } = new List<UserInviteDealerSelection>();
     private UserInvite UserInvite = new UserInvite();
-    private DealerRoles DealerRoles = new DealerRoles();
-    private ContentAccessLevels ContentAccessLevels { get; set; } = new ContentAccessLevels();
-    private List<SelectedItem> LongItems = new List<SelectedItem>();
-    private int[] SelectedContentAccessLevels { get; set; } = Array.Empty<int>();
+    private List<SelectedItem> ContentAccessLevels = new List<SelectedItem>();
+    private List<SelectedItem> DealerRoles = new List<SelectedItem>();
+    private List<SelectedItem> Dealers = new List<SelectedItem>();
 
     [Parameter]
     public EventCallback OnInvite { get; set; }
 
-    private static List<SelectedItem> GenerateDataSource(ContentAccessLevels source) => source.Results.Select(i => new SelectedItem(i.Code.ToString(), i.Name ?? string.Empty)).ToList();
+    private static List<SelectedItem> GenerateDataSource(PagedModel<BaseEnumModel> source) => source.Results.Select(i => new SelectedItem(i.Code.ToString(), i.Name ?? string.Empty)).ToList();
+    private static List<SelectedItem> GenerateDataSource(Dealers source) => source.Results.Select(i => new SelectedItem(i.Id.ToString(), i.Name ?? string.Empty)).ToList();
 
     private async Task OnValidSubmit()
     {
-        UserInvite.ContentAccessLevels.AddRange(SelectedContentAccessLevels);
+        //UserInvite.ContentAccessLevels.AddRange(SelectedContentAccessLevels);
+        UserInvite.UserInviteDealerSelections = Items;
         var result = await YZPortalApiClient.UserInvite(UserInvite);
 
         if (result.IsStatusCodeSucess)
         {
             await OnInvite.InvokeAsync();
-
-
         }
         else
         {
@@ -75,9 +93,81 @@
     {
         await base.OnInitializedAsync();
 
-        DealerRoles = await YZPortalApiClient.GetDealerRoles();
-        ContentAccessLevels = await YZPortalApiClient.GetContentAccessLevels();
+        var dealerRoles = await YZPortalApiClient.GetDealerRoles();
+        this.DealerRoles = GenerateDataSource(dealerRoles);
 
-        LongItems = GenerateDataSource(ContentAccessLevels);
+        var contentAccessLevels = await YZPortalApiClient.GetContentAccessLevels();
+        this.ContentAccessLevels = GenerateDataSource(contentAccessLevels);
+
+        var dealers = await YZPortalApiClient.GetDealers();
+        this.Dealers = GenerateDataSource(dealers);
     }
+
+    private Task<bool> OnSaveAsync(UserInviteDealerSelection item, ItemChangedType changedType)
+    {
+        if (changedType == ItemChangedType.Add)
+        {
+            Items.Add(item);
+        }
+        else
+        {
+            //var oldItem = Items.FirstOrDefault(i => i.Id == item.Id);
+            //if (oldItem != null)
+            //{
+            //    oldItem.Name = item.Name;
+            //    oldItem.Address = item.Address;
+            //    oldItem.DateTime = item.DateTime;
+            //    oldItem.Count = item.Count;
+            //    oldItem.Complete = item.Complete;
+            //    oldItem.Education = item.Education;
+            //}
+        }
+
+        return Task.FromResult(true);
+
+    }
+
+    //private async Task<QueryData<UserInviteDealerSelection>> OnQueryAsync(QueryPageOptions options)
+    //{
+    //    var orderby = ((SortOrder)options.SortOrder == SortOrder.Unset) ? string.Empty : options.SortName + " " + options.SortOrder.ToString();
+
+    //    UserInviteDealerSelection = await YZPortalApiClient.GetUsers(pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby);
+
+    //    return await Task.FromResult(new QueryData<User>()
+    //        {
+    //            Items = UserInviteDealerSelection?.Results ?? new List<User>(),
+    //            TotalCount = UserInviteDealerSelection?.TotalItems ?? 0,
+    //            IsSorted = !string.IsNullOrEmpty(orderby),
+    //            IsSearch = true
+    //        });
+    //}
+
+    //private async Task<bool> OnDeleteAsync(IEnumerable<UserInviteDealerSelection> items)
+    //{
+    //    items.ToList().ForEach(foo => Items.Remove(foo));
+    //    return Task.FromResult(true);
+
+    //    var users = items.ToList();
+    //    foreach (var user in users)
+    //    {
+    //        var response = await YZPortalApiClient.DeleteUser(user.Id);
+
+    //        if (response.IsSuccessStatusCode)
+    //            users.Remove(user);
+    //    }
+
+    //    return await Task.FromResult(true);
+    //}
+
+    private static Task<UserInviteDealerSelection> OnAddAsync() => Task.FromResult(new UserInviteDealerSelection() { });
+
+    //private async Task<UserInviteDealerSelection> OnAddAsync()
+    //{
+    //    var userInviteDealerSelection = new UserInviteDealerSelection()
+    //        {
+    //            DealerId = Guid.TryParse(Dealers.FirstOrDefault()?.Value, out Guid result) ? result : Guid.Empty
+    //        };
+
+    //    return await Task.FromResult(userInviteDealerSelection);
+    //}
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YZPortal.Core.Domain.Contexts;
 
@@ -11,9 +12,11 @@ using YZPortal.Core.Domain.Contexts;
 namespace YZPortal.Core.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    partial class PortalContextModelSnapshot : ModelSnapshot
+    [Migration("20230416091034_AddUserInvitesAndDltDealerInvitesFix")]
+    partial class AddUserInvitesAndDltDealerInvitesFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -568,9 +571,6 @@ namespace YZPortal.Core.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("UserInviteId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -584,8 +584,6 @@ namespace YZPortal.Core.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("UserInviteId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -646,10 +644,15 @@ namespace YZPortal.Core.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getutcdate()");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("ValidUntilDateTime")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserInvites");
                 });
@@ -672,6 +675,9 @@ namespace YZPortal.Core.Migrations
                         .HasDefaultValueSql("getutcdate()");
 
                     b.Property<Guid>("DealerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("MembershipId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UpdatedBy")
@@ -890,13 +896,15 @@ namespace YZPortal.Core.Migrations
                     b.Navigation("Membership");
                 });
 
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.User", b =>
+            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.UserInvite", b =>
                 {
-                    b.HasOne("YZPortal.Core.Domain.Database.Users.UserInvite", "UserInvite")
+                    b.HasOne("YZPortal.Core.Domain.Database.Users.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserInviteId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("UserInvite");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.UserInviteDealerSelection", b =>

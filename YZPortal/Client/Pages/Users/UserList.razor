@@ -1,5 +1,6 @@
 ﻿@page "/users"
 @using Microsoft.AspNetCore.Authorization;
+@using System.Diagnostics.CodeAnalysis;
 @using YZPortal.Client.Clients.YZPortalApi;
 @using YZPortal.Client.Models.Users;
 @using YZPortal.Client.Pages.Users;
@@ -10,55 +11,80 @@
 
 <h1>Users</h1>
 
-<Button OnClick="@OpenInviteUserDialog" Text="Invite User" />
-
-<Table PageItemsSource="@PageItemsSource"
-       TItem="User" 
+<Table TItem="User"
        IsPagination="true"
+       PageItemsSource="@PageItemsSource"
        IsBordered="true"
        ShowToolbar="true"
-       ShowDefaultButtons="false"
-       ShowExtendButtons="true"
+       ShowDefaultButtons="true"
+       ShowDeleteButton="true"
+       ShowAddButton="false"
+       ShowEditButton="false"
        ClickToSelect="true"
-       TableSize="TableSize.Compact"
+       ShowSearch="true"
+       ShowCardView="true"
+       ShowFooter="true"
+       TableSize="TableSize.Normal"
        OnDeleteAsync="@OnDeleteAsync"
        OnQueryAsync="@OnQueryAsync">
+    <TableToolbarTemplate>
+        <TableToolbarButton TItem="User"
+                            Color="Color.Primary"
+                            Icon="fa-fw fa-solid fa-floppy-disk"
+                            Text="Invite User"
+                            OnClick="@OpenInviteUserDialog"
+                                        IsAsync />
+    </TableToolbarTemplate>
     <TableColumns>
         <TableColumn @bind-Field="@context.UserName" Sortable="true" />
         <TableColumn @bind-Field="@context.Name" Sortable="true" />
-        <TableColumn @bind-Field="@context.Admin" Sortable="true" />
+        <TableColumn @bind-Field="@context.Admin" Sortable="true">
+            <Template Context="value">
+                <Checkbox Value="@value.Value" IsDisabled="true"></Checkbox>
+            </Template>
+        </TableColumn>
         <TableColumn @bind-Field="@context.LastLoggedIn" Sortable="true" FormatString="yyyy-MM-dd" />
     </TableColumns>
 </Table>
 
 @code {
-    private static IEnumerable<int> PageItemsSource => new int[] { 4, 10, 20 };
+    private static IEnumerable<int> PageItemsSource => new int[] { 2, 4, 10 };
+
     private Users? Users;
 
     private void OpenInviteUserDialog() => DialogService.Show(new DialogOption()
         {
             Title = "Invite User",
-            Component = BootstrapDynamicComponent.CreateComponent<UserInviteDialog>()
+            Component = BootstrapDynamicComponent.CreateComponent<UserInviteDialog>(),
+            Size = Size.Large,
         });
 
     private async Task<QueryData<User>> OnQueryAsync(QueryPageOptions options)
     {
         var orderby = ((SortOrder)options.SortOrder == SortOrder.Unset) ? string.Empty : options.SortName + " " + options.SortOrder.ToString();
 
-        Users = await YZPortalApiClient.GetUsers(pageNumber: options.PageIndex, orderBy: orderby);
+        Users = await YZPortalApiClient.GetUsers(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby);
 
         return await Task.FromResult(new QueryData<User>()
             {
                 Items = Users?.Results ?? new List<User>(),
                 TotalCount = Users?.TotalItems ?? 0,
-                IsSorted = !string.IsNullOrEmpty(orderby)
+                IsSorted = !string.IsNullOrEmpty(orderby),
+                IsSearch = true
             });
     }
 
-    private Task<bool> OnDeleteAsync(IEnumerable<User> items)
+    private async Task<bool> OnDeleteAsync(IEnumerable<User> items)
     {
-        var idsOfDltedUsers = Users?.Results.Select(x => x.Id).ToList();
-        Users?.Results.RemoveAll(p => idsOfDltedUsers.Contains(p.Id));
-        return Task.FromResult(true);
+        var users = items.ToList();
+        foreach (var user in users)
+        {
+            var response = await YZPortalApiClient.DeleteUser(user.Id);
+
+            if (response.IsSuccessStatusCode)
+                users.Remove(user);
+        }
+
+        return await Task.FromResult(true);
     }
 }
