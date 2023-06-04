@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace YZPortal.Client.Models.Abstracts
+﻿namespace YZPortal.Client.Models.Abstracts
 {
     public class PagedModel<T>
     {

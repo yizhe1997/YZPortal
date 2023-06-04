@@ -17,7 +17,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddLocalStorageService();
 
-builder.Services.AddAuthentication();
+builder.Services.AddAuthentication(configuration);
 
 builder.Services.AddAuthorization();
 

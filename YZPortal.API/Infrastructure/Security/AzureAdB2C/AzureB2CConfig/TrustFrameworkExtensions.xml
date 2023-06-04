@@ -1,0 +1,300 @@
+﻿<TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0" TenantId="yzorganization.onmicrosoft.com" PolicyId="B2C_1A_TrustFrameworkExtensions" PublicPolicyUri="http://yzorganization.onmicrosoft.com/B2C_1A_TrustFrameworkExtensions" TenantObjectId="4369f48a-7236-4eeb-b728-295446bfdec9">
+	<BasePolicy>
+		<TenantId>yzorganization.onmicrosoft.com</TenantId>
+		<PolicyId>B2C_1A_TrustFrameworkLocalization</PolicyId>
+	</BasePolicy>
+	<BuildingBlocks>
+		<ClaimsSchema>
+			<ClaimType Id="identityProviderAccessToken">
+				<DisplayName>Identity Provider Access Token</DisplayName>
+				<DataType>string</DataType>
+				<AdminHelpText>Stores the access token of the identity provider.</AdminHelpText>
+			</ClaimType>
+			<ClaimType Id="identityProviderRefreshToken">
+				<DisplayName>Identity provider refresh token</DisplayName>
+				<DataType>string</DataType>
+			</ClaimType>
+			<ClaimType Id="bearerToken">
+				<DisplayName>AccessToken for graph</DisplayName>
+				<DataType>string</DataType>
+				<UserHelpText>AccessToken to use Graph API as an app.</UserHelpText>
+			</ClaimType>
+			<ClaimType Id="groupDisplayNames">
+				<DisplayName>Groups for graph user</DisplayName>
+				<DataType>stringCollection</DataType>
+				<DefaultPartnerClaimTypes>
+					<Protocol Name="OAuth2" PartnerClaimType="role" />
+					<Protocol Name="OpenIdConnect" PartnerClaimType="role" />
+					<Protocol Name="SAML2" PartnerClaimType="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" />
+				</DefaultPartnerClaimTypes>
+				<UserHelpText>Collection of groups assigned to graph user.</UserHelpText>
+			</ClaimType>
+		</ClaimsSchema>
+	</BuildingBlocks>
+	<ClaimsProviders>
+		<ClaimsProvider>
+			<DisplayName>RESTYZAPI</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="RESTYZAPI-GetGroupsFromMSGraph">
+					<DisplayName>Get groups for graph user</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<!-- Set the ServiceUrl with your own REST API endpoint -->
+						<Item Key="ServiceUrl">https://yzportalapi.azurewebsites.net/api/v1/GraphGroups/DisplayNames</Item>
+						<Item Key="SendClaimsIn">QueryString</Item>
+						<Item Key="AuthenticationType">Basic</Item>
+						<Item Key="AllowInsecureAuthInProduction">false</Item>
+					</Metadata>
+					<CryptographicKeys>
+						<!-- Set authentication using graph app credentials -->
+						<Key Id="BasicAuthenticationUsername" StorageReferenceId="B2C_1A_SecureRESTYZAPIUserName" />
+						<Key Id="BasicAuthenticationPassword" StorageReferenceId="B2C_1A_SecureRESTYZAPIPassword" />
+					</CryptographicKeys>
+					<InputClaims>
+						<!-- Claims sent to your REST API -->
+						<InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+					</InputClaims>
+					<OutputClaims>
+						<!-- Claims parsed from your REST API -->
+						<OutputClaim ClaimTypeReferenceId="groupDisplayNames" PartnerClaimType="value" />
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+		<ClaimsProvider>
+			<DisplayName>Token Issuer</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="JwtIssuer">
+					<DisplayName>JWT Issuer</DisplayName>
+					<Protocol Name="OpenIdConnect" />
+					<OutputTokenFormat>JWT</OutputTokenFormat>
+					<Metadata>
+						<Item Key="client_id">{service:te}</Item>
+						<Item Key="issuer_refresh_token_user_identity_claim_type">objectId</Item>
+						<Item Key="SendTokenResponseBodyWithJsonNumbers">true</Item>
+					</Metadata>
+					<CryptographicKeys>
+						<Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+						<Key Id="issuer_refresh_token_key" StorageReferenceId="B2C_1A_TokenEncryptionKeyContainer" />
+					</CryptographicKeys>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-jwt-issuer" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+		<ClaimsProvider>
+			<DisplayName>Graph</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="SecureREST-AccessToken">
+					<DisplayName>Get access token for graph</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<!-- Set the ServiceUrl with your own REST API endpoint -->
+						<Item Key="ServiceUrl">https://login.microsoftonline.com/yzorganization.onmicrosoft.com/oauth2/v2.0/token</Item>
+						<Item Key="AuthenticationType">Basic</Item>
+						<Item Key="SendClaimsIn">Form</Item>
+					</Metadata>
+					<CryptographicKeys>
+						<!-- Set authentication using graph app credentials -->
+						<Key Id="BasicAuthenticationUsername" StorageReferenceId="B2C_1A_SecureRESTClientId" />
+						<Key Id="BasicAuthenticationPassword" StorageReferenceId="B2C_1A_SecureRESTClientSecret" />
+					</CryptographicKeys>
+					<InputClaims>
+						<!-- Claims sent to your REST API -->
+						<InputClaim ClaimTypeReferenceId="grant_type" DefaultValue="client_credentials" />
+						<InputClaim ClaimTypeReferenceId="scope" DefaultValue="https://graph.microsoft.com/.default" />
+					</InputClaims>
+					<OutputClaims>
+						<!-- Claims parsed from your REST API -->
+						<OutputClaim ClaimTypeReferenceId="bearerToken" PartnerClaimType="access_token" />
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+				<TechnicalProfile Id="REST-GetGroupsFromMSGraph">
+					<DisplayName>Get groups for graph user</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ServiceUrl">https://graph.microsoft.com/beta/users/{objectId}/memberOf?$select=displayName</Item>
+						<Item Key="AuthenticationType">Bearer</Item>
+						<Item Key="UseClaimAsBearerToken">bearerToken</Item>
+						<Item Key="SendClaimsIn">Url</Item>
+					</Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="bearerToken"/>
+						<InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+					</InputClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="groupDisplayNames" PartnerClaimType="value" />
+						<OutputClaim ClaimTypeReferenceId="groupDisplayNames" PartnerClaimType="value" />
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+		<ClaimsProvider>
+			<DisplayName>Facebook</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="Facebook-OAUTH">
+					<Metadata>
+						<Item Key="client_id">5920418734747480</Item>
+						<Item Key="scope">email public_profile</Item>
+						<Item Key="ClaimsEndpoint">https://graph.facebook.com/me?fields=id,first_name,last_name,name,email</Item>
+					</Metadata>
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+		<ClaimsProvider>
+			<DisplayName>Local Account SignIn</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="login-NonInteractive">
+					<Metadata>
+						<Item Key="client_id">373a57a4-9f2a-4a94-ad06-8450d12a8aae</Item>
+						<Item Key="IdTokenAudience">415d8dae-f3e2-4ab2-8551-a5be948d2a6b</Item>
+					</Metadata>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="client_id" DefaultValue="373a57a4-9f2a-4a94-ad06-8450d12a8aae" />
+						<InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="415d8dae-f3e2-4ab2-8551-a5be948d2a6b" />
+					</InputClaims>
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+		<ClaimsProvider>
+			<Domain>commonaad</Domain>
+			<DisplayName>Common AAD</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="AADCommon-OpenIdConnect">
+					<DisplayName>Multi-Tenant AAD</DisplayName>
+					<Description>Login with your Contoso account</Description>
+					<Protocol Name="OpenIdConnect" />
+					<Metadata>
+						<Item Key="METADATA">https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration</Item>
+						<!-- Update the Client ID below to the Application ID -->
+						<Item Key="client_id">0a698163-cfc1-424d-a61f-2f9e2004ce28</Item>
+						<Item Key="response_types">code</Item>
+						<Item Key="scope">openid profile</Item>
+						<Item Key="response_mode">form_post</Item>
+						<Item Key="HttpBinding">POST</Item>
+						<Item Key="UsePolicyInRedirectUri">false</Item>
+						<Item Key="DiscoverMetadataByTokenIssuer">true</Item>
+						<!-- The key below allows you to specify each of the Azure AD tenants that can be used to sign in. Update the GUIDs below for each tenant. -->
+						<Item Key="ValidTokenIssuerPrefixes">https://login.microsoftonline.com/4369f48a-7236-4eeb-b728-295446bfdec9/v2.0</Item>
+						<!-- The commented key below specifies that users from any tenant can sign-in. Uncomment if you would like anyone with an Azure AD account to be able to sign in. -->
+						<!-- <Item Key="ValidTokenIssuerPrefixes">https://login.microsoftonline.com/</Item> -->
+					</Metadata>
+					<CryptographicKeys>
+						<Key Id="client_secret" StorageReferenceId="B2C_1A_AADAppSecret" />
+					</CryptographicKeys>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="oid" />
+						<OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="given_name" />
+						<OutputClaim ClaimTypeReferenceId="surName" PartnerClaimType="family_name" />
+						<OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+						<OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="socialIdpAuthentication" AlwaysUseDefaultValue="true" />
+						<OutputClaim ClaimTypeReferenceId="identityProvider" PartnerClaimType="iss" />
+						<OutputClaim ClaimTypeReferenceId="identityProviderAccessToken" PartnerClaimType="{oauth2:access_token}"/>
+						<OutputClaim ClaimTypeReferenceId="identityProviderRefreshToken" PartnerClaimType="{oauth2:refresh_token}" />
+					</OutputClaims>
+					<OutputClaimsTransformations>
+						<OutputClaimsTransformation ReferenceId="CreateRandomUPNUserName" />
+						<OutputClaimsTransformation ReferenceId="CreateUserPrincipalName" />
+						<OutputClaimsTransformation ReferenceId="CreateAlternativeSecurityId" />
+						<OutputClaimsTransformation ReferenceId="CreateSubjectClaimFromAlternativeSecurityId" />
+					</OutputClaimsTransformations>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-SocialLogin" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+	</ClaimsProviders>
+	<UserJourneys>
+		<UserJourney Id="CustomSignUpSignIn">
+			<OrchestrationSteps>
+				<OrchestrationStep Order="1" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
+					<ClaimsProviderSelections>
+						<ClaimsProviderSelection TargetClaimsExchangeId="FacebookExchange" />
+						<ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
+						<ClaimsProviderSelection TargetClaimsExchangeId="AzureADCommonExchange" />
+					</ClaimsProviderSelections>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<!-- Check if the user has selected to sign in using one of the social providers -->
+				<OrchestrationStep Order="2" Type="ClaimsExchange">
+					<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+							<Value>objectId</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="FacebookExchange" TechnicalProfileReferenceId="Facebook-OAUTH" />
+						<ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
+						<ClaimsExchange Id="AzureADCommonExchange" TechnicalProfileReferenceId="AADCommon-OpenIdConnect" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<!-- For social IDP authentication, attempt to find the user account in the directory. -->
+				<OrchestrationStep Order="3" Type="ClaimsExchange">
+					<Preconditions>
+						<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+							<Value>authenticationSource</Value>
+							<Value>localAccountAuthentication</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="AADUserReadUsingAlternativeSecurityId" TechnicalProfileReferenceId="AAD-UserReadUsingAlternativeSecurityId-NoError" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<!-- Show self-asserted page only if the directory does not have the user account already (i.e. we do not have an objectId). 
+          This can only happen when authentication happened using a social IDP. If local account was created or authentication done
+          using ESTS in step 2, then an user account must exist in the directory by this time. -->
+				<OrchestrationStep Order="4" Type="ClaimsExchange">
+					<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+							<Value>objectId</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="SelfAsserted-Social" TechnicalProfileReferenceId="SelfAsserted-Social" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<!-- This step reads any user attributes that we may not have received when authenticating using ESTS so they can be sent 
+          in the token. -->
+				<OrchestrationStep Order="5" Type="ClaimsExchange">
+					<Preconditions>
+						<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+							<Value>authenticationSource</Value>
+							<Value>socialIdpAuthentication</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<!-- The previous step (SelfAsserted-Social) could have been skipped if there were no attributes to collect 
+             from the user. So, in that case, create the user in the directory if one does not already exist 
+             (verified using objectId which would be set from the last step if account was created in the directory. -->
+				<OrchestrationStep Order="6" Type="ClaimsExchange">
+					<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+							<Value>objectId</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<ClaimsExchanges>
+						<ClaimsExchange Id="AADUserWrite" TechnicalProfileReferenceId="AAD-UserWriteUsingAlternativeSecurityId" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="7" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="RESTYZAPI-GetGroupsFromMSGraph" TechnicalProfileReferenceId="RESTYZAPI-GetGroupsFromMSGraph" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+			</OrchestrationSteps>
+			<ClientDefinition ReferenceId="DefaultWeb" />
+		</UserJourney>
+	</UserJourneys>
+</TrustFrameworkPolicy>

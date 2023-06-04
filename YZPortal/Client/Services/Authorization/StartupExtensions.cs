@@ -6,7 +6,9 @@ namespace YZPortal.Client.Services.Authorization
     {
         public static void AddAuthorization(this IServiceCollection services)
         {
-            services.AddAuthorizationCore(opts =>
+			services.AddApiAuthorization();
+
+			services.AddAuthorizationCore(opts =>
             {
                 // DealerId
                 opts.AddDealerIdPolicy();

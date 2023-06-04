@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
+		<PackageReference Include="Azure.Identity" Version="1.9.0-beta.3" />
 		<PackageReference Include="CsvHelper" Version="30.0.1" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
 		<PackageReference Include="Flurl" Version="3.0.7" />
@@ -19,6 +20,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.Graph" Version="5.9.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 		<PackageReference Include="System.Web.Helpers.Crypto" Version="3.2.3" />
 	</ItemGroup>

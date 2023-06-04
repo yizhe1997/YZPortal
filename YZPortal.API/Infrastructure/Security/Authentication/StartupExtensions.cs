@@ -7,6 +7,8 @@ using YZPortal.API.Infrastructure.Swagger;
 using YZPortal.API.Infrastructure.Security.AzureAd;
 using YZPortal.API.Infrastructure.Security.AzureAdB2C;
 using YZPortal.API.Infrastructure.Security.Jwt;
+using Microsoft.AspNetCore.Authentication;
+using YZPortal.API.Infrastructure.Security.Authentication.BasicAuthentication;
 
 namespace YZPortal.API.Infrastructure.Security.Authentication
 {
@@ -37,6 +39,10 @@ namespace YZPortal.API.Infrastructure.Security.Authentication
                     ClockSkew = TimeSpan.Zero,
                 };
             });
+
+            // Basic
+            services.AddAuthentication()
+            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
 
             // Azure Ad
             services.AddAuthentication()

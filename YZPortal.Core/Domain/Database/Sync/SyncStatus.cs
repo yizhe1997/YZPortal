@@ -1,6 +1,5 @@
 ﻿using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
-using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Extensions;
 
 namespace YZPortal.Core.Domain.Database.Sync

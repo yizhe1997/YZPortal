@@ -1,10 +1,9 @@
-﻿@page "/Authentication/Logout"
+﻿@page "/Authentication2/Logout"
 @using YZPortal.Client.Clients.YZPortalApi;
 @using YZPortal.Client.Services.Authentication;
 @using YZPortal.Client.Services.LocalStorage;
 @inject NavigationManager Nav
 @inject ILocalStorageService LocalStorageService
-@inject CustomAuthenticationStateProvider AuthenticationStateProvider
 
 @code {
 
@@ -14,7 +13,7 @@
 
 		await LocalStorageService.ClearLocalStorage();
 
-		AuthenticationStateProvider.StateChanged();
+		//AuthenticationStateProvider.StateChanged();
 
 		Nav.NavigateTo("#");
 

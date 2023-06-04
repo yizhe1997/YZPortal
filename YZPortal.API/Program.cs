@@ -16,6 +16,7 @@ using YZPortal.API.Infrastructure.AzureStorage;
 using YZPortal.API.Infrastructure.Mediatr.PipelineBehavior;
 using YZPortal.API.Infrastructure.Mvc;
 using YZPortal.API.Infrastructure.Security.Authentication;
+using YZPortal.API.Infrastructure.Security.Authentication.BasicAuthentication;
 using YZPortal.API.Infrastructure.Security.Authorization;
 using YZPortal.API.Infrastructure.Security.AzureAd;
 using YZPortal.API.Infrastructure.Security.AzureAdB2C;
@@ -25,6 +26,7 @@ using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.Core.Error;
+using YZPortal.Core.Graph;
 using YZPortal.Core.StorageConnection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -109,6 +111,9 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options => options.SignIn
 // Jwt            
 builder.Services.AddJwt(configuration);
 
+// Basic Auth            
+builder.Services.AddBasicAuth(configuration);
+
 // AzureAd            
 builder.Services.AddAzureAd(configuration);
 
@@ -132,6 +137,9 @@ builder.Services.AddStorageConnectionStrings(configuration);
 
 // Swagger            
 builder.Services.AddSwaggerDocumentation(configuration);
+
+// Graph
+builder.Services.AddGraph(configuration);
 
 // Add pipeline behaviour (automatic validation and db entity auditing
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));

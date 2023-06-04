@@ -9,6 +9,9 @@ using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
 using YZPortal.FullStackCore.Extensions;
 using YZPortal.Client.Models.Abstracts;
 using YZPortal.Client.Models.Memberships;
+using Microsoft.AspNetCore.Components.Authorization;
+using YZPortal.Client.Models.Graph.Groups;
+using YZPortal.Client.Models.Graph.Users;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
@@ -17,25 +20,22 @@ namespace YZPortal.Client.Clients.YZPortalApi
         private readonly ILogger<YZPortalApiHttpClient> _logger;
         private readonly HttpClient _http;
         private readonly ILocalStorageService _localStorageService;
-        private readonly CustomAuthenticationStateProvider _authenticationStateProvider;
+        private readonly AuthenticationStateProvider _authenticationStateProvider;
 
-        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService tokenService, CustomAuthenticationStateProvider myAuthenticationStateProvider)
+        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService tokenService, AuthenticationStateProvider authenticationStateProvider)
         {
             _logger = logger;
             _http = http;
             _localStorageService = tokenService;
-            _authenticationStateProvider = myAuthenticationStateProvider;
+            _authenticationStateProvider = authenticationStateProvider;
         }
 
         #region Helpers
 
         public async Task<HttpRequestMessage> CreateAuthHttpRequestMessage(string relativeUri, HttpMethod httpMethod)
 		{
-			// Construct HttpRequestMessage with Uri
-			var requestMsg = new HttpRequestMessage(httpMethod, _http.BaseAddress + relativeUri);
-
-			// Add bearer token to request header
-			requestMsg.AddBearerToken(await _localStorageService.GetUserAuthenToken());
+            // Construct HttpRequestMessage with Uri
+            var requestMsg = new HttpRequestMessage(httpMethod, _http.BaseAddress + relativeUri);
 
 			return requestMsg;
 		}
@@ -58,9 +58,74 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Custom Parameters
 
+        // this feels redundant
         public void AddCustomQueryParam(HttpRequestMessage requestMsg, string key, string value)
         {
             requestMsg.AddQueryParam(key, value);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Graph
+
+        #region Users
+
+        public async Task<GraphUsers> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+        {
+            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphUsers", pageSize, pageNumber, searchString, orderBy);
+
+            using var response = await _http.SendAsync(requestMsg);
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<GraphUsers>() ?? new();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+                {
+                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
+                }
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new GraphUsers();
+        }
+
+        #endregion
+
+        #region Groups
+
+        public async Task<GraphGroups> GetGraphGroupsForUser(string userId, int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+        {
+            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
+
+            // Query parameters
+            if (!string.IsNullOrEmpty(userId))
+                requestMsg.AddQueryParam("graphUserId", userId);
+
+            using var response = await _http.SendAsync(requestMsg);
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<GraphGroups>() ?? new();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+                {
+                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
+                }
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new GraphGroups();
         }
 
         #endregion
@@ -91,8 +156,6 @@ namespace YZPortal.Client.Clients.YZPortalApi
 						var userId = subClaimValue == null ? Guid.Empty : Guid.Parse(subClaimValue);
 						await _localStorageService.SetUserId(userId);
 					}
-
-					_authenticationStateProvider.StateChanged();
 				}
 
                 return output;
@@ -136,8 +199,6 @@ namespace YZPortal.Client.Clients.YZPortalApi
                         var userDealerId = dealerIdClaimValue == null ? Guid.Empty : Guid.Parse(dealerIdClaimValue);
                         await _localStorageService.SetUserDealerId(userDealerId);
                     }
-
-                    _authenticationStateProvider.StateChanged();
                 }
 
                 return output;
@@ -210,8 +271,6 @@ namespace YZPortal.Client.Clients.YZPortalApi
                         var userId = subClaimValue == null ? Guid.Empty : Guid.Parse(subClaimValue);
                         await _localStorageService.SetUserId(userId);
                     }
-
-                    _authenticationStateProvider.StateChanged();
                 }
 
                 return output;

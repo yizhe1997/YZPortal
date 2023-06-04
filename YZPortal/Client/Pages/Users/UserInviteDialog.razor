@@ -61,7 +61,6 @@
 
 
 @code {
-    private List<UserInviteDealerSelection> Items { get; set; } = new List<UserInviteDealerSelection>();
     private UserInvite UserInvite = new UserInvite();
     private List<SelectedItem> ContentAccessLevels = new List<SelectedItem>();
     private List<SelectedItem> DealerRoles = new List<SelectedItem>();
@@ -75,8 +74,6 @@
 
     private async Task OnValidSubmit()
     {
-        //UserInvite.ContentAccessLevels.AddRange(SelectedContentAccessLevels);
-        UserInvite.UserInviteDealerSelections = Items;
         var result = await YZPortalApiClient.UserInvite(UserInvite);
 
         if (result.IsStatusCodeSucess)
@@ -107,7 +104,6 @@
     {
         if (changedType == ItemChangedType.Add)
         {
-            Items.Add(item);
         }
         else
         {

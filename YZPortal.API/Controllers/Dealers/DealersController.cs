@@ -26,7 +26,7 @@ namespace YZPortal.Api.Controllers.Dealers
 		///     Returns a list of dealer assigned to the current user.
 		/// </summary>
 		/// <param name="tokenSubClaim">External token</param>
-		[Authorize(Policy = "AllAuthenSchemes")]
+		[AllowAnonymous]
 		[HttpGet]
         public async Task<ActionResult<SearchResponse<Index.Model>>> GetDealers([FromQuery] Index.Request request) =>
             await _mediator.Send(request);

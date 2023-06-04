@@ -1,7 +1,6 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.AspNetCore.Authorization;
-using YZPortal.Client.Services.LocalStorage;
-using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.AspNetCore.Components;
 
 namespace YZPortal.Client.Shared
 {
@@ -23,15 +22,19 @@ namespace YZPortal.Client.Shared
 
         private List<MenuItem> Menus { get; set; } = new List<MenuItem>();
 		private string NotAuthorizeUrl { get; set; } = "/Authentication/Login";
+        [Inject] 
+        NavigationManager Navigation { get; set; }
+        [Inject] 
+        SignOutSessionStateManager SignOutManager { get; set; }
 
-		protected override async Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
 
             await GetMenuItems(Menus);
         }
 
-        // will upgrade this to fetch the menuitems from the server as lan
+        // will upgrade this to fetch the menuitems from the server since language is a thing
         private async Task GetMenuItems(List<MenuItem> Menus)
         {
             // Clear menus
@@ -54,11 +57,13 @@ namespace YZPortal.Client.Shared
         {
             await LocalStorageService.ClearLocalStorage();
 
-            await GetMenuItems(Menus);
+            //await GetMenuItems(Menus);
 
-            AuthenticationStateProvider.StateChanged();
+            //AuthenticationStateProvider.StateChanged();
 
-			StateHasChanged();
-		}
+            //StateHasChanged();
+            await SignOutManager.SetSignOutState();
+            Navigation.NavigateTo("authentication/logout");
+        }
     }
 }

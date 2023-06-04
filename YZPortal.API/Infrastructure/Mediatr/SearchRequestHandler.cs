@@ -12,6 +12,26 @@ namespace YZPortal.API.Infrastructure.Mediatr
         {
         }
 
+        #region Graph
+
+        // For handling index response that query against runtime services 
+        protected TResponse CreateIndexResponse<TModel>(SearchRequest<TResponse> request, List<TModel> results)
+        {
+            return Mapper.Map<TResponse>(new SearchResponse<TModel>
+            {
+                Results = results,
+                SearchString = request.SearchString,
+                OrderBy = string.Join(",", request.OrderByArray),
+                Select = string.Join(",", request.Select),
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                //TotalPages = (int)Math.Ceiling((double)usersMapped.Count / request.PageSize),
+                TotalItems = results.Count
+            });
+        }
+
+        #endregion
+
         // For handling index response that query against runtime services 
         protected TResponse CreateIndexResponse<TModel>(SearchRequest<TResponse> request)
         {

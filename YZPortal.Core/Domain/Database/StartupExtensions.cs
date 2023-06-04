@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using YZPortal.Core.Domain.Contexts;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace YZPortal.Core.Domain.Database
 {
