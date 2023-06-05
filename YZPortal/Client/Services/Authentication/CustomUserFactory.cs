@@ -3,90 +3,40 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 
+// REF: https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/azure-active-directory-groups-and-roles?view=aspnetcore-7.0
 namespace YZPortal.Client.Services.Authentication
 {
     public class CustomUserFactory : AccountClaimsPrincipalFactory<CustomUserAccount>
     {
-        //private readonly YZPortalApiHttpClient _yZPortalApiHttpClient;
         public CustomUserFactory(IAccessTokenProviderAccessor accessor) : base(accessor)
         {
-            //_yZPortalApiHttpClient = yZPortalApiHttpClient;
         }
 
         public async override ValueTask<ClaimsPrincipal> CreateUserAsync(CustomUserAccount account, RemoteAuthenticationUserOptions options)
         {
-            ClaimsPrincipal user = await base.CreateUserAsync(account, options);
+            var initialUser = await base.CreateUserAsync(account, options);
 
-            //if (user?.Identity?.IsAuthenticated ?? false)
-            //{
-            //    var userIdentity = (ClaimsIdentity)user.Identity;
+            if (initialUser.Identity is not null &&
+                initialUser.Identity.IsAuthenticated)
+            {
+                var userIdentity = initialUser.Identity as ClaimsIdentity;
 
-            //    userIdentity.AddClaim(new Claim("roles", "test", ClaimValueTypes.String, "Graph"));
+                if (userIdentity is not null)
+                {
+                    foreach (var claim in account.Roles)
+                    {
+                        userIdentity.AddClaim(new Claim("roles", claim));
+                    }
+                }
+            }
 
-            //    //var userId = user.GetOidClaim();
-
-            //    //if (!string.IsNullOrEmpty(userId))
-            //    //{
-            //    //    var userIdentity = (ClaimsIdentity)user.Identity;
-            //    //    var graphGroups = await _yZPortalApiHttpClient.GetGraphGroupsForUser(userId);
-
-            //    //    // Loop through the groups and add them to the identity
-            //    //    foreach (var group in graphGroups.Results)
-            //    //    {
-            //    //        userIdentity.AddClaim(new Claim(ClaimTypes.Role, group.DisplayName, ClaimValueTypes.String, "Graph"));
-            //    //    }
-            //    //}
-            //}
-
-            //if (user?.Identity?.IsAuthenticated ?? false)
-            //{
-            //    ((ClaimsIdentity)user.Identity).AddClaim(new Claim("office", "VALUE"));
-
-            //    ((ClaimsIdentity)user.Identity).AddClaim(new Claim("roles", "bob"));
-
-            //    if (account.AdditionalProperties.ContainsKey("roles"))
-            //    {
-            //        var roles = account.AdditionalProperties["roles"] as JsonElement?;
-
-            //        if (roles?.ValueKind == JsonValueKind.Array)
-            //        {
-            //            foreach (JsonElement element in roles.Value.EnumerateArray())
-            //            {
-            //                ((ClaimsIdentity)user.Identity).AddClaim(new Claim("roles", element.GetString()));
-            //            }
-            //        }
-            //    }
-
-            //    if (account.AdditionalProperties.ContainsKey("groups"))
-            //    {
-            //        var roles = account.AdditionalProperties["groups"] as JsonElement?;
-
-            //        if (roles?.ValueKind == JsonValueKind.Array)
-            //        {
-            //            foreach (JsonElement element in roles.Value.EnumerateArray())
-            //            {
-            //                ((ClaimsIdentity)user.Identity).AddClaim(new Claim("groups", element.GetString()));
-            //            }
-            //        }
-            //    }
-            //}
-
-
-            return user ?? new ClaimsPrincipal();
+            return initialUser;
         }
     }
 
     public class CustomUserAccount : RemoteUserAccount
     {
-        //[JsonPropertyName("groups")]
-        //public string[] Groups { get; set; } = default!;
-
-        //[JsonPropertyName(ClaimTypes.Role)]
-        //public string[] Roles { get; set; } = default!;
-        [JsonPropertyName("groups")]
-        public string[] Groups { get; set; } = default!;
-
         [JsonPropertyName("roles")]
-        public string[] Roles { get; set; } = default!;
+        public string[] Roles { get; set; } = Array.Empty<string>()!;
     }
 }

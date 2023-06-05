@@ -23,8 +23,8 @@
 				<DisplayName>Groups for graph user</DisplayName>
 				<DataType>stringCollection</DataType>
 				<DefaultPartnerClaimTypes>
-					<Protocol Name="OAuth2" PartnerClaimType="role" />
-					<Protocol Name="OpenIdConnect" PartnerClaimType="role" />
+					<Protocol Name="OAuth2" PartnerClaimType="roles" />
+					<Protocol Name="OpenIdConnect" PartnerClaimType="roles" />
 					<Protocol Name="SAML2" PartnerClaimType="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" />
 				</DefaultPartnerClaimTypes>
 				<UserHelpText>Collection of groups assigned to graph user.</UserHelpText>
