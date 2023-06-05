@@ -3,11 +3,10 @@ using YZPortal.API.Controllers.Pagination;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Graph;
-using Microsoft.Graph.Models;
 
 namespace YZPortal.API.Controllers.Graph.GraphGroups
 {
-	public class Index
+    public class Index
 	{
 		public class Request : SearchRequest<SearchResponse<Model>>
 		{

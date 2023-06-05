@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
-using YZPortal.Client.Clients.YZPortalApi;
-using System.Text.Json;
 
 namespace YZPortal.Client.Services.Authentication
 {

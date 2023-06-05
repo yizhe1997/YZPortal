@@ -1,8 +1,6 @@
-﻿using YZPortal.API.Controllers.ViewModel.Auditable;
-
-namespace YZPortal.API.Controllers.Graph.GraphGroups
+﻿namespace YZPortal.API.Controllers.Graph.GraphGroups
 {
-	public class GraphGroupViewModel
+    public class GraphGroupViewModel
 	{
         public string? Id { get; set; }
         public object? DeletedDateTime { get; set; }

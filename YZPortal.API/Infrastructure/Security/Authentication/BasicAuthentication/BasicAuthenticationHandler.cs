@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
-using System.Net.Http.Headers;
-using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Text.Encodings.Web;
-using YZPortal.API.Infrastructure.Security.Jwt;
 
 namespace YZPortal.API.Infrastructure.Security.Authentication.BasicAuthentication
 {
+    // REF: https://stackoverflow.com/questions/38977088/asp-net-core-web-api-authentication?rq=4
+    // https://stackoverflow.com/questions/35296648/basic-authentication-in-asp-net-core
+    // I dont think this is safe, look into ceritificates and bearer 
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         private readonly IConfiguration _configuration;

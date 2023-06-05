@@ -56,7 +56,7 @@
 					</InputClaims>
 					<OutputClaims>
 						<!-- Claims parsed from your REST API -->
-						<OutputClaim ClaimTypeReferenceId="groupDisplayNames" PartnerClaimType="value" />
+						<OutputClaim ClaimTypeReferenceId="groupDisplayNames" />
 					</OutputClaims>
 					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
 				</TechnicalProfile>
@@ -83,6 +83,7 @@
 			</TechnicalProfiles>
 		</ClaimsProvider>
 		<ClaimsProvider>
+			<!-- REF: https://stackoverflow.com/questions/70953001/azure-ad-b2c-group-membership-custom-policy -->
 			<DisplayName>Graph</DisplayName>
 			<TechnicalProfiles>
 				<TechnicalProfile Id="SecureREST-AccessToken">
@@ -124,7 +125,6 @@
 						<InputClaim ClaimTypeReferenceId="objectId" Required="true" />
 					</InputClaims>
 					<OutputClaims>
-						<OutputClaim ClaimTypeReferenceId="groupDisplayNames" PartnerClaimType="value" />
 						<OutputClaim ClaimTypeReferenceId="groupDisplayNames" PartnerClaimType="value" />
 					</OutputClaims>
 					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />

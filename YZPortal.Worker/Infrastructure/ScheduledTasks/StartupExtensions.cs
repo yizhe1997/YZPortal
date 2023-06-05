@@ -1,6 +1,4 @@
 ﻿using YZPortal.Worker.Tasks.Email.Dealers;
-using YZPortal.Worker.Tasks.Email.Memberships;
-using YZPortal.Worker.Tasks.Email.Users;
 using YZPortal.Worker.Tasks.Sync.Users;
 
 namespace YZPortal.Worker.Infrastructure.ScheduledTasks

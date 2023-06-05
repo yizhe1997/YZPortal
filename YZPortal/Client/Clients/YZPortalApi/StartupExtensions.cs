@@ -25,6 +25,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 		}
     }
 
+    // REF: https://stackoverflow.com/questions/63076954/automatically-attaching-access-token-to-http-client-in-blazor-wasm
     public class CustomAuthorizationMessageHandler : AuthorizationMessageHandler
     {
         public CustomAuthorizationMessageHandler(IAccessTokenProvider provider, NavigationManager navigationManager, IConfiguration configuration) : base(provider, navigationManager)

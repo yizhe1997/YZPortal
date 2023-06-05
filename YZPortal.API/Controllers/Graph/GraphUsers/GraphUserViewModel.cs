@@ -1,8 +1,6 @@
-﻿using YZPortal.API.Controllers.ViewModel.Auditable;
-
-namespace YZPortal.API.Controllers.Graph.GraphUsers
+﻿namespace YZPortal.API.Controllers.Graph.GraphUsers
 {
-	public class GraphUserViewModel
+    public class GraphUserViewModel
 	{
         public string[]? BusinessPhones { get; set; }
         public string? DisplayName { get; set; }

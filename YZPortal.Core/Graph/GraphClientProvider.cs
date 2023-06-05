@@ -3,8 +3,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
-using System;
-using System.Net;
 using YZPortal.Core.Error;
 
 namespace YZPortal.Core.Graph
@@ -57,6 +55,7 @@ namespace YZPortal.Core.Graph
                     requestConfiguration.QueryParameters.Count = true;
                 });
 
+                // REF: https://stackoverflow.com/questions/75690753/pagination-in-ms-graph-groups-in-sdk-v5
                 var pageIterator = PageIterator<User, UserCollectionResponse>
                 .CreatePageIterator(graphClient, usersResponse, (user) =>
                 {
