@@ -27,9 +27,9 @@ namespace YZPortal.Core.Domain.Database
 				// Applied before migration so that DatabaseService transaction can take place for new/existing DB.
 				// Make sure to arrange the database service sequentially as chronology affects the functionality
 				var service = services.GetRequiredService<DatabaseService>();
-				service.UserAdmin();
-				service.EnumValues();
-				service.SyncStatuses();
+				//service.UserAdmin();
+				//service.EnumValues();
+				//service.SyncStatuses();
 			}
         }
     }
