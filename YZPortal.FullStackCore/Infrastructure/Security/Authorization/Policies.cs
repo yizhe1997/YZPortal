@@ -5,58 +5,71 @@ namespace YZPortal.FullStackCore.Infrastructure.Security.Authorization
 {
     public static class Policies
     {
-        #region DealerId
+        #region Roles
 
-        public const string Dealer = "Dealer";
+        #region Admin
 
-        public static AuthorizationPolicy DealerIdPolicy()
+        public const string Administrator = "Administrator";
+
+        public static AuthorizationPolicy CreateAdministratorPolicy()
         {
             return new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
-                                                   .RequireClaim(Claims.UserdealerId)
+                                                   .RequireRole(DealerRoleNames.Administrator.ToString())
                                                    .Build();
         }
 
-        public static void AddDealerIdPolicy(this AuthorizationOptions opts)
+        public static void AddAdministratorPolicy(this AuthorizationOptions opts)
         {
-            opts.AddPolicy(Dealer, DealerIdPolicy());
+            opts.AddPolicy(Administrator, CreateAdministratorPolicy());
         }
 
         #endregion
 
-        #region Dealer Roles
+        #region General
 
-        public const string IsAdmin = "IsAdmin";
+        public const string General = "General";
 
-        public static AuthorizationPolicy IsRoleAdminPolicy()
+        public static AuthorizationPolicy CreateGeneralPolicy()
         {
             return new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
-                                                   .RequireRole(((int)DealerRoleNames.Admin).ToString())
+                                                   .RequireRole(DealerRoleNames.General.ToString())
                                                    .Build();
         }
 
-        public static void AddIsRoleAdminPolicy(this AuthorizationOptions opts)
+        public static void AddGeneralPolicy(this AuthorizationOptions opts)
         {
-            opts.AddPolicy(IsAdmin, IsRoleAdminPolicy());
+            opts.AddPolicy(General, CreateGeneralPolicy());
         }
+
 
         #endregion
 
-        #region Content Access Levels
+        #endregion
 
-        public const string Test = "Test";
+        /// <summary>
+        ///     Assigning Azure AD roles to the group requires Azure P1 plan. Too expensive for now.
+        ///     So a user assigned to Administrator group will have admin rights to all assigned subscription for now...
+        /// </summary>
+        #region Subscription
 
-        public static AuthorizationPolicy IsAccessLevelUserPolicy()
+        #region Badminton
+
+        public const string Badminton = "Badminton";
+
+        public static AuthorizationPolicy CreateBadmintonSubscriptionPolicy()
         {
             return new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
                                                    .RequireRole(((int)ContentAccessLevelNames.All).ToString())
                                                    .Build();
         }
 
-        public static void AddIsAccessLvlUserPolicy(this AuthorizationOptions opts)
+        public static void AddBadmintonSubscriptionPolicy(this AuthorizationOptions opts)
         {
-            opts.AddPolicy(Test, IsAccessLevelUserPolicy());
-
+            opts.AddPolicy(Badminton, CreateBadmintonSubscriptionPolicy());
         }
+
+        #endregion
+
         #endregion
     }
 }

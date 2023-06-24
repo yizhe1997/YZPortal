@@ -18,7 +18,6 @@
             <Authorized>
                 <Logout ImageUrl="_content/Reference.Shared/images/Argo.png" DisplayName="超级管理员" UserName="@context.User.Identity?.Name">
                     <LinkTemplate>
-                        <a href="/fetchDealers"><i class="fa-solid fa-suitcase"></i>Edit User Details</a>
                         <a @onclick="OnLogout"><i class="fa-solid fa-suitcase"></i>Logout</a>
                     </LinkTemplate>
                 </Logout>
@@ -38,7 +37,7 @@
                 <span>YZPortal</span>
             </div>
         </div>
-        <AuthorizeView Roles="Administrators">
+        <AuthorizeView Policy="@Policies.Administrator">
             <div class="layout-menu">
                 <div class="scroll">
                     <Menu Items="@Menus" IsVertical="true" class="menu is-vertical is-collapsed" />

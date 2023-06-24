@@ -2,16 +2,16 @@
 @using Microsoft.AspNetCore.Authorization;
 @using System.Diagnostics.CodeAnalysis;
 @using YZPortal.Client.Clients.YZPortalApi;
-@using YZPortal.Client.Models.Users;
 @using YZPortal.Client.Pages.Users;
 @using YZPortal.FullStackCore.Infrastructure.Security.Authorization
+@using YZPortal.FullStackCore.Models.Users;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject DialogService DialogService
-@attribute [Authorize(Policy = Policies.IsAdmin)]
+@attribute [Authorize(Policy = Policies.Administrator)]
 
 <h1>Users</h1>
 
-<Table TItem="User"
+<Table TItem="UserModel"
        IsPagination="true"
        PageItemsSource="@PageItemsSource"
        IsBordered="true"
@@ -28,7 +28,7 @@
        OnDeleteAsync="@OnDeleteAsync"
        OnQueryAsync="@OnQueryAsync">
     <TableToolbarTemplate>
-        <TableToolbarButton TItem="User"
+        <TableToolbarButton TItem="UserModel"
                             Color="Color.Primary"
                             Icon="fa-fw fa-solid fa-floppy-disk"
                             Text="Invite User"
@@ -37,44 +37,39 @@
     </TableToolbarTemplate>
     <TableColumns>
         <TableColumn @bind-Field="@context.UserName" Sortable="true" />
-        <TableColumn @bind-Field="@context.Name" Sortable="true" />
-        <TableColumn @bind-Field="@context.Admin" Sortable="true">
-            <Template Context="value">
-                <Checkbox Value="@value.Value" IsDisabled="true"></Checkbox>
-            </Template>
-        </TableColumn>
-        <TableColumn @bind-Field="@context.LastLoggedIn" Sortable="true" FormatString="yyyy-MM-dd" />
+        <TableColumn @bind-Field="@context.DisplayName" Sortable="true" />
+        <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" />
     </TableColumns>
 </Table>
 
 @code {
     private static IEnumerable<int> PageItemsSource => new int[] { 2, 4, 10 };
 
-    private Users? Users;
+    private UsersSearchModel? Users;
 
     private void OpenInviteUserDialog() => DialogService.Show(new DialogOption()
         {
             Title = "Invite User",
-            Component = BootstrapDynamicComponent.CreateComponent<UserInviteDialog>(),
+            //Component = BootstrapDynamicComponent.CreateComponent<UserInviteDialog>(),
             Size = Size.Large,
         });
 
-    private async Task<QueryData<User>> OnQueryAsync(QueryPageOptions options)
+    private async Task<QueryData<UserModel>> OnQueryAsync(QueryPageOptions options)
     {
         var orderby = ((SortOrder)options.SortOrder == SortOrder.Unset) ? string.Empty : options.SortName + " " + options.SortOrder.ToString();
 
         Users = await YZPortalApiClient.GetUsers(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby);
 
-        return await Task.FromResult(new QueryData<User>()
+        return await Task.FromResult(new QueryData<UserModel>()
             {
-                Items = Users?.Results ?? new List<User>(),
+                Items = Users?.Results ?? new List<UserModel>(),
                 TotalCount = Users?.TotalItems ?? 0,
                 IsSorted = !string.IsNullOrEmpty(orderby),
                 IsSearch = true
             });
     }
 
-    private async Task<bool> OnDeleteAsync(IEnumerable<User> items)
+    private async Task<bool> OnDeleteAsync(IEnumerable<UserModel> items)
     {
         var users = items.ToList();
         foreach (var user in users)

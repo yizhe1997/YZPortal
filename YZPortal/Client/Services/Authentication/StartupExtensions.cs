@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using YZPortal.Client.Clients.YZPortalApi;
 
 namespace YZPortal.Client.Services.Authentication
 {
@@ -6,11 +7,13 @@ namespace YZPortal.Client.Services.Authentication
 	{
 		public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration) 
 		{
-			services.AddMsalAuthentication<RemoteAuthenticationState, CustomUserAccount>(options =>
+            var yzPortalApiOptions = configuration.GetSection("YZPortalApi").Get<YZPortalApiOptions>() ?? new();
+
+            services.AddMsalAuthentication<RemoteAuthenticationState, CustomUserAccount>(options =>
 			{
 				configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
                 options.UserOptions.RoleClaim = "roles";
-                options.ProviderOptions.DefaultAccessTokenScopes.Add("https://yzorganization.onmicrosoft.com/797f38f6-910d-4224-a027-faa9c581e6c7/Authorization");
+                options.ProviderOptions.DefaultAccessTokenScopes.Add(yzPortalApiOptions.Scope);
 			}).AddAccountClaimsPrincipalFactory<RemoteAuthenticationState, CustomUserAccount, CustomUserFactory>();
 		}
 	}

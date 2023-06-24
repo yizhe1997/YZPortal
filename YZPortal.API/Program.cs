@@ -18,7 +18,6 @@ using YZPortal.API.Infrastructure.Mvc;
 using YZPortal.API.Infrastructure.Security.Authentication;
 using YZPortal.API.Infrastructure.Security.Authentication.BasicAuthentication;
 using YZPortal.API.Infrastructure.Security.Authorization;
-using YZPortal.API.Infrastructure.Security.AzureAd;
 using YZPortal.API.Infrastructure.Security.AzureAdB2C;
 using YZPortal.API.Infrastructure.Security.Jwt;
 using YZPortal.API.Infrastructure.Swagger;
@@ -113,9 +112,6 @@ builder.Services.AddJwt(configuration);
 
 // Basic Auth            
 builder.Services.AddBasicAuth(configuration);
-
-// AzureAd            
-builder.Services.AddAzureAd(configuration);
 
 // AzureAdB2C            
 builder.Services.AddAzureAdB2C(configuration);

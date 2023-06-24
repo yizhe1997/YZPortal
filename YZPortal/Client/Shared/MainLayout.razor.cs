@@ -44,7 +44,7 @@ namespace YZPortal.Client.Shared
 
             var administrationSubMenus = new List<MenuItem>
             {
-                new MenuItem() { Text = "Dealers", Icon = "fa-solid fa-fw fa-table", Url = "/fetchDealers" },
+                //new MenuItem() { Text = "Dealers", Icon = "fa-solid fa-fw fa-table", Url = "/fetchDealers" },
                 new MenuItem() { Text = "User Setup", Icon = "fa-solid fa-fw fa-users", Url = "/users" }
             };
 

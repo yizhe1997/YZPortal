@@ -1,9 +1,8 @@
-﻿using YZPortal.Client.Models.Users;
-using YZPortal.Core.Extensions;
+﻿using YZPortal.FullStackCore.Extensions;
 
 namespace YZPortal.Client.Services.LocalStorage
 {
-	public class LocalStorageProperties
+    public class LocalStorageProperties
 	{
 		internal const string UserAuthToken = "authToken";
 		internal const string UserId = "sub";
@@ -25,10 +24,6 @@ namespace YZPortal.Client.Services.LocalStorage
 
         #region Authentication
 
-        public async Task SetUserAuthenToken(UserLoginResult userLoginResult)
-        {
-            await _localStorageService.SetItemAsync(LocalStorageProperties.UserAuthToken, userLoginResult.AuthToken);
-        }
 		public async Task RemoveUserAuthenToken()
 		{
 			await _localStorageService.RemoveItemAsync(LocalStorageProperties.UserAuthToken);

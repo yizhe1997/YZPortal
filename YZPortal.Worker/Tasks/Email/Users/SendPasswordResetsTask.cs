@@ -1,9 +1,6 @@
-﻿using EFCore.BulkExtensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
-using YZPortal.Worker.Helpers.Scriban;
 using YZPortal.Worker.Infrastructure.Email;
 using YZPortal.Worker.Infrastructure.Email.OfficeSmtp;
 using YZPortal.Worker.Infrastructure.Email.SendGrid;
@@ -31,43 +28,43 @@ namespace YZPortal.Worker.Tasks.Email.Users
 
             try
             {
-                // Parse and validate template
-                var template = ScribanHelper.ParseTemplate("./SendPasswordReset.html");
-                if (template == null)
-                    throw new Exception("Failed to parse template for " + nameof(SendPasswordResetsTask));
+                //// Parse and validate template
+                //var template = ScribanHelper.ParseTemplate("./SendPasswordReset.html");
+                //if (template == null)
+                //    throw new Exception("Failed to parse template for " + nameof(SendPasswordResetsTask));
 
-                // Query
-                var lastAttempted = DateTime.UtcNow.Subtract(emailOptions.AttemptInterval);
-                var resets = await dbContext.UserPasswordResets
-                    .Include(x => x.User)
-                    .Where(x =>
-                        x.UserId != Guid.Empty && // make sure there is an associated user for the email AND
-                        (x.SentDateTime == null && (x.ValidUntilDateTime > DateTime.UtcNow || x.ValidUntilDateTime == null)) || // (has not been sent AND is still valid) OR
-                        (
-                            (x.FailedSentDateTime != null && x.SentDateTime == null) &&// (it has failed AND
-                            x.Attempts < emailOptions.SendAttempts && // has not been attempted too often AND                     
-                            x.LastAttemptedSentDateTime < lastAttempted // enough time has passed since last attempt)
-                        )
-                    ).ToListAsync();
+                //// Query
+                //var lastAttempted = DateTime.UtcNow.Subtract(emailOptions.AttemptInterval);
+                //var resets = await dbContext.UserPasswordResets
+                //    .Include(x => x.User)
+                //    .Where(x =>
+                //        x.UserId != Guid.Empty && // make sure there is an associated user for the email AND
+                //        (x.SentDateTime == null && (x.ValidUntilDateTime > DateTime.UtcNow || x.ValidUntilDateTime == null)) || // (has not been sent AND is still valid) OR
+                //        (
+                //            (x.FailedSentDateTime != null && x.SentDateTime == null) &&// (it has failed AND
+                //            x.Attempts < emailOptions.SendAttempts && // has not been attempted too often AND                     
+                //            x.LastAttemptedSentDateTime < lastAttempted // enough time has passed since last attempt)
+                //        )
+                //    ).ToListAsync();
 
-                // Prepare template input
-                var models = resets.Select(x => new EmailReset
-                {
-                    callbackurl = x.CallbackUrl,
-                    Notification = x
-                }).ToList();
+                //// Prepare template input
+                //var models = resets.Select(x => new EmailReset
+                //{
+                //    callbackurl = x.CallbackUrl,
+                //    Notification = x
+                //}).ToList();
 
-                // Send notifications and update emailable entities
-                var result = await SendNotificationsAsync(models.Select(x => new EmailMessage
-                {
-                    Content = template.Render(x),
-                    Subject = "Dealer Portal Password Reset",
-                    Notifications = new List<EmailableEntity>() { x.Notification }
-                }).ToList(), cancellationToken);
+                //// Send notifications and update emailable entities
+                //var result = await SendNotificationsAsync(models.Select(x => new EmailMessage
+                //{
+                //    Content = template.Render(x),
+                //    Subject = "Dealer Portal Password Reset",
+                //    Notifications = new List<EmailableEntity>() { x.Notification }
+                //}).ToList(), cancellationToken);
 
-                await dbContext.BulkUpdateAsync(resets);
+                //await dbContext.BulkUpdateAsync(resets);
 
-                logger.LogInformation($"Password resets sent: ({result})");
+                //logger.LogInformation($"Password resets sent: ({result})");
             }
             catch (Exception ex)
             {

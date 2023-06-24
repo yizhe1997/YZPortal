@@ -9,7 +9,6 @@ namespace YZPortal.API.Controllers.Graph.GraphGroups
 		{
 			// Index
 			CreateMap<Group, Index.Model>();
-            CreateMap<DirectoryObject, Index.Model>();
         }
 	}
 }

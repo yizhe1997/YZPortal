@@ -1,8 +1,8 @@
 ﻿@page "/authentication/{action}"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using YZPortal.Client.Clients.YZPortalApi;
-@using YZPortal.Client.Models.Graph.Groups;
 @using YZPortal.Client.Services.Authentication;
+@using YZPortal.FullStackCore.Extensions;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
 <RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
@@ -10,55 +10,28 @@
 @code{
     [Parameter] public string? Action { get; set; }
 
-    private GraphGroups? GraphGroups;
-
     private async Task HandleAuthenticationAsync()
     {
-        ////// Your logic for handling the successful authentication can go here
-        ////// For example, you can make an API call to create a user
-        ////var response = await HttpClient.PostAsJsonAsync("api/user", new User { Name = "John", Email = "john@example.com" });
-        ////response.EnsureSuccessStatusCode();
+        // Create user in server if subject claim does not exist and update user if it does
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var identity = authState.User.Identities.FirstOrDefault(c => c.IsAuthenticated);
+        if (identity != null)
+        {
+            var userId = authState.User.GetSubClaim();
 
-        //var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        //var identity = authState.User.Identities.FirstOrDefault(c => c.IsAuthenticated);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var user = await YZPortalApiClient.GetUser(userId);
+                if (user.Id == Guid.Empty)
+                {
+                    var newUser = await YZPortalApiClient.UserCreate();
+                }
+                else
+                {
+                    var newUser = await YZPortalApiClient.UserUpdate(userId);
+                }
 
-        //if (identity != null)
-        //{
-        //    var userId = authState.GetOidClaim();
-
-        //    if (!string.IsNullOrEmpty(userId))
-        //    {
-        //        GraphGroups = await YZPortalApiClient.GetGraphGroupsForUser(userId);
-
-        //        foreach (var group in GraphGroups.Results)// Loop through the groups and add them to the identity
-        //        {
-        //            identity.AddClaim(new System.Security.Claims.Claim("roles", group.DisplayName, System.Security.Claims.ClaimValueTypes.String, "Graph"));
-        //        }
-        //    }
-        //}
-
-        ////// SHOULD PROBABLY USE OWN API TO FETCH THE LIST OF DISPLAYNAME SINCE CUSTOM POLICY NOT WORKING OUT....
-        ////var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        ////var identity = authState.User.Identities.FirstOrDefault(c => c.IsAuthenticated);
-
-        //if (identity != null)
-        //{
-        //    var roleClaims = identity.FindAll("role");
-
-        //    foreach (var claim in roleClaims)
-        //    {
-        //        // Get display name from claim value
-        //        var claimValueDisplayName = claim.Value.ParseRoleClaim();
-
-        //        if (!string.IsNullOrEmpty(claimValueDisplayName))
-        //        {
-        //            // Remove the unformatted claim value
-        //            identity.TryRemoveClaim(claim);
-
-        //            // Add the display name as formatted claim value
-        //            identity.AddClaim(new System.Security.Claims.Claim("roles", claimValueDisplayName, System.Security.Claims.ClaimValueTypes.String, "Graph"));
-        //        }
-        //    }
-        //}
+            }
+        }
     }
 }

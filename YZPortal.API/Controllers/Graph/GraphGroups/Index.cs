@@ -3,19 +3,21 @@ using YZPortal.API.Controllers.Pagination;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Graph;
+using YZPortal.FullStackCore.Models.Abstracts;
+using YZPortal.FullStackCore.Models.Graph.Groups;
 
 namespace YZPortal.API.Controllers.Graph.GraphGroups
 {
     public class Index
 	{
-		public class Request : SearchRequest<SearchResponse<Model>>
+		public class Request : SearchRequest<SearchModel<Model>>
 		{
 			public string? GraphUserId { get; set; }
 		}
-		public class Model : GraphGroupViewModel
-		{
+		public class Model : GraphGroupModel
+        {
 		}
-		public class RequestHandler : SearchRequestHandler<Request, SearchResponse<Model>>
+		public class RequestHandler : SearchRequestHandler<Request, SearchModel<Model>>
 		{
             private readonly GraphClientProvider _graphClientProvider;
 
@@ -24,7 +26,7 @@ namespace YZPortal.API.Controllers.Graph.GraphGroups
                 _graphClientProvider = graphClientProvider;
 
             }
-			public override async Task<SearchResponse<Model>> Handle(Request request, CancellationToken cancellationToken)
+			public override async Task<SearchModel<Model>> Handle(Request request, CancellationToken cancellationToken)
 			{
 				// Vars
                 var groupsMapped = new List<Model>();

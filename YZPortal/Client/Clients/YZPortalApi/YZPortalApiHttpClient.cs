@@ -1,21 +1,15 @@
 ﻿using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text;
-using YZPortal.Client.Models.Dealers;
-using YZPortal.Client.Models.Users;
-using YZPortal.Client.Services.Authentication;
 using YZPortal.Client.Services.LocalStorage;
-using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
 using YZPortal.FullStackCore.Extensions;
-using YZPortal.Client.Models.Abstracts;
-using YZPortal.Client.Models.Memberships;
 using Microsoft.AspNetCore.Components.Authorization;
-using YZPortal.Client.Models.Graph.Groups;
-using YZPortal.Client.Models.Graph.Users;
+using YZPortal.FullStackCore.Models.Abstracts;
+using YZPortal.FullStackCore.Models.Users;
+using YZPortal.FullStackCore.Models.Graph.Users;
+using YZPortal.FullStackCore.Models.Graph.Groups;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
-	public class YZPortalApiHttpClient
+    public class YZPortalApiHttpClient
     {
         private readonly ILogger<YZPortalApiHttpClient> _logger;
         private readonly HttpClient _http;
@@ -32,7 +26,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Helpers
 
-        public async Task<HttpRequestMessage> CreateAuthHttpRequestMessage(string relativeUri, HttpMethod httpMethod)
+        public HttpRequestMessage CreateAuthHttpRequestMessage(string relativeUri, HttpMethod httpMethod)
 		{
             // Construct HttpRequestMessage with Uri
             var requestMsg = new HttpRequestMessage(httpMethod, _http.BaseAddress + relativeUri);
@@ -40,18 +34,18 @@ namespace YZPortal.Client.Clients.YZPortalApi
 			return requestMsg;
 		}
 
-		public async Task<HttpRequestMessage> CreatePaginatedAuthHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+		public HttpRequestMessage CreatePaginatedAuthHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
         {
 			// Construct authenticated/authorized HttpRequestMessage with Uri
-			var requestMsg = await CreateAuthHttpRequestMessage(relativeUri, HttpMethod.Get);
+			var requestMsg = CreateAuthHttpRequestMessage(relativeUri, HttpMethod.Get);
 
 			// Add pagination query params to HttpRequestMessage
-			requestMsg.AddQueryParam(nameof(PagedModel<User>.PageSize), pageSize.ToString());
-			requestMsg.AddQueryParam(nameof(PagedModel<User>.PageNumber), pageNumber.ToString());
+			requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageSize), pageSize.ToString());
+			requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageNumber), pageNumber.ToString());
             if (!string.IsNullOrEmpty(searchString))
-			    requestMsg.AddQueryParam(nameof(PagedModel<User>.SearchString), searchString);
+			    requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.SearchString), searchString);
 			if (!string.IsNullOrEmpty(orderBy))
-				requestMsg.AddQueryParam(nameof(PagedModel<User>.OrderBy), orderBy);
+				requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.OrderBy), orderBy);
 
 			return requestMsg;
 		}
@@ -72,14 +66,14 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Users
 
-        public async Task<GraphUsers> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+        public async Task<GraphUsersModel> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
         {
-            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphUsers", pageSize, pageNumber, searchString, orderBy);
+            var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphUsers", pageSize, pageNumber, searchString, orderBy);
 
             using var response = await _http.SendAsync(requestMsg);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<GraphUsers>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<GraphUsersModel>() ?? new();
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
@@ -93,16 +87,16 @@ namespace YZPortal.Client.Clients.YZPortalApi
                 _logger.LogError(ex.Message);
             }
 
-            return new GraphUsers();
+            return new GraphUsersModel();
         }
 
         #endregion
 
         #region Groups
 
-        public async Task<GraphGroups> GetGraphGroupsForUser(string userId, int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+        public async Task<GraphGroupsModel> GetGraphGroupsForUser(string userId, int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
         {
-            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
+            var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
 
             // Query parameters
             if (!string.IsNullOrEmpty(userId))
@@ -111,7 +105,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
             using var response = await _http.SendAsync(requestMsg);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<GraphGroups>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<GraphGroupsModel>() ?? new();
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
@@ -125,7 +119,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
                 _logger.LogError(ex.Message);
             }
 
-            return new GraphGroups();
+            return new GraphGroupsModel();
         }
 
         #endregion
@@ -134,71 +128,50 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Users
 
-        public async Task<UserLoginResult> UserAuthenticate(UserLogin user)
+        public async Task<UserModel> UserCreate()
         {
-			using var response = await _http.PostAsJsonAsync("/api/v1/Authenticate", user);
-			try
-			{
-                var output = await response.Content.ReadFromJsonAsync<UserLoginResult>() ?? new();
-
-                if (response.IsSuccessStatusCode)
-				{
-					output.IsStatusCodeSucess = true;
-
-					// Store token in cache
-					await _localStorageService.SetUserAuthenToken(output);
-
-					// Parse claims from jwt and set user subject claim in local storage
-					if (!string.IsNullOrEmpty(output.AuthToken))
-					{
-						var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(output.AuthToken);
-						var subClaimValue = claims.FirstOrDefault(c => c.Type == Claims.UserId)?.Value;
-						var userId = subClaimValue == null ? Guid.Empty : Guid.Parse(subClaimValue);
-						await _localStorageService.SetUserId(userId);
-					}
-				}
+            using var response = await _http.PostAsJsonAsync("/api/v1/Users", new { });
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<UserModel>() ?? new();
 
                 return output;
             }
-			catch (Exception ex)
-			{
-				_logger.LogError(ex.Message);
-			}
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
 
-			return new UserLoginResult();
-		}
+            return new UserModel();
+        }
 
-        public async Task<UserDealerAuthorizeResult> UserAuthorize(Guid dealerId)
+        public async Task<UserModel> UserUpdate(string subClaim)
         {
-			var requestMsg = await CreateAuthHttpRequestMessage($"api/v1/Authorize", HttpMethod.Post);
-
-			var json = JsonSerializer.Serialize(new { dealerId = dealerId.ToString() }) ?? "{}";
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            requestMsg.Content = content;
-
-            using var response = await _http.SendAsync(requestMsg);
+            using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subClaim}", new { });
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<UserDealerAuthorizeResult>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<UserModel>() ?? new();
 
-                if (response.IsSuccessStatusCode)
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new UserModel();
+        }
+
+        public async Task<UserModel> GetUser(string subClaim)
+        {
+            using var response = await _http.GetAsync($"api/v1/Users/{subClaim}");
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<UserModel>() ?? new();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
-                    output.IsStatusCodeSucess = true;
-
-                    // Store token in cache
-                    await _localStorageService.SetUserAuthenToken(output);
-
-                    // Parse claims from jwt and obtain user's dealerId, content access levels, dealer roles
-                    // to be stored in local storage
-                    if (!string.IsNullOrEmpty(output.AuthToken))
-                    {
-                        var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(output.AuthToken);
-
-                        // should create a function for this repetitive code
-                        var dealerIdClaimValue = claims.FirstOrDefault(c => c.Type == Claims.UserdealerId)?.Value;
-                        var userDealerId = dealerIdClaimValue == null ? Guid.Empty : Guid.Parse(dealerIdClaimValue);
-                        await _localStorageService.SetUserDealerId(userDealerId);
-                    }
+                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
                 }
 
                 return output;
@@ -208,31 +181,17 @@ namespace YZPortal.Client.Clients.YZPortalApi
                 _logger.LogError(ex.Message);
             }
 
-            return new UserDealerAuthorizeResult();
+            return new UserModel();
         }
 
-        // these should be in another place if not calling runtime.. but for now it's ok cause going to add new details soon
-        public async Task<UserDetail> GetUserDetails()
-        {
-            // for runtime... this should be used from local storage service
-            var userDetail = new UserDetail
-            {
-                AuthToken = await _localStorageService.GetUserAuthenToken(),
-                DisplayName = await _localStorageService.GetUserDisplayName(),
-                Email = await _localStorageService.GetUserEmail(),
-				Id = await _localStorageService.GetUserId()
-			};
-            return userDetail;
-        }
-
-		public async Task<Users> GetUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+        public async Task<UsersSearchModel> GetUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
 		{
-            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
+            var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
 
 			using var response = await _http.SendAsync(requestMsg);
 			try
 			{
-				var output = await response.Content.ReadFromJsonAsync<Users>() ?? new();
+				var output = await response.Content.ReadFromJsonAsync<UsersSearchModel>() ?? new();
 
 				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
 				{
@@ -246,138 +205,14 @@ namespace YZPortal.Client.Clients.YZPortalApi
 				_logger.LogError(ex.Message);
 			}
 
-			return new Users();
+			return new UsersSearchModel();
 		}
-
-        public async Task<UserLoginResult> UserInvite(UserInvite user)
-        {
-            using var response = await _http.PostAsJsonAsync("/api/v1/Authenticate", user);
-            try
-            {
-                var output = await response.Content.ReadFromJsonAsync<UserLoginResult>() ?? new();
-
-                if (response.IsSuccessStatusCode)
-                {
-                    output.IsStatusCodeSucess = true;
-
-                    // Store token in cache
-                    await _localStorageService.SetUserAuthenToken(output);
-
-                    // Parse claims from jwt and set user subject claim in local storage
-                    if (!string.IsNullOrEmpty(output.AuthToken))
-                    {
-                        var claims = CustomAuthenticationStateProvider.ParseClaimsFromJwt(output.AuthToken);
-                        var subClaimValue = claims.FirstOrDefault(c => c.Type == Claims.UserId)?.Value;
-                        var userId = subClaimValue == null ? Guid.Empty : Guid.Parse(subClaimValue);
-                        await _localStorageService.SetUserId(userId);
-                    }
-                }
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-
-            return new UserLoginResult();
-        }
 
         public async Task<HttpResponseMessage> DeleteUser(Guid userId)
         {
-            var requestMsg = await CreateAuthHttpRequestMessage($"api/v1/users/{userId}", HttpMethod.Delete);
-            var response = await _http.SendAsync(requestMsg);
+            var response = await _http.DeleteAsync($"api/v1/users/{userId}");
             return response;
         }
-
-        #endregion
-
-        #region Dealers
-
-        public async Task<Dealers> GetDealers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
-        {
-			var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/Dealers", pageSize, pageNumber, searchString, orderBy);
-
-            using var response = await _http.SendAsync(requestMsg);
-			try
-            {
-                var output = await response.Content.ReadFromJsonAsync<Dealers>() ?? new();
-
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
-                }
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Dealers();
-        }
-
-        #endregion
-
-        #region Memberships
-
-        #region Content Access Levels
-
-        // TODO: make it such that each dealer has its own set of content access levels
-        public async Task<ContentAccessLevels> GetContentAccessLevels(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
-        {
-            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/ContentAccessLevels", pageSize, pageNumber, searchString, orderBy);
-
-            using var response = await _http.SendAsync(requestMsg);
-            try
-            {
-                var output = await response.Content.ReadFromJsonAsync<ContentAccessLevels>() ?? new();
-
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
-                }
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-
-            return new ContentAccessLevels();
-        }
-
-        #endregion
-
-        #region Roles
-
-        public async Task<DealerRoles> GetDealerRoles(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
-        {
-            var requestMsg = await CreatePaginatedAuthHttpRequestMessage($"api/v1/DealerRoles", pageSize, pageNumber, searchString, orderBy);
-
-            using var response = await _http.SendAsync(requestMsg);
-            try
-            {
-                var output = await response.Content.ReadFromJsonAsync<DealerRoles>() ?? new();
-
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
-                }
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-
-            return new DealerRoles();
-        }
-
-        #endregion
 
         #endregion
     }

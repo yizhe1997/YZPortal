@@ -1,9 +1,6 @@
-﻿using EFCore.BulkExtensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
-using YZPortal.Worker.Helpers.Scriban;
 using YZPortal.Worker.Infrastructure.Email;
 using YZPortal.Worker.Infrastructure.Email.OfficeSmtp;
 using YZPortal.Worker.Infrastructure.Email.SendGrid;
@@ -31,47 +28,47 @@ namespace YZPortal.Worker.Tasks.Email.Dealers
 
             try
             {
-                // Parse and validate template
-                var template = ScribanHelper.ParseTemplate("Tasks/Email/Dealers/SendDealerInvite.html");
-                if (template == null)
-                    throw new Exception("Failed to parse template for " + nameof(SendDealerInvitesTask));
+                //// Parse and validate template
+                //var template = ScribanHelper.ParseTemplate("Tasks/Email/Dealers/SendDealerInvite.html");
+                //if (template == null)
+                //    throw new Exception("Failed to parse template for " + nameof(SendDealerInvitesTask));
 
-                // Query
-                var lastAttempted = DateTime.UtcNow.Subtract(emailOptions.AttemptInterval);
-                var dbInvites = await dbContext.UserInvites
-                    .Include(i => i.UserInviteDealerSelections)
-                    .ThenInclude(x => x.Dealer)
-                    .Where(x =>
-                        (x.SentDateTime == null && (x.ValidUntilDateTime > DateTime.UtcNow || x.ValidUntilDateTime == null)) || // (has not been sent AND is still valid) OR
-                        (
-                            (x.FailedSentDateTime != null && x.SentDateTime == null) &&// (it has failed AND
-                            x.Attempts < emailOptions.SendAttempts && // has not been attempted too often AND                     
-                            x.LastAttemptedSentDateTime < lastAttempted // enough time has passed since last attempt)
-                        )
-                    ).ToListAsync();
+                //// Query
+                //var lastAttempted = DateTime.UtcNow.Subtract(emailOptions.AttemptInterval);
+                //var dbInvites = await dbContext.UserInvites
+                //    .Include(i => i.UserInviteDealerSelections)
+                //    .ThenInclude(x => x.Dealer)
+                //    .Where(x =>
+                //        (x.SentDateTime == null && (x.ValidUntilDateTime > DateTime.UtcNow || x.ValidUntilDateTime == null)) || // (has not been sent AND is still valid) OR
+                //        (
+                //            (x.FailedSentDateTime != null && x.SentDateTime == null) &&// (it has failed AND
+                //            x.Attempts < emailOptions.SendAttempts && // has not been attempted too often AND                     
+                //            x.LastAttemptedSentDateTime < lastAttempted // enough time has passed since last attempt)
+                //        )
+                //    ).ToListAsync();
 
-                // Prepare template input
-                var models = dbInvites
-                    .Select(x => new SendInviteHtmlInput
-                    {
-                        callbackurl = x.CallbackUrl,
-                        dealername = (x.UserInviteDealerSelections.Any()) ? 
-                        string.Join(", ", x.UserInviteDealerSelections.Select(x => x.Dealer.Name).ToList()) :
-                        "aaaaaa",
-                        Notification = x
-                    }).ToList();
+                //// Prepare template input
+                //var models = dbInvites
+                //    .Select(x => new SendInviteHtmlInput
+                //    {
+                //        callbackurl = x.CallbackUrl,
+                //        dealername = (x.UserInviteDealerSelections.Any()) ? 
+                //        string.Join(", ", x.UserInviteDealerSelections.Select(x => x.Dealer.Name).ToList()) :
+                //        "aaaaaa",
+                //        Notification = x
+                //    }).ToList();
 
-                // Send notifications and update emailable entities
-                var result = await SendNotificationsAsync(models.Select(x => new EmailMessage
-                {
-                    Content = template.Render(x),
-                    Subject = "YZ Portal Invite",
-                    Notifications = new List<EmailableEntity>() { x.Notification }
-                }).ToList(), cancellationToken);
+                //// Send notifications and update emailable entities
+                //var result = await SendNotificationsAsync(models.Select(x => new EmailMessage
+                //{
+                //    Content = template.Render(x),
+                //    Subject = "YZ Portal Invite",
+                //    Notifications = new List<EmailableEntity>() { x.Notification }
+                //}).ToList(), cancellationToken);
 
-                await dbContext.BulkUpdateAsync(dbInvites, cancellationToken: cancellationToken);
+                //await dbContext.BulkUpdateAsync(dbInvites, cancellationToken: cancellationToken);
 
-                logger.LogInformation($"Invites sent: ({result})");
+                //logger.LogInformation($"Invites sent: ({result})");
             }
             catch (Exception ex)
             {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 using YZPortal.API.Controllers.Pagination;
 using YZPortal.Core.Domain.Contexts;
+using YZPortal.FullStackCore.Models.Abstracts;
 
 namespace YZPortal.API.Infrastructure.Mediatr
 {
@@ -17,7 +18,7 @@ namespace YZPortal.API.Infrastructure.Mediatr
         // For handling index response that query against runtime services 
         protected TResponse CreateIndexResponse<TModel>(SearchRequest<TResponse> request, List<TModel> results)
         {
-            return Mapper.Map<TResponse>(new SearchResponse<TModel>
+            return Mapper.Map<TResponse>(new SearchModel<TModel>
             {
                 Results = results,
                 SearchString = request.SearchString,
@@ -41,7 +42,7 @@ namespace YZPortal.API.Infrastructure.Mediatr
             int totalPages = 0;
             int totalItems = 0;
 
-            return Mapper.Map<TResponse>(new SearchResponse<TModel>
+            return Mapper.Map<TResponse>(new SearchModel<TModel>
             {
                 Results = results,
                 SearchString = request.SearchString,
@@ -112,7 +113,7 @@ namespace YZPortal.API.Infrastructure.Mediatr
                 totalItems = paginatedResults.TotalItems;
             }
 
-            return Mapper.Map<TResponse>(new SearchResponse<TModel>
+            return Mapper.Map<TResponse>(new SearchModel<TModel>
             {
                 Results = results,
                 SearchString = request.SearchString,
@@ -184,7 +185,7 @@ namespace YZPortal.API.Infrastructure.Mediatr
                 totalItems = paginatedResults.TotalItems;
             }
 
-            return Mapper.Map<TResponse>(new SearchResponse<TModel>
+            return Mapper.Map<TResponse>(new SearchModel<TModel>
             {
                 Results = results,
                 SearchString = request.SearchString,

@@ -1,6 +1,4 @@
-﻿using YZPortal.Client.Models.Users;
-
-namespace YZPortal.Client.Services.LocalStorage
+﻿namespace YZPortal.Client.Services.LocalStorage
 {
     public interface ILocalStorageService
     {
@@ -10,7 +8,6 @@ namespace YZPortal.Client.Services.LocalStorage
 
         Task<string> GetUserAuthenToken();
         Task RemoveUserAuthenToken();
-        Task SetUserAuthenToken(UserLoginResult userLoginResult);
 		Task ClearLocalStorage();
 
 		#endregion

@@ -7,9 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
 using System.Reflection;
 using System.Security.Claims;
-using YZPortal.Core.Domain.Database.Dealers;
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
-using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Domain.Database.Sync;
 using YZPortal.Core.Domain.Database.Users;
 
@@ -26,32 +24,6 @@ namespace YZPortal.Core.Domain.Contexts
         }
 
         #region Data Sets
-
-        #region Users
-
-        public DbSet<UserPasswordReset> UserPasswordResets { get; set; }
-        public DbSet<UserInvite> UserInvites { get; set; }
-        public DbSet<UserInviteDealerSelection> UserInviteDealerSelections { get; set; }
-
-        #endregion
-
-        #region Memberships
-
-        public DbSet<ContentAccessLevel> ContentAccessLevels { get; set; }
-        public DbSet<Membership> Memberships { get; set; }
-        public DbSet<MembershipDealerRole> MembershipDealerRoles { get; set; }
-        public DbSet<MembershipContentAccessLevel> MembershipContentAccessLevels { get; set; }
-        public DbSet<MembershipNotification> MembershipNotifications { get; set; }
-
-        #endregion
-
-        #region Dealers
-
-        public DbSet<Dealer> Dealers { get; set; }
-        // should add dealerId to dealerRole, and contentaccesslevel is dealer specific also
-        public DbSet<DealerRole> DealerRoles { get; set; }
-
-        #endregion
 
         #region Sync
 
@@ -93,66 +65,6 @@ namespace YZPortal.Core.Domain.Contexts
                 .HasKey(x => new { x.Type, x.Name });
 
             #endregion
-
-            #region Memberships
-
-            #region Membership Dealer Role
-
-            builder.Entity<MembershipDealerRole>()
-                .HasKey(bc => new { bc.DealerRoleId, bc.MembershipId });
-            builder.Entity<MembershipDealerRole>()
-                .HasOne(bc => bc.DealerRole)
-                .WithMany(b => b.MembershipDealerRoles)
-                .HasForeignKey(bc => bc.DealerRoleId);
-            builder.Entity<MembershipDealerRole>()
-                .HasOne(bc => bc.Membership)
-                .WithOne(c => c.MembershipDealerRole)
-                .HasForeignKey<MembershipDealerRole>(bc => bc.MembershipId);
-
-            // restrict deletion of dealer role when membership dealer role deleted or for statuses just dont cr8 a relationship..... omg
-            #endregion
-
-            #region Dealer Role
-
-            builder.Entity<DealerRole>()
-                .HasIndex(bc => new { bc.Name })
-                .IsUnique();
-
-            #endregion
-
-            #region Membership Access Level
-
-            builder.Entity<MembershipContentAccessLevel>()
-                .HasKey(bc => new { bc.ContentAccessLevelId, bc.MembershipId });
-            builder.Entity<MembershipContentAccessLevel>()
-                .HasOne(bc => bc.ContentAccessLevel)
-                .WithMany(b => b.MembershipContentAccessLevels)
-                .HasForeignKey(bc => bc.ContentAccessLevelId);
-            builder.Entity<MembershipContentAccessLevel>()
-                .HasOne(bc => bc.Membership)
-                .WithMany(c => c.MembershipContentAccessLevels)
-                .HasForeignKey(bc => bc.MembershipId);
-
-            #endregion
-
-            #region Content Access Level
-
-            builder.Entity<ContentAccessLevel>()
-                .HasIndex(bc => new { bc.Name })
-                .IsUnique();
-
-            #endregion
-
-            #endregion
-
-            #region Dealers
-
-            // Ref: https://dataschool.com/sql-optimization/how-indexing-works/
-            builder.Entity<Dealer>()
-                .HasIndex(bc => new { bc.Name })
-                .IsUnique();
-
-            #endregion
         }
 
         public override int SaveChanges()
@@ -188,7 +100,7 @@ namespace YZPortal.Core.Domain.Contexts
 
             Guid currentUserId = string.IsNullOrEmpty(nameClaim) ? Guid.Empty : Guid.Parse(nameClaim);
             User? currentUser = Users?.FirstOrDefault(u => u.Id == currentUserId) ?? null;
-            var identityName = currentUser?.Name ?? "Anonymous";
+            var identityName = currentUser?.DisplayName ?? "Anonymous";
 
             // Track change and create timestamps
             foreach (var entityEntry in entries)
@@ -228,7 +140,7 @@ namespace YZPortal.Core.Domain.Contexts
             // Default values for IAuditableEntity
             modelBuilder.Entity<TEntity>().Property(e => e.CreatedDate).HasDefaultValueSql("getutcdate()");
             modelBuilder.Entity<TEntity>().Property(e => e.CreatedBy).HasDefaultValue("unknown");
-            modelBuilder.Entity<TEntity>().Property(e => e.UpdatedDate).HasDefaultValueSql("getutcdate()");
+            modelBuilder.Entity<TEntity>().Property(e => e.UpdatedDate).HasDefaultValueSql("null");
             modelBuilder.Entity<TEntity>().Property(e => e.UpdatedBy).HasDefaultValue("unknown");
         }
 

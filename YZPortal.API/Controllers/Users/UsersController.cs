@@ -1,12 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using YZPortal.API.Controllers.ControllerTypes;
-using YZPortal.API.Controllers.Pagination;
+using YZPortal.FullStackCore.Models.Abstracts;
 
 namespace YZPortal.API.Controllers.Users
 {
-	public class UsersController : ApiAdminScopeControllerClass
-	{
+    public class UsersController : ApiB2CController
+    {
 		public UsersController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
 		{
 		}
@@ -15,31 +15,42 @@ namespace YZPortal.API.Controllers.Users
 		///     Returns a list of user.
 		/// </summary>
 		[HttpGet]
-		public async Task<ActionResult<SearchResponse<Index.Model>>> GetUser([FromQuery] Index.Request request) => await _mediator.Send(request);
+		public async Task<ActionResult<SearchModel<Index.Model>>> GetUsers([FromQuery] Index.Request request) => await _mediator.Send(request);
 
 		/// <summary>
 		///     Deletes a user.
 		/// </summary>
-		[HttpDelete("{id}")]
-		public async Task<ActionResult<Delete.Model>> DeleteUser([FromRoute] Guid id) => await _mediator.Send(new Delete.Request { Id = id });
+		[HttpDelete("{subjectId}")]
+		public async Task<ActionResult<Delete.Model>> DeleteUser([FromRoute] Guid subjectId) => await _mediator.Send(new Delete.Request { Id = subjectId });
 
 		/// <summary>
 		///     Returns user detail.
 		/// </summary>
-		[HttpGet("{id}")]
-		public async Task<ActionResult<Details.Model>> GetUser([FromRoute] Guid id, [FromQuery] Details.Request request)
+		[HttpGet("{subjectId}")]
+		public async Task<ActionResult<Details.Model>> GetUser([FromRoute] Guid subjectId, [FromQuery] Details.Request request)
 		{
-			request.Id = id;
+			request.SubjectId = subjectId;
 			return await _mediator.Send(request);
 		}
 
-		/// <summary>
-		///     Updates the detail of a user.
-		/// </summary>
-		[HttpPut("{id}")]
-		public async Task<ActionResult<Update.Model>> UpdateUser([FromRoute] Guid id, [FromBody] Update.Request request)
+        /// <summary>
+        ///     Creates new user via b2c token.
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> CreateUser([FromBody] Create.Request request)
+        {
+            var payLoad = await _mediator.Send(request);
+
+            return CreatedAtAction(nameof(GetUser), new { id = payLoad.Id }, payLoad);
+        }
+
+        /// <summary>
+        ///     Updates the detail of a user via b2c token.
+        /// </summary>
+        [HttpPut("{subjectId}")]
+		public async Task<ActionResult<Update.Model>> UpdateUser([FromRoute] Guid subjectId, [FromBody] Update.Request request)
 		{
-			if (id != Guid.Empty) request.Id = id;
+			if (subjectId != Guid.Empty) request.SubjectId = subjectId;
 			return await _mediator.Send(request);
 		}
 	}

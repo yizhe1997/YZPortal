@@ -3,12 +3,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Web.Helpers;
 using YZPortal.Core.Domain.Database.Users;
-using YZPortal.Core.Domain.Database.Dealers;
-using YZPortal.Core.Domain.Database.Memberships;
 using YZPortal.Core.Domain.Database.Sync;
-using YZPortal.Core.Extensions;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.FullStackCore.Enums.Memberships;
+using YZPortal.FullStackCore.Extensions;
 
 namespace YZPortal.Core.Domain.Database
 {
@@ -41,15 +39,14 @@ namespace YZPortal.Core.Domain.Database
             if (Admin == null)
             {
                 // Check if theres pre-existing admin user, create new if no and overwrite if yes
-                var AdminCheck = _userManager.Users.Where(x => x.Admin == true).FirstOrDefault();
+                var AdminCheck = _userManager.Users.FirstOrDefault();
                 if (AdminCheck == null)
                 {
                     Admin = new User
                     {
                         Email = _options.AdminEmail,
-                        Name = "admin",
-                        EmailConfirmed = true,
-                        Admin = true
+                        DisplayName = "admin",
+                        EmailConfirmed = true
                     };
 
                     var result = _userManager.CreateAsync(Admin, _options.AdminPassword).Result;
@@ -87,32 +84,32 @@ namespace YZPortal.Core.Domain.Database
 
         public void EnumValues()
         {
-            var DealerRoleTypes = typeof(DealerRoleNames).GetEnumDataTypeValues();
+            //var DealerRoleTypes = typeof(DealerRoleNames).GetEnumDataTypeValues();
 
-            foreach (var type in DealerRoleTypes)
-            {
-                if (!_dbContext.DealerRoles.Where(x => type == x.Name).Any())
-                {
-                    _dbContext.Add(new DealerRole() { Name = type });
-                }
-            }
+            //foreach (var type in DealerRoleTypes)
+            //{
+            //    if (!_dbContext.DealerRoles.Where(x => type == x.Name).Any())
+            //    {
+            //        _dbContext.Add(new DealerRole() { Name = type });
+            //    }
+            //}
 
-            var ContentAccessLevelTypes = typeof(ContentAccessLevelNames).GetEnumDataTypeValues();
+            //var ContentAccessLevelTypes = typeof(ContentAccessLevelNames).GetEnumDataTypeValues();
 
-            foreach (var type in ContentAccessLevelTypes)
-            {
-                if (!_dbContext.ContentAccessLevels.Where(x => type == x.Name).Any())
-                {
-                    _dbContext.Add(new ContentAccessLevel() { Name = type });
-                }
-            }
+            //foreach (var type in ContentAccessLevelTypes)
+            //{
+            //    if (!_dbContext.ContentAccessLevels.Where(x => type == x.Name).Any())
+            //    {
+            //        _dbContext.Add(new ContentAccessLevel() { Name = type });
+            //    }
+            //}
 
-            if (!_dbContext.Dealers.Where(d => d.Name == "Default").Any())
-            {
-                _dbContext.Add(new Dealer() { Name = "Default" });
-            }
+            //if (!_dbContext.Dealers.Where(d => d.Name == "Default").Any())
+            //{
+            //    _dbContext.Add(new Dealer() { Name = "Default" });
+            //}
 
-            _dbContext.SaveChanges();
+            //_dbContext.SaveChanges();
         }
         public void SyncStatuses()
         {

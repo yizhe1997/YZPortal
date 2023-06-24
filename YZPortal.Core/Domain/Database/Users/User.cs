@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
-using YZPortal.Core.Domain.Database.Memberships;
+using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
 
 namespace YZPortal.Core.Domain.Database.Users
 {
@@ -15,30 +14,38 @@ namespace YZPortal.Core.Domain.Database.Users
 	//| AspNetRoleClaims | Claims by roles. | No               | 
 	//+------------------+------------------+------------------+
 
-	public class User : IdentityUser<Guid>
+	public class User : IdentityUser<Guid>, IAuditableEntity
     {
-        [Required]
-        public string? Name { get; set; }
-        public bool Admin { get; set; } = false;
-		// Ref: https://stackoverflow.com/questions/26430094/asp-net-identity-provider-signinmanager-keeps-returning-failure
-		public override string? UserName { get { return Email; } set { Email = value; } }
-        public DateTime? LastLoggedIn { get; set; }
-        public List<Membership> Memberships { get; set; } = new List<Membership>();
-        public List<UserPasswordReset> UserPasswordResets { get; set; } = new List<UserPasswordReset>();
-        public UserInvite? UserInvite { get; set; }
+        #region B2C Claims
+
+        public string? DisplayName { get; set; }
+        public Guid SubjectIdentifier { get; set; }
+        public string? IpAddress { get; set; }
+        public DateTime? AuthTime { get; set; }
+        public DateTime? AuthExpireTime { get; set; }
+        public string? AuthClassRef { get; set; }
 
         #region Identity Provider
 
-        public Guid TokenSubClaim { get; set; }
-		public int IdentityProvider { get; set; }
+        public string? IdentityProvider { get; set; } // TODO
+        public string? LastidpAccessToken { get; set; } // TODO
 
-		#endregion
-	}
-	[Flags]
-	public enum IdentityProviderNames
-	{
-		None = 0,
-		AzureAd = 1,
-		AzureAdB2C = 2
-	}
+        #endregion
+
+        #endregion
+
+        #region IAuditableEntity
+
+        public DateTime? CreatedDate { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+        public string? UpdatedBy { get; set; }
+
+        #endregion
+
+        //public virtual ICollection<Logs> Logs { get; set; } = new HashSet<Logs>();
+
+        // Ref: https://stackoverflow.com/questions/26430094/asp-net-identity-provider-signinmanager-keeps-returning-failure
+        public override string? UserName { get { return Email; } set { Email = value; } } // TODO EMAIL        
+    }
 }

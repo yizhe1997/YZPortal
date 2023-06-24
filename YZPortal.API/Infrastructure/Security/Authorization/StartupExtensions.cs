@@ -11,27 +11,18 @@ namespace YZPortal.API.Infrastructure.Security.Authorization
         {
             services.AddAuthorization(opts =>
             {
-                // DealerId
-                opts.AddDealerIdPolicy();
-
                 // Role
-                opts.AddIsRoleAdminPolicy();
+                opts.AddAdministratorPolicy();
+                opts.AddGeneralPolicy();
 
-                // Access Levels
-                opts.AddIsAccessLvlUserPolicy();
+                // Subscription
+                opts.AddBadmintonSubscriptionPolicy();
 
+                // Authentication Schema
                 var allAuthenSchemes = new AuthorizationPolicyBuilder(
 						JwtBearerDefaults.AuthenticationScheme,
-						Constants.AzureAdB2C,
-						Constants.AzureAd);
+						Constants.AzureAdB2C);
 				opts.AddPolicy("AllAuthenSchemes", allAuthenSchemes
-					.RequireAuthenticatedUser()
-					.Build());
-
-				var allExternalAuthSchemes = new AuthorizationPolicyBuilder(
-						Constants.AzureAdB2C,
-						Constants.AzureAd);
-				opts.AddPolicy("AllExternalAuthSchemes", allExternalAuthSchemes
 					.RequireAuthenticatedUser()
 					.Build());
 			});

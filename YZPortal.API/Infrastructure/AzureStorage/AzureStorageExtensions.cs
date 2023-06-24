@@ -2,8 +2,8 @@
 using Azure.Storage.Sas;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net;
-using YZPortal.API.Controllers.ViewModel.Auditable;
 using YZPortal.Core.Error;
+using YZPortal.FullStackCore.Models.Abstracts;
 
 namespace YZPortal.API.Infrastructure.AzureStorage
 {
@@ -155,8 +155,8 @@ namespace YZPortal.API.Infrastructure.AzureStorage
 	/// <summary>
 	///     View model used for attachment type entities 
 	/// </summary>
-	public class AttachmentViewModel : AuditableViewModel
-	{
+	public class AttachmentViewModel : AuditableModel
+    {
 		public string? FileName { get; set; }
 		public string? DisplayName { get; set; }
 		public string? FileType { get; set; }

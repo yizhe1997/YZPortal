@@ -3,8 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Identity.Web;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
-using YZPortal.API.Infrastructure.Swagger;
-using YZPortal.API.Infrastructure.Security.AzureAd;
 using YZPortal.API.Infrastructure.Security.AzureAdB2C;
 using YZPortal.API.Infrastructure.Security.Jwt;
 using Microsoft.AspNetCore.Authentication;
@@ -17,10 +15,9 @@ namespace YZPortal.API.Infrastructure.Security.Authentication
         public static void AddAuthentications(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtOptions = configuration.GetSection("Jwt").Get<JwtIssuerOptions>();
-            var swaggerOptions = configuration.GetSection("Swagger").Get<SwaggerOptions>() ?? new();
-            var azureAdApiOptions = configuration.GetSection("AzureAdApi").Get<AzureAdApiOptions>() ?? new();
             var azureAdB2CApiOptions = configuration.GetSection("AzureAdB2CApi").Get<AzureAdB2CApiOptions>() ?? new();
 
+            // I can probably use this instead of basic auth for the custom policy
             // Jwt Bearer
             services.AddAuthentication()
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
@@ -43,17 +40,6 @@ namespace YZPortal.API.Infrastructure.Security.Authentication
             // Basic
             services.AddAuthentication()
             .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
-
-            // Azure Ad
-            services.AddAuthentication()
-            .AddMicrosoftIdentityWebApi(x =>
-            {
-                configuration.Bind("AzureAdApi", x);
-                x.TokenValidationParameters.NameClaimType = "name";
-            }, x =>
-            {
-                configuration.Bind("AzureAdApi", x);
-            }, jwtBearerScheme: Constants.AzureAd);
 
             // Azure Ad B2C
             services.AddAuthentication()
@@ -78,15 +64,9 @@ namespace YZPortal.API.Infrastructure.Security.Authentication
                     var token = authorization.Substring("Bearer ".Length).Trim();
                     var jwtHandler = new JwtSecurityTokenHandler();
                     var issuer = jwtHandler.ReadJwtToken(token).Claims.FirstOrDefault(x => x.Type == "aud")?.Value;
-                    var azureAdApiOptionsAudience = azureAdApiOptions?.Audience ?? "";
                     var azureAdB2CApiOptionsClientId = azureAdB2CApiOptions?.ClientId ?? "";
 
-                    if (string.Equals(issuer, azureAdApiOptionsAudience, StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (!string.IsNullOrEmpty(azureAdApiOptionsAudience))
-                            return Constants.AzureAd;
-                    }
-                    else if (string.Equals(issuer, azureAdB2CApiOptionsClientId, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(issuer, azureAdB2CApiOptionsClientId, StringComparison.OrdinalIgnoreCase))
                     {
                         if (!string.IsNullOrEmpty(azureAdB2CApiOptionsClientId))
                             return Constants.AzureAdB2C;

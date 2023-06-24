@@ -1,9 +1,6 @@
-﻿using EFCore.BulkExtensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
-using YZPortal.Worker.Helpers.Scriban;
 using YZPortal.Worker.Infrastructure.Email;
 using YZPortal.Worker.Infrastructure.Email.OfficeSmtp;
 using YZPortal.Worker.Infrastructure.Email.SendGrid;
@@ -31,45 +28,45 @@ namespace YZPortal.Worker.Tasks.Email.Memberships
 
             try
             {
-                // Parse and validate template
-                var template = ScribanHelper.ParseTemplate("./SendMembershipNotification.html");
-                if (template == null)
-                    throw new Exception("Failed to parse template for " + nameof(SendMembershipNotificationsTask));
+                //// Parse and validate template
+                //var template = ScribanHelper.ParseTemplate("./SendMembershipNotification.html");
+                //if (template == null)
+                //    throw new Exception("Failed to parse template for " + nameof(SendMembershipNotificationsTask));
 
-                // Query
-                var lastAttempted = DateTime.UtcNow.Subtract(emailOptions.AttemptInterval);
-                var notifications = await dbContext.MembershipNotifications
-                .Include(x => x.Membership)
-                .ThenInclude(x => x.Dealer)
-                .Where(x =>
-                    x.SentDateTime == null || // has not been sent OR 
-                    (
-                        x.FailedSentDateTime != null && x.SentDateTime == null && // (it has failed AND
-                        x.Attempts < emailOptions.SendAttempts && // has not been attempted too often AND                      
-                        x.LastAttemptedSentDateTime < lastAttempted // enough time has passed since last attempt)
-                    )
-                ).ToListAsync();
+                //// Query
+                //var lastAttempted = DateTime.UtcNow.Subtract(emailOptions.AttemptInterval);
+                //var notifications = await dbContext.MembershipNotifications
+                //.Include(x => x.Membership)
+                //.ThenInclude(x => x.Dealer)
+                //.Where(x =>
+                //    x.SentDateTime == null || // has not been sent OR 
+                //    (
+                //        x.FailedSentDateTime != null && x.SentDateTime == null && // (it has failed AND
+                //        x.Attempts < emailOptions.SendAttempts && // has not been attempted too often AND                      
+                //        x.LastAttemptedSentDateTime < lastAttempted // enough time has passed since last attempt)
+                //    )
+                //).ToListAsync();
 
-                // Prepare template input
-                var models = notifications
-                    .GroupBy(x => x.Email)
-                    .Select(x => new EmailMembershipNotification
-                    {
-                        dealername = string.Join(", ", x.ToList().Select(x => x.Membership.Dealer.Name).ToList()),
-                        Notifications = x.ToList()
-                    }).ToList();
+                //// Prepare template input
+                //var models = notifications
+                //    .GroupBy(x => x.Email)
+                //    .Select(x => new EmailMembershipNotification
+                //    {
+                //        dealername = string.Join(", ", x.ToList().Select(x => x.Membership.Dealer.Name).ToList()),
+                //        Notifications = x.ToList()
+                //    }).ToList();
 
-                // Send notifications and update emailable entities
-                var result = await SendNotificationsAsync(models.Select(x => new EmailMessage
-                {
-                    Content = template.Render(x),
-                    Subject = "YZ Portal Membership Notification",
-                    Notifications = x.Notifications
-                }).ToList(), cancellationToken);
+                //// Send notifications and update emailable entities
+                //var result = await SendNotificationsAsync(models.Select(x => new EmailMessage
+                //{
+                //    Content = template.Render(x),
+                //    Subject = "YZ Portal Membership Notification",
+                //    Notifications = x.Notifications
+                //}).ToList(), cancellationToken);
 
-                await dbContext.BulkUpdateAsync(notifications);
+                //await dbContext.BulkUpdateAsync(notifications);
 
-                logger.LogInformation($"Membership notifications sent: ({result})");
+                //logger.LogInformation($"Membership notifications sent: ({result})");
             }
             catch (Exception ex)
             {

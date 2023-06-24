@@ -3,31 +3,32 @@ using YZPortal.API.Controllers.Pagination;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Users;
+using YZPortal.FullStackCore.Models.Abstracts;
+using YZPortal.FullStackCore.Models.Users;
 
 namespace YZPortal.API.Controllers.Users
 {
-	public class Index
+    public class Index
 	{
-		public class Request : SearchRequest<SearchResponse<Model>>
+		public class Request : SearchRequest<SearchModel<Model>>
 		{
 		}
-		public class Model : UserViewModel
+		public class Model : UserModel
 		{
 		}
-		public class RequestHandler : SearchRequestHandler<Request, SearchResponse<Model>>
+		public class RequestHandler : SearchRequestHandler<Request, SearchModel<Model>>
 		{
 			public RequestHandler(PortalContext dbContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor) : base(dbContext, mapper, httpContext, userAccessor)
 			{
 			}
-			public override async Task<SearchResponse<Model>> Handle(Request request, CancellationToken cancellationToken)
+			public override async Task<SearchModel<Model>> Handle(Request request, CancellationToken cancellationToken)
 			{
-				// Only get non-admin users to prevent self-deletion from client app
-				var query = Database.Users.Where(x => x.Admin == false).AsQueryable();
+				var query = Database.Users.AsQueryable();
 
 				return await CreateIndexResponseAsync<User, Model>(
 					request,
 					query,
-					x => x.Name.Contains(request.SearchString) ||
+					x => x.DisplayName.Contains(request.SearchString) ||
 					x.UserName.Contains(request.SearchString));
 			}
 		}

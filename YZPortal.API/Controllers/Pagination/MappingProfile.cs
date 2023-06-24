@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using YZPortal.FullStackCore.Models.Abstracts;
 
 namespace YZPortal.API.Controllers.Pagination
 {
@@ -7,12 +8,12 @@ namespace YZPortal.API.Controllers.Pagination
         public MappingProfile()
         {
             // Search Response
-            CreateMap(typeof(SearchRequest<>), typeof(SearchResponse<>), MemberList.Source);
-            CreateMap(typeof(PaginatedList<>), typeof(SearchResponse<>), MemberList.Source);
+            CreateMap(typeof(SearchRequest<>), typeof(SearchModel<>), MemberList.Source);
+            CreateMap(typeof(PaginatedList<>), typeof(SearchModel<>), MemberList.Source);
 
             // Paged Response
-            CreateMap(typeof(PagedRequest<>), typeof(PagedResponse<>), MemberList.Source);
-            CreateMap(typeof(PaginatedList<>), typeof(PagedResponse<>), MemberList.Source);
+            CreateMap(typeof(PagedRequest<>), typeof(PagedModel<>), MemberList.Source);
+            CreateMap(typeof(PaginatedList<>), typeof(PagedModel<>), MemberList.Source);
         }
     }
 }

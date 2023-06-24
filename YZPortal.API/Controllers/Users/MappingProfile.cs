@@ -3,12 +3,15 @@ using YZPortal.Core.Domain.Database.Users;
 
 namespace YZPortal.API.Controllers.Users
 {
-	public class MappingProfile : Profile
+    public class MappingProfile : Profile
 	{
 		public MappingProfile()
 		{
-			// Index
-			CreateMap<User, Index.Model>();
+            // Create
+            CreateMap<User, Create.Model>();
+
+            // Index
+            CreateMap<User, Index.Model>();
 
 			// Details
 			CreateMap<User, Details.Model>();

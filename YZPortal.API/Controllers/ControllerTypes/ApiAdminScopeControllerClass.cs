@@ -4,8 +4,8 @@ using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
 
 namespace YZPortal.API.Controllers.ControllerTypes
 {
-	[Authorize(Policy = Policies.IsAdmin)]
-	public class ApiAdminScopeControllerClass : ApiSecureController
+	[Authorize(Policy = Policies.Administrator)]
+	public class ApiAdminScopeControllerClass : ApiJwtBearerController
 	{
 		public ApiAdminScopeControllerClass(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
 		{

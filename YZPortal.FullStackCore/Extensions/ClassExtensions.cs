@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
-namespace YZPortal.Core.Extensions
+namespace YZPortal.FullStackCore.Extensions
 {
     public static class ClassExtensions
     {

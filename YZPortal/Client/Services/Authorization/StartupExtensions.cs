@@ -6,18 +6,17 @@ namespace YZPortal.Client.Services.Authorization
     {
         public static void AddAuthorization(this IServiceCollection services)
         {
+            // i forgot why we need this... can remove if dont need
 			services.AddApiAuthorization();
 
 			services.AddAuthorizationCore(opts =>
             {
-                // DealerId
-                opts.AddDealerIdPolicy();
-
                 // Role
-                opts.AddIsRoleAdminPolicy();
+                opts.AddAdministratorPolicy();
+                opts.AddGeneralPolicy();
 
-                // Access Levels
-                opts.AddIsAccessLvlUserPolicy();
+                // Subscription
+                opts.AddBadmintonSubscriptionPolicy();
             });
         }
     }

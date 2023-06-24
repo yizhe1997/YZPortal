@@ -5,6 +5,7 @@ using System.Net;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Error;
+using YZPortal.FullStackCore.Models.Users;
 
 namespace YZPortal.API.Controllers.Users
 {
@@ -14,8 +15,8 @@ namespace YZPortal.API.Controllers.Users
 		{
 			internal Guid Id { get; set; }
 		}
-		public class Model : UserViewModel
-		{
+		public class Model : UserModel
+        {
 		}
 		public class RequestHandler : BaseRequestHandler<Request, Model>
 		{
@@ -27,10 +28,6 @@ namespace YZPortal.API.Controllers.Users
 				var user = await Database.Users.FirstOrDefaultAsync(u => u.Id == request.Id);
 				if (user == null)
 					throw new RestException(HttpStatusCode.NotFound, "User not found.");
-
-				// Forbid deletion of admin user
-				if (user.Admin == true)
-					throw new RestException(HttpStatusCode.NotFound, "Admin user not allowed for deletion.");
 
 				// Remove from users table if record exit
 				Database.Users.Remove(user);

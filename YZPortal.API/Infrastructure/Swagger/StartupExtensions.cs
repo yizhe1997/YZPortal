@@ -5,7 +5,6 @@ using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
-using YZPortal.API.Infrastructure.Security.AzureAd;
 using YZPortal.API.Infrastructure.Security.AzureAdB2C;
 
 namespace YZPortal.API.Infrastructure.Swagger
@@ -14,18 +13,8 @@ namespace YZPortal.API.Infrastructure.Swagger
     {
         public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services, IConfiguration configuration)
         {
-			services.Configure<SwaggerOptions>(configuration.GetSection("Swagger"));
-
-			//var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-			//var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
 			services.AddSwaggerGen(opts =>
             {
-                var swaggerOptions = configuration.GetSection("Swagger").Get<SwaggerOptions>() ?? new();
-
-                var azureAdApiOptions = configuration.GetSection("AzureAdApi").Get<AzureAdApiOptions>() ?? new();
-                var azureAdSwaggerOptions = configuration.GetSection("AzureAdSwagger").Get<AzureAdSwaggerOptions>() ?? new();
-
                 var azureAdB2CApiOptions = configuration.GetSection("AzureAdB2CApi").Get<AzureAdB2CApiOptions>() ?? new();
                 var azureAdB2CSwaggerOptions = configuration.GetSection("AzureAdB2CSwagger").Get<AzureAdB2CSwaggerOptions>() ?? new();
 
@@ -55,67 +44,39 @@ namespace YZPortal.API.Infrastructure.Swagger
                     Type = SecuritySchemeType.ApiKey
                 });
 
-                if (swaggerOptions.IsAzureAdOAuth2Provider == true)
+                opts.AddSecurityDefinition(Constants.AzureAdB2C, new OpenApiSecurityScheme
                 {
-                    opts.AddSecurityDefinition(Constants.AzureAd, new OpenApiSecurityScheme
+                    Type = SecuritySchemeType.OAuth2,
+                    Scheme = Constants.AzureAdB2C,
+                    Description = "Azure AD B2C authorization",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Flows = new OpenApiOAuthFlows()
                     {
-                        Type = SecuritySchemeType.OAuth2,
-                        Scheme = Constants.AzureAd,
-                        Description = "Azure AD authorization",
-                        Name = "Authorization",
-                        In = ParameterLocation.Header,
-                        Flows = new OpenApiOAuthFlows()
+                        Implicit = new OpenApiOAuthFlow()
                         {
-                            Implicit = new OpenApiOAuthFlow()
-                            {
-                                AuthorizationUrl = new Uri($"{azureAdApiOptions.Instance}/{azureAdApiOptions.TenantId}/oauth2/v2.0/authorize"),
-                                TokenUrl = new Uri($"{azureAdApiOptions.Instance}/{azureAdApiOptions.TenantId}/oauth2/v2.0/token"),
-                                Scopes = new Dictionary<string, string>
-                                {
-                                    {
-                                        azureAdSwaggerOptions.Scope,
-                                        "Provides authorization token for YZPortal API"
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-                else
-                {
-                    opts.AddSecurityDefinition(Constants.AzureAdB2C, new OpenApiSecurityScheme
-                    {
-                        Type = SecuritySchemeType.OAuth2,
-                        Scheme = Constants.AzureAdB2C,
-                        Description = "Azure AD B2C authorization",
-                        Name = "Authorization",
-                        In = ParameterLocation.Header,
-                        Flows = new OpenApiOAuthFlows()
-                        {
-                            Implicit = new OpenApiOAuthFlow()
-                            {
-                                AuthorizationUrl = new Uri($"{azureAdB2CApiOptions.Instance}/{azureAdB2CApiOptions.Domain}/oauth2/v2.0/authorize?p={azureAdB2CApiOptions.SignUpSignInPolicyId}"),
-                                TokenUrl = new Uri($"{azureAdB2CApiOptions.Instance}/{azureAdB2CApiOptions.Domain}/oauth2/v2.0/token?p={azureAdB2CApiOptions.SignUpSignInPolicyId}"),
-                                Scopes = new Dictionary<string, string>
+                            AuthorizationUrl = new Uri($"{azureAdB2CApiOptions.Instance}/{azureAdB2CApiOptions.Domain}/oauth2/v2.0/authorize?p={azureAdB2CApiOptions.SignUpSignInPolicyId}"),
+                            TokenUrl = new Uri($"{azureAdB2CApiOptions.Instance}/{azureAdB2CApiOptions.Domain}/oauth2/v2.0/token?p={azureAdB2CApiOptions.SignUpSignInPolicyId}"),
+                            Scopes = new Dictionary<string, string>
                                 {
                                     {
                                         azureAdB2CSwaggerOptions.Scope,
                                         "Provides authorization token for Dealer Portal WebAPI"
                                     }
                                 }
-                            }
                         }
-                    });
-                }
+                    }
+                });
 
-				#endregion
+                #endregion
 
-				#region Add Security Requirements
+                #region Add Security Requirements
 
-				var openApiSecurityRequirement = new OpenApiSecurityRequirement()
+                var openApiSecurityRequirement = new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecurityScheme {
+                        new OpenApiSecurityScheme
+                        {
                             Reference = new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
@@ -126,39 +87,22 @@ namespace YZPortal.API.Infrastructure.Swagger
                             In = ParameterLocation.Header
                         },
                         new List<string>()
+                    },
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = Constants.AzureAdB2C
+                            },
+                            Scheme = Constants.AzureAdB2C,
+                            Name = "Authorization",
+                            In = ParameterLocation.Header,
+                        },
+                        new List<string>() { azureAdB2CSwaggerOptions.Scope }
                     }
                 };
-
-                if (swaggerOptions.IsAzureAdOAuth2Provider == true)
-                {
-                    openApiSecurityRequirement.Add(new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = Constants.AzureAd
-                        },
-                        Scheme = Constants.AzureAd,
-                        Name = "Authorization",
-                        In = ParameterLocation.Header
-                    },
-                    new List<string>() { azureAdSwaggerOptions.Scope });
-                }
-                else
-                {
-                    openApiSecurityRequirement.Add(new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = Constants.AzureAdB2C
-                        },
-                        Scheme = Constants.AzureAdB2C,
-                        Name = "Authorization",
-                        In = ParameterLocation.Header,
-                    },
-                    new List<string>() { azureAdB2CSwaggerOptions.Scope });
-                }
 
                 opts.AddSecurityRequirement(openApiSecurityRequirement);
 
@@ -184,9 +128,7 @@ namespace YZPortal.API.Infrastructure.Swagger
 
         public static IApplicationBuilder UseSwaggerDocumentation(this IApplicationBuilder app, IApiVersionDescriptionProvider provider, IConfiguration configuration)
         {
-            var swaggerOptions = configuration.GetSection("Swagger").Get<SwaggerOptions>() ?? new();
             var azureAdB2CSwaggerOptions = configuration.GetSection("AzureAdB2CSwagger").Get<AzureAdB2CSwaggerOptions>() ?? new();
-            var azureAdSwaggerOptions = configuration.GetSection("AzureAdSwagger").Get<AzureAdSwaggerOptions>() ?? new();
 
             app.UseSwagger(opts =>
             {
@@ -209,8 +151,8 @@ namespace YZPortal.API.Infrastructure.Swagger
                 opts.RoutePrefix = "docs";
                 opts.DefaultModelsExpandDepth(-1);
                 opts.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
-                opts.OAuthClientId(swaggerOptions.IsAzureAdOAuth2Provider ? azureAdSwaggerOptions.ClientId : azureAdB2CSwaggerOptions.ClientId);
-                opts.OAuthClientSecret(swaggerOptions.IsAzureAdOAuth2Provider ? azureAdSwaggerOptions.ClientId : azureAdB2CSwaggerOptions.ClientId);
+                opts.OAuthClientId(azureAdB2CSwaggerOptions.ClientId);
+                opts.OAuthClientSecret(azureAdB2CSwaggerOptions.ClientId);
                 opts.OAuthAppName(azureAdB2CSwaggerOptions?.AppName ?? "");
                 opts.OAuthUseBasicAuthenticationWithAccessCodeGrant();
             });
@@ -229,7 +171,6 @@ namespace YZPortal.API.Infrastructure.Swagger
 
             public void Apply(OpenApiOperation operation, OperationFilterContext context)
             {
-                var azureAdSwaggerOptions = Configuration.GetSection("AzureAdSwagger").Get<AzureAdSwaggerOptions>() ?? new();
                 var azureAdB2CSwaggerOptions = Configuration.GetSection("AzureAdB2CSwagger").Get<AzureAdB2CSwaggerOptions>() ?? new();
 
                 if (context != null && operation != null)
@@ -263,12 +204,6 @@ namespace YZPortal.API.Infrastructure.Swagger
                     {
                         requireAuth = true;
                         id = JwtBearerDefaults.AuthenticationScheme;
-                    }
-                    else if (requiredScopes.Contains(Constants.AzureAd) || requiredScopes2.Contains(Constants.AzureAd))
-                    {
-                        requireAuth = true;
-                        id = Constants.AzureAd;
-                        scope = azureAdSwaggerOptions?.Scope ?? "";
                     }
 
                     if (requireAuth && !string.IsNullOrEmpty(id))

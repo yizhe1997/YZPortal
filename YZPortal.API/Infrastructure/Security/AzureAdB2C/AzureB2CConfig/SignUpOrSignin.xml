@@ -23,6 +23,7 @@
 				<OutputClaim ClaimTypeReferenceId="identityProviderAccessToken" PartnerClaimType="idp_access_token"/>
 				<OutputClaim ClaimTypeReferenceId="identityProviderRefreshToken" PartnerClaimType="idp_refresh_token"/>
 				<OutputClaim ClaimTypeReferenceId="groupDisplayNames" />
+				<OutputClaim ClaimTypeReferenceId="signInNames.emailAddress" PartnerClaimType="email"/>
 			</OutputClaims>
 			<SubjectNamingInfo ClaimType="sub" />
 		</TechnicalProfile>

@@ -153,306 +153,6 @@ namespace YZPortal.Core.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Dealers.Dealer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Dealers");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.ContentAccessLevel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("ContentAccessLevels");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.DealerRole", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("DealerRoles");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.Membership", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<bool>("Admin")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<Guid>("DealerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Disabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DealerId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Memberships");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.MembershipContentAccessLevel", b =>
-                {
-                    b.Property<Guid>("ContentAccessLevelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MembershipId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.HasKey("ContentAccessLevelId", "MembershipId");
-
-                    b.HasIndex("MembershipId");
-
-                    b.ToTable("MembershipContentAccessLevels");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.MembershipDealerRole", b =>
-                {
-                    b.Property<Guid>("DealerRoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MembershipId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.HasKey("DealerRoleId", "MembershipId");
-
-                    b.HasIndex("MembershipId")
-                        .IsUnique();
-
-                    b.ToTable("MembershipDealerRoles");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.MembershipNotification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<int>("Attempts")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FailedMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FailedSentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastAttemptedSentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("MembershipId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("SentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MembershipId");
-
-                    b.ToTable("MembershipNotifications");
-                });
-
             modelBuilder.Entity("YZPortal.Core.Domain.Database.Sync.SyncStatus", b =>
                 {
                     b.Property<int>("Type")
@@ -512,11 +212,26 @@ namespace YZPortal.Core.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Admin")
-                        .HasColumnType("bit");
+                    b.Property<string>("AuthClassRef")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("AuthExpireTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("AuthTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -526,21 +241,20 @@ namespace YZPortal.Core.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("IdentityProvider")
-                        .HasColumnType("int");
+                    b.Property<string>("IdentityProvider")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("LastLoggedIn")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastidpAccessToken")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -562,14 +276,17 @@ namespace YZPortal.Core.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TokenSubClaim")
+                    b.Property<Guid>("SubjectIdentifier")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("UserInviteId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -585,190 +302,7 @@ namespace YZPortal.Core.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("UserInviteId");
-
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.UserInvite", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<int>("Attempts")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CallbackUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClaimedDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FailedMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FailedSentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastAttemptedSentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("SentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("Token")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<DateTime?>("ValidUntilDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserInvites");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.UserInviteDealerSelection", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<Guid>("DealerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<int>("UserContentAccessLevels")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("UserInviteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("UserRole")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DealerId");
-
-                    b.HasIndex("UserInviteId");
-
-                    b.ToTable("UserInviteDealerSelections");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.UserPasswordReset", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("newid()");
-
-                    b.Property<int>("Attempts")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CallbackUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClaimedDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FailedMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("FailedSentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastAttemptedSentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("SentDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("Token")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UpdatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("unknown");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ValidUntilDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserPasswordResets");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -820,138 +354,6 @@ namespace YZPortal.Core.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.Membership", b =>
-                {
-                    b.HasOne("YZPortal.Core.Domain.Database.Dealers.Dealer", "Dealer")
-                        .WithMany()
-                        .HasForeignKey("DealerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("YZPortal.Core.Domain.Database.Users.User", "User")
-                        .WithMany("Memberships")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dealer");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.MembershipContentAccessLevel", b =>
-                {
-                    b.HasOne("YZPortal.Core.Domain.Database.Memberships.ContentAccessLevel", "ContentAccessLevel")
-                        .WithMany("MembershipContentAccessLevels")
-                        .HasForeignKey("ContentAccessLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("YZPortal.Core.Domain.Database.Memberships.Membership", "Membership")
-                        .WithMany("MembershipContentAccessLevels")
-                        .HasForeignKey("MembershipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ContentAccessLevel");
-
-                    b.Navigation("Membership");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.MembershipDealerRole", b =>
-                {
-                    b.HasOne("YZPortal.Core.Domain.Database.Memberships.DealerRole", "DealerRole")
-                        .WithMany("MembershipDealerRoles")
-                        .HasForeignKey("DealerRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("YZPortal.Core.Domain.Database.Memberships.Membership", "Membership")
-                        .WithOne("MembershipDealerRole")
-                        .HasForeignKey("YZPortal.Core.Domain.Database.Memberships.MembershipDealerRole", "MembershipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DealerRole");
-
-                    b.Navigation("Membership");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.MembershipNotification", b =>
-                {
-                    b.HasOne("YZPortal.Core.Domain.Database.Memberships.Membership", "Membership")
-                        .WithMany()
-                        .HasForeignKey("MembershipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Membership");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.User", b =>
-                {
-                    b.HasOne("YZPortal.Core.Domain.Database.Users.UserInvite", "UserInvite")
-                        .WithMany()
-                        .HasForeignKey("UserInviteId");
-
-                    b.Navigation("UserInvite");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.UserInviteDealerSelection", b =>
-                {
-                    b.HasOne("YZPortal.Core.Domain.Database.Dealers.Dealer", "Dealer")
-                        .WithMany()
-                        .HasForeignKey("DealerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("YZPortal.Core.Domain.Database.Users.UserInvite", null)
-                        .WithMany("UserInviteDealerSelections")
-                        .HasForeignKey("UserInviteId");
-
-                    b.Navigation("Dealer");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.UserPasswordReset", b =>
-                {
-                    b.HasOne("YZPortal.Core.Domain.Database.Users.User", "User")
-                        .WithMany("UserPasswordResets")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.ContentAccessLevel", b =>
-                {
-                    b.Navigation("MembershipContentAccessLevels");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.DealerRole", b =>
-                {
-                    b.Navigation("MembershipDealerRoles");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Memberships.Membership", b =>
-                {
-                    b.Navigation("MembershipContentAccessLevels");
-
-                    b.Navigation("MembershipDealerRole");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.User", b =>
-                {
-                    b.Navigation("Memberships");
-
-                    b.Navigation("UserPasswordResets");
-                });
-
-            modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.UserInvite", b =>
-                {
-                    b.Navigation("UserInviteDealerSelections");
                 });
 #pragma warning restore 612, 618
         }
