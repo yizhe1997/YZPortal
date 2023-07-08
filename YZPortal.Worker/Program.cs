@@ -33,18 +33,13 @@ builder.Services.AddEmailNotifications(configuration);
 builder.Services.AddSendGridNotifications(configuration);
 builder.Services.AddOfficeSmtpNotifications(configuration);
 
-// EFCore
-var conn = configuration.GetConnectionString("Primary");
-builder.Services.AddDbContext<PortalContext>(options =>
-{
-	options.UseSqlServer(conn);
-	options.EnableSensitiveDataLogging(true);
-});
+// Db Context
+builder.Services.AddDbContext(configuration);
 
 // Current Context
 builder.Services.AddTransient<CurrentContext>();
 
-// Prereq for Iidentity... and to use usermanager (not meant for ef core migration)
+// Prereq Microsoft.AspNetCore.Identity and to use usermanager (not meant for ef core migration)
 builder.Services.AddIdentityCore<User>()
 		.AddEntityFrameworkStores<PortalContext>();
 

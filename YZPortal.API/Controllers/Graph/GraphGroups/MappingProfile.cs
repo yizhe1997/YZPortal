@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Graph.Models;
+using YZPortal.FullStackCore.Models.Graph.Groups;
 
 namespace YZPortal.API.Controllers.Graph.GraphGroups
 {
@@ -8,7 +9,7 @@ namespace YZPortal.API.Controllers.Graph.GraphGroups
 		public MappingProfile()
 		{
 			// Index
-			CreateMap<Group, Index.Model>();
+			CreateMap<Group, GraphGroupModel>();
         }
 	}
 }

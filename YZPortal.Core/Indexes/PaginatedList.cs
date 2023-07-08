@@ -1,33 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace YZPortal.API.Controllers.Pagination
+﻿namespace YZPortal.Core.Indexes
 {
-    public static class PaginationExtensions
-    {
-        public static Task<PaginatedList<TDestination>> ToPaginatedListAsync<TDestination>(this IQueryable<TDestination> queryable, IPaginationParams paginationParams)
-            => PaginatedList<TDestination>.CreateAsync(queryable, paginationParams.PageNumber, paginationParams.PageSize);
-
-        public static Task<PaginatedList<TDestination>> ToPaginatedListAsync<TDestination>(this IQueryable<TDestination> queryable, int pageNumber, int pageSize)
-            => PaginatedList<TDestination>.CreateAsync(queryable, pageNumber, pageSize);
-
-        public static PaginatedList<TDestination> ToPaginatedList<TDestination>(this IQueryable<TDestination> queryable, int pageNumber, int pageSize)
-            => PaginatedList<TDestination>.Create(queryable, pageNumber, pageSize);
-
-        public static PaginatedList<TDestination> ToPaginatedList<TDestination>(this IQueryable<TDestination> queryable, IPaginationParams paginationParams)
-            => PaginatedList<TDestination>.Create(queryable, paginationParams.PageNumber, paginationParams.PageSize);
-    }
-
     public class PaginatedList<T> : List<T>
     {
-        public int TotalItems { get; private set; }
-        public int PageNumber { get; private set; }
-        public int PageSize { get; private set; }
-        public int TotalPages { get; private set; }
-        public int StartPage { get; private set; }
-        public int EndPage { get; private set; }
-        public int StartIndex { get; private set; }
-        public int EndIndex { get; private set; }
-        public IEnumerable<int> Pages { get; private set; }
+        public int TotalItems { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
+        public int StartPage { get; set; }
+        public int EndPage { get; set; }
+        public int StartIndex { get; set; }
+        public int EndIndex { get; set; }
+        public IEnumerable<int> Pages { get; set; }
         public List<T> Results { get { return this; } }
 
         public PaginatedList(List<T> items, int totalItems, int pageNumber, int pageSize = 10, int maxPages = -1)
@@ -99,24 +82,8 @@ namespace YZPortal.API.Controllers.Pagination
             AddRange(items);
         }
 
-        public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int currentPage, int pageSize, int maxPages = -1)
+        public PaginatedList()
         {
-            var count = await source.CountAsync();
-            var items = await source.Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
-            return new PaginatedList<T>(items, count, currentPage, pageSize, maxPages);
         }
-
-        public static PaginatedList<T> Create(IQueryable<T> source, int currentPage, int pageSize, int maxPages = -1)
-        {
-            var count = source.Count();
-            var items = source.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
-            return new PaginatedList<T>(items, count, currentPage, pageSize, maxPages);
-        }
-    }
-
-    public interface IPaginationParams
-    {
-        int PageNumber { get; set; }
-        int PageSize { get; set; }
     }
 }

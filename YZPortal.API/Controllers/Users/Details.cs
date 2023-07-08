@@ -1,37 +1,32 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
+using Microsoft.AspNetCore.Identity;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
-using YZPortal.Core.Error;
+using YZPortal.Core.Domain.Database;
+using YZPortal.Core.Domain.Database.Users;
 using YZPortal.FullStackCore.Models.Users;
 
 namespace YZPortal.API.Controllers.Users
 {
     public class Details
 	{
-		public class Request : IRequest<Model>
+		public class Request : IRequest<UserModel>
 		{
 			internal Guid SubjectId { get; set; }
 		}
-
-		public class Model : UserModel
-        {
-		}
-
-		public class RequestHandler : BaseRequestHandler<Request, Model>
+		public class RequestHandler : BaseRequestHandler<Request, UserModel>
 		{
-			public RequestHandler(PortalContext dbContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor) : base(dbContext, mapper, httpContext, userAccessor)
+            public RequestHandler(DatabaseService dbService, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor) : base(dbService, mapper, httpContext, userAccessor)
+            {
+            }
+            public override async Task<UserModel> Handle(Request request, CancellationToken cancellationToken)
 			{
-			}
-			public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
-			{
-				var user = await Database.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == request.SubjectId);
-				if (user == null)
-					throw new RestException(HttpStatusCode.NotFound, "User not found.");
+				// Get user from db
+                var user = await DatabaseService.UserGetAsync(request.SubjectId, cancellationToken);
 
-				return Mapper.Map<Model>(user);
+                // Return mapped model
+                return Mapper.Map<UserModel>(user);
 			}
 		}
 	}

@@ -7,23 +7,32 @@ using YZPortal.Core.Domain.Database.Sync;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.FullStackCore.Enums.Memberships;
 using YZPortal.FullStackCore.Extensions;
+using System.Net;
+using YZPortal.Core.Error;
+using AutoMapper;
+using System.Linq.Dynamic.Core;
+using YZPortal.Core.Indexes;
 
 namespace YZPortal.Core.Domain.Database
 {
+    // TODO: maybe can do logging here? instead of logging from error middleware, but then again the http req url already has the info? idk
+    // TODO: maybe can create partial class for each entity?
     public class DatabaseService
     {
         private readonly PortalContext _dbContext;
         private readonly DatabaseOptions _options;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<DatabaseService> _logger;
+        private readonly IMapper _mapper;
 
         // Constructor
-        public DatabaseService(PortalContext dbContext, UserManager<User> userManager, IOptions<DatabaseOptions> options, ILogger<DatabaseService> logger)
+        public DatabaseService(PortalContext dbContext, UserManager<User> userManager, IOptions<DatabaseOptions> options, ILogger<DatabaseService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _options = options.Value;
             _logger = logger;
+            _mapper = mapper;
         }
 
         #region Create and update admin user on startup
@@ -129,6 +138,112 @@ namespace YZPortal.Core.Domain.Database
                     _dbContext.SyncStatuses.Remove(checkSyncStatus);
                 }
             }
+        }
+
+        #endregion
+
+        #region User
+
+        /// <summary>
+        ///     Async get users.
+        /// </summary>
+        public async Task<SearchList<User>> UsersToSearchListAsync(ISearchParams request, System.Linq.Expressions.Expression<Func<User, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken())
+        {
+            // AsQueryable allows dynamically build and refine query by adding additional LINQ operators
+            return await _dbContext.GetUsersAsQueryable().CreateSearchListAsync(request, searchPredicate, cancellationToken);
+
+            //// Variables
+            //List<User> results;
+            //int pageNumber;
+            //int pageSize;
+            //int totalPages;
+            //int totalItems;
+
+            //results = users.Results;
+            //pageNumber = users.PageNumber;
+            //pageSize = users.PageSize;
+            //totalPages = users.TotalPages;
+            //totalItems = users.TotalItems;
+
+            //// Need to map this somehow
+            //return new SearchModel<Model>
+            //{
+            //    Results = _mapper.Map<List<Model>>(results),
+            //    SearchString = request.SearchString,
+            //    OrderBy = request.OrderBy,
+            //    PageNumber = pageNumber,
+            //    PageSize = pageSize,
+            //    TotalPages = totalPages,
+            //    TotalItems = totalItems,
+            //};
+
+            //return _mapper.Map<SearchModel<TModel>>(users);
+        }
+
+        /// <summary>
+        ///     Async update user if user with subject identifier exist.
+        /// </summary>
+        public async Task<User> UserGetAsync(Guid id, CancellationToken cancellationToken = new CancellationToken())
+        {
+            // Validate if user exist
+            var user = await _dbContext.GetUserByIdFirstOrDefaultAsync(id, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
+
+            return user;
+        }
+
+        // TODO: use interface for type T to handle current context and etc, not sure if this will work? but theres similarity
+        /// <summary>
+        ///     Async create user if user with subject identifier does not exist.
+        /// </summary>
+        public async Task<User> UserCreateAsync<T>(T body, CancellationToken cancellationToken = new CancellationToken()) where T : class
+        {
+            // If T body is already user then dont map?
+            // Map input body to new user
+            var newUser = _mapper.Map<User>(body);
+
+            // Validate if user exist
+            var user = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(newUser.SubjectIdentifier, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User already exist!");
+
+            // Create user and validate
+            var createUserResult = await _userManager.CreateAsync(user);
+            if (!createUserResult.Succeeded)
+                throw new RestException(HttpStatusCode.BadRequest, createUserResult.Errors.Select(e => e.Description).ToList());
+
+            return user;
+        }
+
+        // TODO: use interface for type T to handle current context and etc, not sure if this will work? but theres similarity
+        // but.... model and entity should they have the same name? but i value automappers flexibility more, imo i think adding new
+        // config in mapping profile is more flexible than defining it for an interface only? issue with interface is i have 
+        // to add evrything right?
+        /// <summary>
+        ///     Async update user if user with subject identifier exist.
+        /// </summary>
+        public async Task<User> UserUpdateAsync<T>(Guid subId, T body, CancellationToken cancellationToken = new CancellationToken()) where T : CurrentContext
+        {
+            // Validate if user exist
+            var user = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
+
+            // Map fields to existing user and save
+            _mapper.Map(body, user);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return user;
+        }
+
+        /// <summary>
+        ///     Async delete user if user with the given id exist.
+        /// </summary>
+        public async Task<User> UserDeleteAsync(Guid id, CancellationToken cancellationToken = new CancellationToken())
+        {
+            // Validate if user exist
+            var user = await _dbContext.GetUserByIdFirstOrDefaultAsync(id, cancellationToken) ?? throw new RestException(HttpStatusCode.NotFound, "User not found.");
+
+            // If user exist then remove from db and save
+            _dbContext.Users.Remove(user);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return user;
         }
 
         #endregion

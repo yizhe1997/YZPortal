@@ -1,19 +1,20 @@
 ﻿using AutoMapper;
 using MediatR;
 using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Domain.Database;
 
 namespace YZPortal.API.Infrastructure.Mediatr
 {
     public abstract class BaseRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
-        protected PortalContext Database { get; }
+        protected DatabaseService DatabaseService { get; set; }
         protected CurrentContext CurrentContext { get; set; }
         protected HttpContext? HttpContext { get; set; }
         protected IMapper Mapper { get; set; }
 
-        public BaseRequestHandler(PortalContext dbContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext currentContext)
+        public BaseRequestHandler(DatabaseService dbService, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext currentContext)
         {
-            Database = dbContext;
+            DatabaseService = dbService;
             Mapper = mapper;
             HttpContext = httpContext.HttpContext ?? null;
             CurrentContext = currentContext;

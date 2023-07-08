@@ -48,25 +48,30 @@
     private UsersSearchModel? Users;
 
     private void OpenInviteUserDialog() => DialogService.Show(new DialogOption()
-        {
-            Title = "Invite User",
-            //Component = BootstrapDynamicComponent.CreateComponent<UserInviteDialog>(),
-            Size = Size.Large,
-        });
+    {
+        Title = "Invite User",
+        //Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(),
+        Size = Size.Large,
+    });
 
     private async Task<QueryData<UserModel>> OnQueryAsync(QueryPageOptions options)
     {
-        var orderby = ((SortOrder)options.SortOrder == SortOrder.Unset) ? string.Empty : options.SortName + " " + options.SortOrder.ToString();
+        var orderby = new List<string>();
 
-        Users = await YZPortalApiClient.GetUsers(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby);
+        if (options.SortOrder != SortOrder.Unset)
+        {
+            orderby.Add(options.SortName + " " + options.SortOrder.ToString());
+        }
+
+        Users = await YZPortalApiClient.GetUsers(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby.ToArray());
 
         return await Task.FromResult(new QueryData<UserModel>()
-            {
-                Items = Users?.Results ?? new List<UserModel>(),
-                TotalCount = Users?.TotalItems ?? 0,
-                IsSorted = !string.IsNullOrEmpty(orderby),
-                IsSearch = true
-            });
+        {
+            Items = Users?.Results ?? new List<UserModel>(),
+            TotalCount = Users?.TotalItems ?? 0,
+            IsSorted = orderby.Any(),
+            IsSearch = true
+        });
     }
 
     private async Task<bool> OnDeleteAsync(IEnumerable<UserModel> items)

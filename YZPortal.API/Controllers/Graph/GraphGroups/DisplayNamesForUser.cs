@@ -3,6 +3,7 @@ using MediatR;
 using System.ComponentModel.DataAnnotations;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Graph;
 
 namespace YZPortal.API.Controllers.Graph.GraphGroups
@@ -22,14 +23,13 @@ namespace YZPortal.API.Controllers.Graph.GraphGroups
         {
             private readonly GraphClientProvider _graphClientProvider;
 
-            public RequestHandler(PortalContext dbContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor, GraphClientProvider graphClientProvider) : base(dbContext, mapper, httpContext, userAccessor)
+            public RequestHandler(DatabaseService dbService, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor, GraphClientProvider graphClientProvider) : base(dbService, mapper, httpContext, userAccessor)
             {
                 _graphClientProvider = graphClientProvider;
-
             }
             public override async Task<Model> Handle(Request request, CancellationToken cancellationToken)
             {
-                var userGroups = await _graphClientProvider.GetUserGroups(request.ObjectId, new string[] { "displayName" });
+                var userGroups = await _graphClientProvider.UserGroupsGetAsync(request.ObjectId, new string[] { "displayName" });
                 var userGroupDisplayNames = userGroups.Select(x => x.DisplayName ?? string.Empty).ToArray() ?? Array.Empty<string>();
 
                 return new Model() { GroupDisplayNames = userGroupDisplayNames };

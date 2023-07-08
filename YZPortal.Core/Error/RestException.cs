@@ -25,7 +25,7 @@ namespace YZPortal.Core.Error
             Error = code.ToString();
         }
 
-        public RestException(string code, string message)
+        public RestException(string? code, string? message)
         {
             if (!Enum.TryParse(code, out HttpStatusCode httpStatusCode) || code == null)
             {
@@ -33,7 +33,7 @@ namespace YZPortal.Core.Error
             }
 
             Code = httpStatusCode;
-            Error = message;
+            Error = message ?? httpStatusCode.ToString();
         }
     }
 }

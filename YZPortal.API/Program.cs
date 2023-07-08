@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Newtonsoft.Json;
 using Serilog;
@@ -88,21 +87,20 @@ builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies().Where(assemb
 // AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies().Where(assembly => !assembly.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal)));
 
-// EFCore
-var conn = configuration.GetConnectionString("Primary");
-builder.Services.AddDbContext<PortalContext>(options =>
-{
-    options.UseSqlServer(conn);
-    options.EnableSensitiveDataLogging(true);
-});
+#region Context
+
+// Db Context
+builder.Services.AddDbContext(configuration);
+
+// Current Context
+builder.Services.AddCurrentContext();
+
+#endregion
 
 // Seeding Db
 builder.Services.AddDatabaseService(configuration);
 
-// Current Context
-builder.Services.AddTransient<CurrentContext>();
-
-// Prereq for Iidentity... and to use usermanager
+// Prereq Microsoft.AspNetCore.Identity and to use usermanager (not meant for ef core migration)
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<PortalContext>()
     .AddDefaultTokenProviders();

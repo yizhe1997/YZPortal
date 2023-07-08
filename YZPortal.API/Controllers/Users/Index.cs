@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
-using YZPortal.API.Controllers.Pagination;
+using Microsoft.AspNetCore.Identity;
+using YZPortal.API.Controllers.ControllerRequests.Indexes;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.FullStackCore.Models.Abstracts;
 using YZPortal.FullStackCore.Models.Users;
@@ -10,27 +12,26 @@ namespace YZPortal.API.Controllers.Users
 {
     public class Index
 	{
-		public class Request : SearchRequest<SearchModel<Model>>
+		public class Request : SearchRequest<SearchModel<UserModel>>
 		{
 		}
-		public class Model : UserModel
+		public class RequestHandler : SearchRequestHandler<Request, SearchModel<UserModel>>
 		{
-		}
-		public class RequestHandler : SearchRequestHandler<Request, SearchModel<Model>>
-		{
-			public RequestHandler(PortalContext dbContext, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor) : base(dbContext, mapper, httpContext, userAccessor)
+            public RequestHandler(DatabaseService dbService, IMapper mapper, IHttpContextAccessor httpContext, CurrentContext userAccessor) : base(dbService, mapper, httpContext, userAccessor)
+            {
+            }
+            public override async Task<SearchModel<UserModel>> Handle(Request request, CancellationToken cancellationToken)
 			{
-			}
-			public override async Task<SearchModel<Model>> Handle(Request request, CancellationToken cancellationToken)
-			{
-				var query = Database.Users.AsQueryable();
+                // Get users
+                var users = await DatabaseService.UsersToSearchListAsync(
+                    request,
+                    x => x.DisplayName.Contains(request.SearchString) ||
+                    x.UserName.Contains(request.SearchString)
+                    , cancellationToken);
 
-				return await CreateIndexResponseAsync<User, Model>(
-					request,
-					query,
-					x => x.DisplayName.Contains(request.SearchString) ||
-					x.UserName.Contains(request.SearchString));
-			}
+                // Return mapped model
+                return Mapper.Map<SearchModel<UserModel>>(users);
+            }
 		}
 	}
 }

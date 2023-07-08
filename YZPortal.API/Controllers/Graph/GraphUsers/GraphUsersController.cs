@@ -1,10 +1,10 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using YZPortal.API.Controllers.ControllerTypes;
 using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
 using YZPortal.FullStackCore.Models.Abstracts;
+using YZPortal.FullStackCore.Models.Graph.Users;
 
 namespace YZPortal.API.Controllers.Graph.GraphUsers
 {
@@ -16,7 +16,7 @@ namespace YZPortal.API.Controllers.Graph.GraphUsers
 
         [Authorize(Policy = Policies.Administrator)]
         [HttpGet("Graph")]
-		public async Task<ActionResult<SearchModel<Index.Model>>> GetGraphUsers([FromQuery] Index.Request request) => await _mediator.Send(request);
+		public async Task<ActionResult<SearchModel<GraphUserModel>>> GetGraphUsers([FromQuery] Index.Request request) => await _mediator.Send(request);
 
 	}
 }

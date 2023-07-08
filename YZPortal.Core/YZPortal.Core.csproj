@@ -23,6 +23,7 @@
 		<PackageReference Include="Microsoft.Graph" Version="5.9.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 		<PackageReference Include="System.Web.Helpers.Crypto" Version="3.2.3" />
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.24" />
 	</ItemGroup>
 
 	<ItemGroup>

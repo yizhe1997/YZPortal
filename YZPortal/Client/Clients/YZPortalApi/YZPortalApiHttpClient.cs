@@ -14,14 +14,12 @@ namespace YZPortal.Client.Clients.YZPortalApi
         private readonly ILogger<YZPortalApiHttpClient> _logger;
         private readonly HttpClient _http;
         private readonly ILocalStorageService _localStorageService;
-        private readonly AuthenticationStateProvider _authenticationStateProvider;
 
-        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService tokenService, AuthenticationStateProvider authenticationStateProvider)
+        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService tokenService)
         {
             _logger = logger;
             _http = http;
             _localStorageService = tokenService;
-            _authenticationStateProvider = authenticationStateProvider;
         }
 
         #region Helpers
@@ -34,7 +32,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 			return requestMsg;
 		}
 
-		public HttpRequestMessage CreatePaginatedAuthHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+		public HttpRequestMessage CreatePaginatedAuthHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
 			// Construct authenticated/authorized HttpRequestMessage with Uri
 			var requestMsg = CreateAuthHttpRequestMessage(relativeUri, HttpMethod.Get);
@@ -44,8 +42,14 @@ namespace YZPortal.Client.Clients.YZPortalApi
 			requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageNumber), pageNumber.ToString());
             if (!string.IsNullOrEmpty(searchString))
 			    requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.SearchString), searchString);
-			if (!string.IsNullOrEmpty(orderBy))
-				requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.OrderBy), orderBy);
+
+            if (orderBy != null)
+            {
+                foreach (var val in orderBy)
+                {
+                    requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.OrderBy), val);
+                }
+            }
 
 			return requestMsg;
 		}
@@ -66,7 +70,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Users
 
-        public async Task<GraphUsersModel> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+        public async Task<GraphUsersModel> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
             var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphUsers", pageSize, pageNumber, searchString, orderBy);
 
@@ -94,7 +98,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Groups
 
-        public async Task<GraphGroupsModel> GetGraphGroupsForUser(string userId, int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+        public async Task<GraphGroupsModel> GetGraphGroupsForUser(string userId, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
             var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
 
@@ -184,7 +188,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new UserModel();
         }
 
-        public async Task<UsersSearchModel> GetUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string? orderBy = null)
+        public async Task<UsersSearchModel> GetUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
 		{
             var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
 
@@ -210,7 +214,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         public async Task<HttpResponseMessage> DeleteUser(Guid userId)
         {
-            var response = await _http.DeleteAsync($"api/v1/users/{userId}");
+            var response = await _http.DeleteAsync($"api/v1/Users/{userId}");
             return response;
         }
 
