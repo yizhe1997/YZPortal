@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Graph.Models.ODataErrors;
 using System.Net;
 
 namespace YZPortal.Core.Error
@@ -51,6 +52,21 @@ namespace YZPortal.Core.Error
                             }.ToString());
 
                             logger.LogError($"RestException thrown for method {methodPathString}.\r\nStatusCode:\r\n{(int)ex.Code}\r\nError message:\r\n{ex.Error}");
+                        }
+                        // ODataError
+                        else if (typeof(ODataError) == contextFeature.Error.GetType() || typeof(ODataError) == innerException?.GetType())
+                        {
+                            var ex = innerException == null ? (ODataError)contextFeature.Error : (ODataError)innerException;
+                            var statusCode = !Enum.TryParse(ex.Error?.Code, out HttpStatusCode httpStatusCode) ? (int)httpStatusCode : context.Response.StatusCode;
+                            var errMsg = ex.Error?.Message ?? context.Response.StatusCode.ToString();
+
+                            await context.Response.WriteAsync(new ErrorDetails()
+                            {
+                                StatusCode = statusCode,
+                                Message = errMsg
+                            }.ToString());
+
+                            logger.LogError($"ODataError thrown for method {methodPathString}.\r\nStatusCode:\r\n{statusCode}\r\nError message:\r\n{errMsg}");
                         }
                         else
                         {

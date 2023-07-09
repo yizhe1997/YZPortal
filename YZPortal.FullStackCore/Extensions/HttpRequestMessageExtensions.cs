@@ -1,9 +1,8 @@
-﻿using System.Net.Http.Headers;
-using System.Web;
+﻿using System.Web;
 
 namespace YZPortal.FullStackCore.Extensions
 {
-	public static class HttpRequestMessageExtensions
+    public static class HttpRequestMessageExtensions
 	{
 		public static void AddQueryParam(this HttpRequestMessage request, string name, string value)
 		{

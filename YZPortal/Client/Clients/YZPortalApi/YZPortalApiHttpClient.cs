@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Json;
 using YZPortal.Client.Services.LocalStorage;
 using YZPortal.FullStackCore.Extensions;
-using Microsoft.AspNetCore.Components.Authorization;
 using YZPortal.FullStackCore.Models.Abstracts;
 using YZPortal.FullStackCore.Models.Users;
 using YZPortal.FullStackCore.Models.Graph.Users;

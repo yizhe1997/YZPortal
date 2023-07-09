@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using YZPortal.API.Controllers.ControllerRequests.Indexes;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
-using YZPortal.Core.Domain.Database.Users;
 using YZPortal.FullStackCore.Models.Abstracts;
 using YZPortal.FullStackCore.Models.Users;
 

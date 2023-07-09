@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;

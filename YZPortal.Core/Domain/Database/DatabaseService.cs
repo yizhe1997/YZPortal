@@ -183,10 +183,10 @@ namespace YZPortal.Core.Domain.Database
         /// <summary>
         ///     Async update user if user with subject identifier exist.
         /// </summary>
-        public async Task<User> UserGetAsync(Guid id, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<User> UserGetAsync(Guid subId, CancellationToken cancellationToken = new CancellationToken())
         {
             // Validate if user exist
-            var user = await _dbContext.GetUserByIdFirstOrDefaultAsync(id, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
+            var user = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
 
             return user;
         }
@@ -202,14 +202,16 @@ namespace YZPortal.Core.Domain.Database
             var newUser = _mapper.Map<User>(body);
 
             // Validate if user exist
-            var user = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(newUser.SubjectIdentifier, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User already exist!");
+            var checkUser = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(newUser.SubjectIdentifier, cancellationToken);
+            if (checkUser != null)
+                throw new RestException(HttpStatusCode.BadRequest, "User already exist!");
 
             // Create user and validate
-            var createUserResult = await _userManager.CreateAsync(user);
+            var createUserResult = await _userManager.CreateAsync(newUser);
             if (!createUserResult.Succeeded)
                 throw new RestException(HttpStatusCode.BadRequest, createUserResult.Errors.Select(e => e.Description).ToList());
 
-            return user;
+            return newUser;
         }
 
         // TODO: use interface for type T to handle current context and etc, not sure if this will work? but theres similarity
