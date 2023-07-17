@@ -18,12 +18,14 @@
        ShowToolbar="true"
        ShowDefaultButtons="true"
        ShowDeleteButton="true"
+       IsMultipleSelect="true"
        ShowAddButton="false"
        ShowEditButton="false"
        ClickToSelect="true"
        ShowSearch="true"
        ShowCardView="true"
        ShowFooter="true"
+       DoubleClickToEdit="true"
        TableSize="TableSize.Normal"
        OnDeleteAsync="@OnDeleteAsync"
        OnQueryAsync="@OnQueryAsync">
@@ -70,11 +72,10 @@
             Items = Users?.Results ?? new List<UserModel>(),
             TotalCount = Users?.TotalItems ?? 0,
             IsSorted = orderby.Any(),
-            IsSearch = true
+            IsSearch = !string.IsNullOrEmpty(options.SearchText)
         });
     }
 
-    // Not working
     private async Task<bool> OnDeleteAsync(IEnumerable<UserModel> items)
     {
         var users = items.ToList();
@@ -83,7 +84,7 @@
             var response = await YZPortalApiClient.DeleteUser(user.Id);
 
             if (response.IsSuccessStatusCode)
-                users.Remove(user);
+                Users?.Results.Remove(user);
         }
 
         return await Task.FromResult(true);

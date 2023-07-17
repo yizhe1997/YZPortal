@@ -12,7 +12,7 @@ namespace YZPortal.API.Controllers.Graph.GraphGroups
     {
         public class Request : IRequest<BaseResponseModel>
         {
-            public string[] UserSubjectId { get; set; } = Array.Empty<string>();
+            public string[] UserSubjectIds { get; set; } = Array.Empty<string>();
             public string? GroupId { get; set; }
         }
         public class RequestHandler : BaseRequestHandler<Request, BaseResponseModel>
@@ -25,7 +25,7 @@ namespace YZPortal.API.Controllers.Graph.GraphGroups
             }
             public override async Task<BaseResponseModel> Handle(Request request, CancellationToken cancellationToken)
             {
-                await _graphClientProvider.GroupAddUsersAsync(request.GroupId, request.UserSubjectId, cancellationToken);
+                await _graphClientProvider.GroupAddUsersAsync(request.GroupId, request.UserSubjectIds, cancellationToken);
 
                 return new BaseResponseModel() { };
             }
