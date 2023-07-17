@@ -31,11 +31,11 @@ namespace YZPortal.Client.Shared
         {
             await base.OnInitializedAsync();
 
-            await GetMenuItems(Menus);
+            GetMenuItems(Menus);
         }
 
         // will upgrade this to fetch the menuitems from the server since language is a thing
-        private async Task GetMenuItems(List<MenuItem> Menus)
+        private void GetMenuItems(List<MenuItem> Menus)
         {
             // Clear menus
             Menus.Clear();

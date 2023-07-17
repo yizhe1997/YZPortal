@@ -20,10 +20,10 @@ namespace YZPortal.API.Controllers.Users
                 .ForMember(c => c.Email, opt => opt.MapFrom(src => src.Email))
                 // If new user or id is guid empty then map created date and created by with latest info, else map itself
                 .ForMember(c => c.CreatedDate, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? DateTime.UtcNow : dest.CreatedDate))
-                .ForMember(c => c.CreatedBy, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? src.NameIdentifier.ToString() : dest.CreatedBy))
+                .ForMember(c => c.CreatedBy, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? src.NameIdentifier : dest.CreatedBy))
                 // If new user or id is guid empty then map updated date and updated by with itself, else with latest info
                 .ForMember(c => c.UpdatedDate, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? dest.UpdatedDate : DateTime.UtcNow))
-                .ForMember(c => c.UpdatedBy, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? dest.UpdatedBy : src.NameIdentifier.ToString()));
+                .ForMember(c => c.UpdatedBy, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? dest.UpdatedBy : src.NameIdentifier));
             CreateMap<User, UserModel>();
         }
 	}

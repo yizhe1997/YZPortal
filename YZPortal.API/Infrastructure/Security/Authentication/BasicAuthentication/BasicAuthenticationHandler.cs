@@ -20,7 +20,7 @@ namespace YZPortal.API.Infrastructure.Security.Authentication.BasicAuthenticatio
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             var basicAuthenticationOptions = _configuration.GetSection("BasicAuthentication").Get<BasicAuthenticationOptions>();
-            var authHeader = (string)Request.Headers.Authorization;
+            var authHeader = Request.Headers.Authorization.ToString();
 
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("basic", StringComparison.OrdinalIgnoreCase))
             {

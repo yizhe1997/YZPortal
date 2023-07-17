@@ -27,7 +27,7 @@ namespace YZPortal.API.Controllers.Users
 				var user = await DatabaseService.UserDeleteAsync(request.Id, cancellationToken);
                 
 				// If user not null, delete user from graph
-				await _graphClientProvider.UserDeleteAsync(user.SubjectIdentifier.ToString());
+				await _graphClientProvider.UserDeleteAsync(user.SubjectIdentifier);
 
 				// Return mapped model
                 return Mapper.Map<UserModel>(user);

@@ -28,7 +28,7 @@ namespace YZPortal.API.Controllers.Users
 		///     Returns user detail.
 		/// </summary>
 		[HttpGet("{subjectId}")]
-		public async Task<ActionResult<UserModel>> GetUser([FromRoute] Guid subjectId, [FromQuery] Details.Request request)
+		public async Task<ActionResult<UserModel>> GetUser([FromRoute] string subjectId, [FromQuery] Details.Request request)
 		{
 			request.SubjectId = subjectId;
 			return await _mediator.Send(request);
@@ -49,10 +49,10 @@ namespace YZPortal.API.Controllers.Users
         ///     Updates the detail of a user via b2c token.
         /// </summary>
         [HttpPut("{subjectId}")]
-		public async Task<ActionResult<UserModel>> UpdateUser([FromRoute] Guid subjectId, [FromBody] Update.Request request)
+		public async Task<ActionResult<UserModel>> UpdateUser([FromRoute] string subjectId, [FromBody] Update.Request request)
 		{
-			if (subjectId != Guid.Empty) request.SubjectId = subjectId;
-			return await _mediator.Send(request);
+            request.SubjectId = subjectId;
+            return await _mediator.Send(request);
 		}
 	}
 }

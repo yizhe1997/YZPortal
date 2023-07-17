@@ -2,7 +2,7 @@
 {
     public abstract class HostedService : IHostedService
     {
-        private Task ExecutingTask;
+        private Task? ExecutingTask;
 
         public virtual Task StartAsync(CancellationToken cancellationToken)
         {

@@ -108,7 +108,7 @@ namespace YZPortal.API.Infrastructure.Swagger
 
 				#endregion
 
-				opts.CustomSchemaIds(s => s.FullName.Replace("+", "."));
+				opts.CustomSchemaIds(s => s.FullName?.Replace("+", "."));
                 opts.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                 opts.DescribeAllParametersInCamelCase();
 
@@ -180,15 +180,15 @@ namespace YZPortal.API.Infrastructure.Swagger
                     var requiredScopes = context.MethodInfo.DeclaringType?
                             .GetCustomAttributes(true)
                             .OfType<AuthorizeAttribute>()
-                            .Select(attr => attr.AuthenticationSchemes)
-                            .Distinct();
+                            .Select(attr => attr.AuthenticationSchemes ?? JwtBearerDefaults.AuthenticationScheme)
+                            .Distinct() ?? new List<string>();
 
                     //  for method level authentication scheme
                     var requiredScopes2 = context.MethodInfo
                             .GetCustomAttributes(true)
                             .OfType<AuthorizeAttribute>()
-                            .Select(attr => attr.AuthenticationSchemes)
-                            .Distinct();
+                            .Select(attr => attr.AuthenticationSchemes ?? JwtBearerDefaults.AuthenticationScheme)
+                            .Distinct() ?? new List<string>();
 
                     bool requireAuth = false;
                     string id = "";

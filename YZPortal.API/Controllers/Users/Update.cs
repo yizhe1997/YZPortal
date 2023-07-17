@@ -11,7 +11,7 @@ namespace YZPortal.API.Controllers.Users
 	{
 		public class Request : IRequest<UserModel>
 		{
-			internal Guid SubjectId { get; set; }
+			internal string? SubjectId { get; set; }
 		}
 		public class RequestHandler : BaseRequestHandler<Request, UserModel>
 		{

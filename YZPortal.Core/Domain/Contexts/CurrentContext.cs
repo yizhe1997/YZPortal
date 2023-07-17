@@ -21,7 +21,7 @@ namespace YZPortal.Core.Domain.Contexts
 
         #region Claims
 
-        public Guid NameIdentifier => Guid.TryParse(_httpContext?.User.GetNameIdentifier(), out Guid result) ? result : Guid.Empty;
+        public string? NameIdentifier => _httpContext?.User.GetNameIdentifier();
         public string? DisplayName => _httpContext?.User.GetDisplayName();
         public string? AuthClassRef => _httpContext?.User.GetAuthClassRef();
         public string? Email => _httpContext?.User.GetEmail();

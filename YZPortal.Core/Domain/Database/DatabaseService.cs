@@ -183,13 +183,25 @@ namespace YZPortal.Core.Domain.Database
         /// <summary>
         ///     Async update user if user with subject identifier exist.
         /// </summary>
-        public async Task<User> UserGetAsync(Guid subId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<User> UserGetBySubIdAsync(string? subId, CancellationToken cancellationToken = new CancellationToken())
         {
             // Validate if user exist
             var user = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
 
             return user;
         }
+
+        /// <summary>
+        ///     Async update user if user with Id exist.
+        /// </summary>
+        public async Task<User> UserGetAsync(Guid Id, CancellationToken cancellationToken = new CancellationToken())
+        {
+            // Validate if user exist
+            var user = await _dbContext.GetUserByIdFirstOrDefaultAsync(Id, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
+
+            return user;
+        }
+
 
         // TODO: use interface for type T to handle current context and etc, not sure if this will work? but theres similarity
         /// <summary>
@@ -221,7 +233,7 @@ namespace YZPortal.Core.Domain.Database
         /// <summary>
         ///     Async update user if user with subject identifier exist.
         /// </summary>
-        public async Task<User> UserUpdateAsync<T>(Guid subId, T body, CancellationToken cancellationToken = new CancellationToken()) where T : CurrentContext
+        public async Task<User> UserUpdateAsync<T>(string? subId, T body, CancellationToken cancellationToken = new CancellationToken()) where T : CurrentContext
         {
             // Validate if user exist
             var user = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");

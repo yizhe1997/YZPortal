@@ -8,7 +8,7 @@ namespace YZPortal.FullStackCore.Extensions
 		{
 			if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(value))
 			{
-				var uriBuilder = new UriBuilder(request.RequestUri);
+				var uriBuilder = new UriBuilder(request.RequestUri ?? new Uri(string.Empty));
 				var query = HttpUtility.ParseQueryString(uriBuilder.Query);
 				query[name] = value;
 				uriBuilder.Query = query.ToString();

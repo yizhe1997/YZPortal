@@ -65,7 +65,7 @@ namespace YZPortal.Worker.Tasks.Email
 
                             SmtpClient SmtpClient = officeSmtpOptions.ConstructOfficeSmtpMessage();
 
-                            MailMessage officeSmtpMessage = new MailMessage(officeSmtpOptions.SenderEmail, message.Notifications.Select(x => x.Email).First(), message.Subject, message.Content);
+                            MailMessage officeSmtpMessage = new MailMessage(officeSmtpOptions.SenderEmail ?? string.Empty, message.Notifications.Select(x => x.Email).First() ?? string.Empty, message.Subject, message.Content);
                             officeSmtpMessage.IsBodyHtml = true;
 
                             await SmtpClient.SendMailAsync(officeSmtpMessage);

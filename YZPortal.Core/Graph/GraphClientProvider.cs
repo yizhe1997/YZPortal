@@ -2,9 +2,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
-using Microsoft.Graph.Models.ODataErrors;
 using Microsoft.Kiota.Abstractions;
-using YZPortal.Core.Error;
 using YZPortal.Core.Indexes;
 
 namespace YZPortal.Core.Graph
@@ -30,7 +28,7 @@ namespace YZPortal.Core.Graph
             var users = await UsersGetAsync(request.Select, request.OrderBy, request.PageSize, request.PageNumber, cancellationToken);
 
             // AsQueryable allows dynamically build and refine query by adding additional LINQ operators
-            return await users.AsQueryable().CreateSearchListAsync(request, searchPredicate, cancellationToken);
+            return users.CreateSearchList(request, searchPredicate);
         }
 
         public async Task<List<User>> UsersGetAsync(string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
@@ -66,33 +64,33 @@ namespace YZPortal.Core.Graph
             return usersResponse?.Value ?? new List<User>();
         }
 
-        public async Task<User> UserGetAsync(string? userId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<User> UserGetAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
         {
             var graphClient = GetGraphClient();
 
-            var user = await graphClient.Users[userId].GetAsync(requestConfiguration => requestConfiguration.Headers.Add("ConsistencyLevel", "eventual"), cancellationToken);
+            var user = await graphClient.Users[userSubId].GetAsync(requestConfiguration => requestConfiguration.Headers.Add("ConsistencyLevel", "eventual"), cancellationToken);
 
             return user ?? new User();
         }
 
-        public async Task<User> UserDeleteAsync(string? userId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<User> UserDeleteAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
         {
             var graphClient = GetGraphClient();
 
-            var user = await graphClient.Users[userId].GetAsync(requestConfiguration => requestConfiguration.Headers.Add("ConsistencyLevel", "eventual"), cancellationToken);
+            var user = await graphClient.Users[userSubId].GetAsync(requestConfiguration => requestConfiguration.Headers.Add("ConsistencyLevel", "eventual"), cancellationToken);
 
             if (user != null)
-                await graphClient.Users[userId].DeleteAsync(requestConfiguration => requestConfiguration.Headers.Add("ConsistencyLevel", "eventual"), cancellationToken);
+                await graphClient.Users[userSubId].DeleteAsync(requestConfiguration => requestConfiguration.Headers.Add("ConsistencyLevel", "eventual"), cancellationToken);
 
             return user ?? new User();
         }
 
-        public async Task<List<Group>> UserGroupsGetAsync(string? userId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<List<Group>> UserGroupsGetAsync(string? userSubId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
         {
             var graphClient = GetGraphClient();
 
             // Construct the original and subsequent OdataNextLink URLs which contains all the query parameters present in the original request
-            var userGroupsResponse = await graphClient.Users[userId].MemberOf.GraphGroup.GetAsync(requestConfiguration =>
+            var userGroupsResponse = await graphClient.Users[userSubId].MemberOf.GraphGroup.GetAsync(requestConfiguration =>
             {
                 requestConfiguration.QueryParameters.Select = select ?? Array.Empty<string>();
                 requestConfiguration.QueryParameters.Top = pageSize;
@@ -106,11 +104,11 @@ namespace YZPortal.Core.Graph
             return userGroupsResponse?.Value ?? new List<Group>();
         }
 
-        public async Task<SearchList<Group>> UserGroupsToSearchListAsync(string? userId, ISearchParams request, System.Linq.Expressions.Expression<Func<Group, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchList<Group>> UserGroupsToSearchListAsync(string? userSubId, ISearchParams request, System.Linq.Expressions.Expression<Func<Group, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken())
         {
-            var groups = await UserGroupsGetAsync(userId, request.Select, request.OrderBy, request.PageSize, request.PageNumber, cancellationToken);
+            var groups = await UserGroupsGetAsync(userSubId, request.Select, request.OrderBy, request.PageSize, request.PageNumber, cancellationToken);
 
-            return await groups.AsQueryable().CreateSearchListAsync(request, searchPredicate, cancellationToken);
+            return groups.CreateSearchList(request, searchPredicate);
         }
 
         #endregion
@@ -141,10 +139,10 @@ namespace YZPortal.Core.Graph
             var groups = await GroupsGetAsync(request.Select, request.OrderBy, request.PageSize, request.PageNumber, cancellationToken);
 
             // TODO: use the correct extension
-            return await groups.AsQueryable().CreateSearchListAsync(request, searchPredicate, cancellationToken);
+            return groups.CreateSearchList(request, searchPredicate);
         }
 
-        public async Task<List<User>> GroupUsersGetAsync(string groupId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<List<User>> GroupUsersGetAsync(string? groupId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
         {
             var graphClient = GetGraphClient();
 
@@ -161,6 +159,41 @@ namespace YZPortal.Core.Graph
             usersInGroup = (UserCollectionResponse?)await GetItemsFromPageAsync(graphClient, usersInGroup, pageNumber, cancellationToken);
 
             return usersInGroup?.Value ?? new List<User>();
+        }
+
+        // Ref https://learn.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=csharp
+        public async Task GroupAddUsersAsync(string? groupId, string[] userSubIds, CancellationToken cancellationToken = new CancellationToken())
+        {
+            var graphClient = GetGraphClient();
+
+            // Note that up to 20 members can be added in a single request.
+            var formattedUserIds = new List<string>();
+            foreach (var userId in userSubIds)
+            {
+                formattedUserIds.Add($"{_graphOptions.BaseUrl}/directoryObjects/{userId}");
+            }
+            var requestBody = new Group
+            {
+                AdditionalData = new Dictionary<string, object>
+                {
+                    {
+                        "members@odata.bind" , formattedUserIds
+                    },
+                },
+            };
+
+            await graphClient.Groups[groupId].PatchAsync(requestBody, cancellationToken: cancellationToken);
+
+            return;
+        }
+
+        public async Task GroupRemoveUserAsync(string? groupId, string? userSubId, CancellationToken cancellationToken = new CancellationToken())
+        {
+            var graphClient = GetGraphClient();
+
+            await graphClient.Groups[groupId].Members[userSubId].Ref.DeleteAsync(cancellationToken: cancellationToken);
+
+            return;
         }
 
         #endregion

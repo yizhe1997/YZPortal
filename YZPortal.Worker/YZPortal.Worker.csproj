@@ -33,10 +33,4 @@
 		<ProjectReference Include="..\YZPortal.Core\YZPortal.Core.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="Tasks/Email/Dealers/SendDealerInvite.html">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
 </Project>

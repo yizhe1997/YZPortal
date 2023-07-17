@@ -14,7 +14,7 @@ namespace YZPortal.API.Infrastructure.AzureStorage
 		/// <summary>
 		///     Access the azure cloud blob given the container and object name. Returns null if exception caught
 		/// </summary>
-		public static async Task<BlobClient> ReferenceCloudBlob(this BlobServiceClient BlobClient, string containerName, string fileName, bool toUpload = false)
+		public static async Task<BlobClient?> ReferenceCloudBlob(this BlobServiceClient BlobClient, string containerName, string fileName, bool toUpload = false)
 		{
 			try
 			{
@@ -51,22 +51,27 @@ namespace YZPortal.API.Infrastructure.AzureStorage
 		/// </summary>
 		public static async Task<string> GetBlobContentType(this BlobServiceClient BlobClient, string containerName, string fileName)
 		{
-			BlobClient blob = await BlobClient.ReferenceCloudBlob(containerName, fileName);
+			BlobClient? blob = await BlobClient.ReferenceCloudBlob(containerName, fileName);
 
 			try
 			{
-				var provider = new FileExtensionContentTypeProvider();
-
-				var getBlobPropertiesResult = await blob.GetPropertiesAsync();
-				var contentType = getBlobPropertiesResult.Value.ContentType;
-
-				if (contentType == null && !provider.TryGetContentType(fileName, out contentType))
+                if (blob != null)
 				{
-					contentType = "application/octet-stream";
-				}
+                    var getBlobPropertiesResult = await blob.GetPropertiesAsync();
+                    var contentType = getBlobPropertiesResult.Value.ContentType;
 
-				return contentType;
-			}
+                    var provider = new FileExtensionContentTypeProvider();
+
+                    if (contentType == null && !provider.TryGetContentType(fileName, out contentType))
+                    {
+                        contentType = "application/octet-stream";
+                    }
+
+                    return contentType;
+                }
+
+                return "application/octet-stream";
+            }
 			catch
 			{
 				return "application/octet-stream";
@@ -76,7 +81,7 @@ namespace YZPortal.API.Infrastructure.AzureStorage
 		public static async Task UploadAttachmentAsBlob(this BlobServiceClient BlobClient, string containerName, string fileName, IFormFile file)
 		{
 			// Reference a blob from azure container
-			BlobClient blob = await BlobClient.ReferenceCloudBlob(containerName, fileName, true);
+			BlobClient? blob = await BlobClient.ReferenceCloudBlob(containerName, fileName, true);
 
 			if (blob != null)
 				try
@@ -94,7 +99,7 @@ namespace YZPortal.API.Infrastructure.AzureStorage
 		public static async Task DeleteAttachmentAsBlob(this BlobServiceClient BlobClient, string containerName, string fileName)
 		{
 			// Reference a blob from azure container
-			BlobClient blob = await BlobClient.ReferenceCloudBlob(containerName, fileName);
+			BlobClient? blob = await BlobClient.ReferenceCloudBlob(containerName, fileName);
 
 			if (blob != null)
 				try
@@ -112,7 +117,7 @@ namespace YZPortal.API.Infrastructure.AzureStorage
 		public static async Task DwnloadAttachmentFromBlob(this MemoryStream stream, BlobServiceClient BlobClient, string containerName, string fileName)
 		{
 			// Reference a blob from azure container
-			BlobClient blob = await BlobClient.ReferenceCloudBlob(containerName, fileName);
+			BlobClient? blob = await BlobClient.ReferenceCloudBlob(containerName, fileName);
 
 			if (blob != null)
 				try

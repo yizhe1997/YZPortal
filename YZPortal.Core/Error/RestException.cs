@@ -7,7 +7,7 @@ namespace YZPortal.Core.Error
         public HttpStatusCode Code { get; }
         public string Error { get; }
 
-        public RestException(HttpStatusCode code, List<string> errors = null)
+        public RestException(HttpStatusCode code, List<string> errors)
         {
             Code = code;
             Error = errors == null ? code.ToString() : string.Join(",", errors);

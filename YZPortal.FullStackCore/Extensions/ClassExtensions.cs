@@ -6,50 +6,50 @@ namespace YZPortal.FullStackCore.Extensions
 {
     public static class ClassExtensions
     {
-        // Not tested yet
-        public static Tuple<bool, string, string> GetDataAnotationDetail<T>(T item) where T : class
-        {
-            Tuple<bool, string, string> result = null;
+        //// Not tested yet
+        //public static Tuple<bool, string, string> GetDataAnotationDetail<T>(T item) where T : class
+        //{
+        //    Tuple<bool, string, string> result = null;
 
-            var tableName = string.Empty;
-            var tableAttr = item.GetType().GetCustomAttributes().FirstOrDefault() as TableAttribute;
+        //    var tableName = string.Empty;
+        //    var tableAttr = item.GetType().GetCustomAttributes().FirstOrDefault() as TableAttribute;
 
-            if (tableAttr != null)
-            {
-                tableName = tableAttr.Name;
-            }
+        //    if (tableAttr != null)
+        //    {
+        //        tableName = tableAttr.Name;
+        //    }
 
-            var properties = item.GetType().GetProperties();
-            bool breakcondition = false;
-            foreach (var property in properties)
-            {
-                Attribute[] attrs = Attribute.GetCustomAttributes(property);
-                if (attrs != null)
-                {
-                    foreach (Attribute attr in attrs)
-                    {
+        //    var properties = item.GetType().GetProperties();
+        //    bool breakcondition = false;
+        //    foreach (var property in properties)
+        //    {
+        //        Attribute[] attrs = Attribute.GetCustomAttributes(property);
+        //        if (attrs != null)
+        //        {
+        //            foreach (Attribute attr in attrs)
+        //            {
 
-                        if (attr is KeyAttribute)
-                        {
-                            var a = (KeyAttribute)attr;
-                            var obj = property.GetValue(item, null);
-                            result = Tuple.Create(true, tableName, Convert.ToString(obj));
-                            breakcondition = true;
-                            break;
-                        }
+        //                if (attr is KeyAttribute)
+        //                {
+        //                    var a = (KeyAttribute)attr;
+        //                    var obj = property.GetValue(item, null);
+        //                    result = Tuple.Create(true, tableName, Convert.ToString(obj));
+        //                    breakcondition = true;
+        //                    break;
+        //                }
 
-                    }
-                }
-                if (breakcondition)
-                {
-                    break;
-                }
-            }
+        //            }
+        //        }
+        //        if (breakcondition)
+        //        {
+        //            break;
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        public static string GetAttributeTableName<T>(T item) where T : class
+        public static string? GetAttributeTableName<T>(T item) where T : class
         {
             var tableAttr = item.GetType().GetCustomAttributes().FirstOrDefault() as TableAttribute;
 

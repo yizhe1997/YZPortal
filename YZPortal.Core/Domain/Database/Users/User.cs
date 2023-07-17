@@ -19,7 +19,7 @@ namespace YZPortal.Core.Domain.Database.Users
         #region B2C Claims
 
         public string? DisplayName { get; set; }
-        public Guid SubjectIdentifier { get; set; }
+        public string? SubjectIdentifier { get; set; }
         public string? IpAddress { get; set; }
         public DateTime? AuthTime { get; set; }
         public DateTime? AuthExpireTime { get; set; }

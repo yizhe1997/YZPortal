@@ -12,10 +12,6 @@ namespace YZPortal.Core.Indexes
         public static PaginatedList<TEntity> CreatePaginatedList<TEntity>(this IQueryable<TEntity> query, IPaginationParams paginationParams) where TEntity : class
             => query.ToPaginatedList(paginationParams);
 
-        // this might not work? since it does not implement iasyncquerayble
-        public static async Task<PaginatedList<TEntity>> CreatePaginatedListAsync<TEntity>(this List<TEntity> list, ISearchParams paginationParams, CancellationToken cancellationToken = new CancellationToken()) where TEntity : class
-            => await list.AsQueryable().ToPaginatedListAsync(paginationParams, cancellationToken);
-
         public static PaginatedList<TEntity> CreatePaginatedList<TEntity>(this List<TEntity> list, ISearchParams paginationParams) where TEntity : class
             => list.AsQueryable().ToPaginatedList(paginationParams);
 
