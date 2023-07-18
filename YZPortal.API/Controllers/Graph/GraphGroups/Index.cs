@@ -13,7 +13,7 @@ namespace YZPortal.API.Controllers.Graph.GraphGroups
 	{
 		public class Request : SearchRequest<SearchModel<GraphGroupModel>>
 		{
-			public string? GraphUserId { get; set; }
+			public string? UserSubjectId { get; set; }
 		}
 		public class RequestHandler : SearchRequestHandler<Request, SearchModel<GraphGroupModel>>
 		{
@@ -26,9 +26,9 @@ namespace YZPortal.API.Controllers.Graph.GraphGroups
 			public override async Task<SearchModel<GraphGroupModel>> Handle(Request request, CancellationToken cancellationToken)
 			{
                 // If request.GraphUserId is not null or empty, then get groups for that user. Else get all groups
-                var groups = (!string.IsNullOrEmpty(request.GraphUserId)) ? 
+                var groups = (!string.IsNullOrEmpty(request.UserSubjectId)) ? 
 					await _graphClientProvider.UserGroupsToSearchListAsync(
-                        request.GraphUserId,
+                        request.UserSubjectId,
                         request,
                         x => x.DisplayName.Contains(request.SearchString)
                         , cancellationToken) : 

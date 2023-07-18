@@ -1,0 +1,66 @@
+﻿﻿@using BootstrapBlazor.Components
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Diagnostics.CodeAnalysis;
+@using YZPortal.Client.Clients.YZPortalApi
+@using YZPortal.FullStackCore.Infrastructure.Security.Authorization
+@using YZPortal.FullStackCore.Models.Graph.Groups;
+@using YZPortal.FullStackCore.Models.Users;
+
+@inject YZPortalApiHttpClient YZPortalApiClient
+
+<EditForm Model="@GraphUser" OnValidSubmit="OnValidSubmit">
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@GraphUser.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
+    </div>
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@GraphUser.DisplayName" DisplayText="Name" ShowLabel="true" />
+    </div>
+    <div class="row g-3">
+        <div class="col-12 col-sm-6">
+            <MultiSelect Items="@GraphGroups" @bind-Value="SelectedGraphGroups" />
+        </div>
+        <div class="col-12 col-sm-6">
+            <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Invite</button>
+</EditForm>
+
+@code {
+    private List<SelectedItem> GraphGroups = new List<SelectedItem>();
+    private IEnumerable<string?> SelectedGraphGroups { get; set; } = Enumerable.Empty<string?>();
+
+    [Parameter]
+    public EventCallback OnInvite { get; set; }
+
+    [Parameter]
+    public UserModel GraphUser { get; set; } = new UserModel();
+
+    private static List<SelectedItem> GenerateDataSource(GraphGroupsModel source) => source.Results.Select(i => new SelectedItem(i.Id, i.DisplayName ?? string.Empty)).ToList();
+
+    private async Task OnValidSubmit()
+    {
+        var userSubIds = new string[] { GraphUser.SubjectIdentifier ?? string.Empty };
+        foreach (var selectdGraphGroup in SelectedGraphGroups)
+        {
+            await YZPortalApiClient.GraphGroupAddUsers(selectdGraphGroup, userSubIds);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var graphGroups = await YZPortalApiClient.GetGraphGroups();
+        this.GraphGroups = GenerateDataSource(graphGroups);
+
+        var selectedGraphGroups = await YZPortalApiClient.GetGraphGroups(GraphUser.SubjectIdentifier);
+        this.SelectedGraphGroups = selectedGraphGroups.Results.Select(x => x.Id).ToList();
+    }
+
+    private void ClearListItems()
+    {
+        SelectedGraphGroups = Enumerable.Empty<string?>();
+    }
+}

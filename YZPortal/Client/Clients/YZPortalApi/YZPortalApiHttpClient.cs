@@ -8,6 +8,7 @@ using YZPortal.FullStackCore.Models.Graph.Groups;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
+    // TODO: Advanced query
     public class YZPortalApiHttpClient
     {
         private readonly ILogger<YZPortalApiHttpClient> _logger;
@@ -24,23 +25,23 @@ namespace YZPortal.Client.Clients.YZPortalApi
         #region Helpers
 
         public HttpRequestMessage CreateAuthHttpRequestMessage(string relativeUri, HttpMethod httpMethod)
-		{
+        {
             // Construct HttpRequestMessage with Uri
             var requestMsg = new HttpRequestMessage(httpMethod, _http.BaseAddress + relativeUri);
 
-			return requestMsg;
-		}
+            return requestMsg;
+        }
 
-		public HttpRequestMessage CreatePaginatedAuthHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
+        public HttpRequestMessage CreatePaginatedAuthHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
-			// Construct authenticated/authorized HttpRequestMessage with Uri
-			var requestMsg = CreateAuthHttpRequestMessage(relativeUri, HttpMethod.Get);
+            // Construct authenticated/authorized HttpRequestMessage with Uri
+            var requestMsg = CreateAuthHttpRequestMessage(relativeUri, HttpMethod.Get);
 
-			// Add pagination query params to HttpRequestMessage
-			requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageSize), pageSize.ToString());
-			requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageNumber), pageNumber.ToString());
+            // Add pagination query params to HttpRequestMessage
+            requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageSize), pageSize.ToString());
+            requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageNumber), pageNumber.ToString());
             if (!string.IsNullOrEmpty(searchString))
-			    requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.SearchString), searchString);
+                requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.SearchString), searchString);
 
             if (orderBy != null)
             {
@@ -50,18 +51,8 @@ namespace YZPortal.Client.Clients.YZPortalApi
                 }
             }
 
-			return requestMsg;
-		}
-
-        #region Custom Parameters
-
-        // this feels redundant
-        public void AddCustomQueryParam(HttpRequestMessage requestMsg, string key, string value)
-        {
-            requestMsg.AddQueryParam(key, value);
+            return requestMsg;
         }
-
-        #endregion
 
         #endregion
 
@@ -97,13 +88,12 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Groups
 
-        public async Task<GraphGroupsModel> GetGraphGroupsForUser(string userId, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
+        public async Task<GraphGroupsModel> GetGraphGroups(string? userSubId = null, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
             var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
 
-            // Query parameters
-            if (!string.IsNullOrEmpty(userId))
-                requestMsg.AddQueryParam("graphUserId", userId);
+            if (!string.IsNullOrEmpty(userSubId))
+                requestMsg.AddQueryParam("userSubjectId", userSubId);
 
             using var response = await _http.SendAsync(requestMsg);
             try
@@ -123,6 +113,24 @@ namespace YZPortal.Client.Clients.YZPortalApi
             }
 
             return new GraphGroupsModel();
+        }
+
+        public async Task GraphGroupAddUsers(string? groupId = null, string[]? userSubIds = null)
+        {
+            using var response = await _http.PostAsJsonAsync("/api/v1/GraphGroups/AddUser", new
+            {
+                GroupId = groupId,
+                UserSubjectIds = userSubIds ?? Array.Empty<string>()
+            });
+        }
+
+        public async Task GraphGroupRemoveUser(string? groupId = null, string? userSubId = null)
+        {
+            using var response = await _http.PostAsJsonAsync("/api/v1/GraphGroups/RemoveUser", new
+            {
+                GroupId = groupId,
+                UserSubjectId = userSubId
+            });
         }
 
         #endregion
@@ -188,28 +196,28 @@ namespace YZPortal.Client.Clients.YZPortalApi
         }
 
         public async Task<UsersSearchModel> GetUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
-		{
+        {
             var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
 
-			using var response = await _http.SendAsync(requestMsg);
-			try
-			{
-				var output = await response.Content.ReadFromJsonAsync<UsersSearchModel>() ?? new();
+            using var response = await _http.SendAsync(requestMsg);
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<UsersSearchModel>() ?? new();
 
-				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-				{
-					await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
-				}
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+                {
+                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
+                }
 
-				return output;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex.Message);
-			}
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
 
-			return new UsersSearchModel();
-		}
+            return new UsersSearchModel();
+        }
 
         public async Task<HttpResponseMessage> DeleteUser(Guid userId)
         {

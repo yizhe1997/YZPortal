@@ -57,6 +57,7 @@ namespace YZPortal.Core.Error
                         else if (typeof(ODataError) == contextFeature.Error.GetType() || typeof(ODataError) == innerException?.GetType())
                         {
                             var ex = innerException == null ? (ODataError)contextFeature.Error : (ODataError)innerException;
+                            // TODO: this is not working it always turns to status code 0, try adding use to group again for example...
                             var statusCode = !Enum.TryParse(ex.Error?.Code, out HttpStatusCode httpStatusCode) ? (int)httpStatusCode : context.Response.StatusCode;
                             var errMsg = ex.Error?.Message ?? context.Response.StatusCode.ToString();
 

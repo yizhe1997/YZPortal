@@ -25,23 +25,20 @@
        ShowSearch="true"
        ShowCardView="true"
        ShowFooter="true"
-       DoubleClickToEdit="true"
+       ShowExtendButtons="true"
+       ShowExtendEditButton="false"
+       ShowExtendDeleteButton="false"
        TableSize="TableSize.Normal"
        OnDeleteAsync="@OnDeleteAsync"
        OnQueryAsync="@OnQueryAsync">
-    <TableToolbarTemplate>
-        <TableToolbarButton TItem="UserModel"
-                            Color="Color.Primary"
-                            Icon="fa-fw fa-solid fa-floppy-disk"
-                            Text="Invite User"
-                            OnClick="@OpenInviteUserDialog"
-                                        IsAsync />
-    </TableToolbarTemplate>
     <TableColumns>
         <TableColumn @bind-Field="@context.UserName" Sortable="true" />
         <TableColumn @bind-Field="@context.DisplayName" Sortable="true" />
         <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" />
     </TableColumns>
+    <RowButtonTemplate>
+        <TableCellButton Color="Color.Primary" Icon="fa-solid fa-pen" Text="Edit" OnClick="() => OpenUserEditDialog(context)" />
+    </RowButtonTemplate>
 </Table>
 
 @code {
@@ -49,12 +46,20 @@
 
     private UsersSearchModel? Users;
 
-    private void OpenInviteUserDialog() => DialogService.Show(new DialogOption()
+    private async Task OpenUserEditDialog(UserModel userModel)
     {
-        Title = "Invite User",
-        //Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(),
-        Size = Size.Large,
-    });
+        var op = new DialogOption()
+            {
+                Title = "Edit User",
+                Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(),
+                Size = Size.Large
+            };
+        op.Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(new Dictionary<string, object?>
+            {
+                [nameof(UserEditDialog.GraphUser)] = userModel
+            });
+        await DialogService.Show(op);
+    }
 
     private async Task<QueryData<UserModel>> OnQueryAsync(QueryPageOptions options)
     {
@@ -68,12 +73,12 @@
         Users = await YZPortalApiClient.GetUsers(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby.ToArray());
 
         return await Task.FromResult(new QueryData<UserModel>()
-        {
-            Items = Users?.Results ?? new List<UserModel>(),
-            TotalCount = Users?.TotalItems ?? 0,
-            IsSorted = orderby.Any(),
-            IsSearch = !string.IsNullOrEmpty(options.SearchText)
-        });
+            {
+                Items = Users?.Results ?? new List<UserModel>(),
+                TotalCount = Users?.TotalItems ?? 0,
+                IsSorted = orderby.Any(),
+                IsSearch = !string.IsNullOrEmpty(options.SearchText)
+            });
     }
 
     private async Task<bool> OnDeleteAsync(IEnumerable<UserModel> items)
