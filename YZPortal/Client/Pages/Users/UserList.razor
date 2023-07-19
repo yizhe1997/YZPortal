@@ -32,9 +32,9 @@
        OnDeleteAsync="@OnDeleteAsync"
        OnQueryAsync="@OnQueryAsync">
     <TableColumns>
-        <TableColumn @bind-Field="@context.UserName" Sortable="true" />
-        <TableColumn @bind-Field="@context.DisplayName" Sortable="true" />
-        <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" />
+        <TableColumn @bind-Field="@context.UserName" Sortable="true" Text="Email" />
+        <TableColumn @bind-Field="@context.DisplayName" Sortable="true" Text="Name" />
+        <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" Text="Last logged-in" />
     </TableColumns>
     <RowButtonTemplate>
         <TableCellButton Color="Color.Primary" Icon="fa-solid fa-pen" Text="Edit" OnClick="() => OpenUserEditDialog(context)" />
@@ -48,17 +48,38 @@
 
     private async Task OpenUserEditDialog(UserModel userModel)
     {
-        var op = new DialogOption()
+        var diloagOpt = new DialogOption()
             {
+                ShowCloseButton = false,
                 Title = "Edit User",
                 Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(),
                 Size = Size.Large
             };
-        op.Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(new Dictionary<string, object?>
+        diloagOpt.Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(new Dictionary<string, object?>
             {
-                [nameof(UserEditDialog.GraphUser)] = userModel
+                [nameof(UserEditDialog.GraphUser)] = userModel,
+                //[nameof(UserEditDialog.GraphUser)] = EventCallback.Factory.Create<MouseEventArgs>(this, diloagOpt.on)
             });
-        await DialogService.Show(op);
+        await DialogService.Show(diloagOpt);
+    }
+
+    private async Task<bool> OnValidSubmit(string? userSubId, IEnumerable<string?> SelectedGraphGroups, IEnumerable<string?> ExistingGraphGroups)
+    {
+        var userSubIds = new string[] { userSubId ?? string.Empty };
+
+        // Add groups
+        foreach (var selectdGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
+        {
+            await YZPortalApiClient.GraphGroupAddUsers(selectdGraphGroup, userSubIds);
+        }
+
+        // Remove groups
+        foreach (var selectdGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
+        {
+            await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, userSubId);
+        }
+
+        return await Task.FromResult(true);
     }
 
     private async Task<QueryData<UserModel>> OnQueryAsync(QueryPageOptions options)

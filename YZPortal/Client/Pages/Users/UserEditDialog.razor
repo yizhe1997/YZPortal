@@ -9,7 +9,7 @@
 
 @inject YZPortalApiHttpClient YZPortalApiClient
 
-<EditForm Model="@GraphUser" OnValidSubmit="OnValidSubmit">
+<EditForm id="@nameof(UserEditDialog)" Model="@GraphUser" OnValidSubmit="OnValidSubmit">
     <div class="col-12">
         <BootstrapInput @bind-Value="@GraphUser.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
     </div>
@@ -17,6 +17,7 @@
         <BootstrapInput @bind-Value="@GraphUser.DisplayName" DisplayText="Name" ShowLabel="true" />
     </div>
     <div class="row g-3">
+        <Divider Text="Groups" Alignment="Alignment.Left" style="margin: 2rem 0;" />
         <div class="col-12 col-sm-6">
             <MultiSelect Items="@GraphGroups" @bind-Value="SelectedGraphGroups" />
         </div>
@@ -24,12 +25,17 @@
             <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Invite</button>
 </EditForm>
+
+<div class="modal-footer">
+    <button type="submit" form="@nameof(UserEditDialog)" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-light">Cancel</button>
+</div>
 
 @code {
     private List<SelectedItem> GraphGroups = new List<SelectedItem>();
     private IEnumerable<string?> SelectedGraphGroups { get; set; } = Enumerable.Empty<string?>();
+    private IEnumerable<string?> ExistingGraphGroups { get; set; } = Enumerable.Empty<string?>();
 
     [Parameter]
     public EventCallback OnInvite { get; set; }
@@ -42,9 +48,17 @@
     private async Task OnValidSubmit()
     {
         var userSubIds = new string[] { GraphUser.SubjectIdentifier ?? string.Empty };
-        foreach (var selectdGraphGroup in SelectedGraphGroups)
+
+        // Add groups
+        foreach (var selectdGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
         {
             await YZPortalApiClient.GraphGroupAddUsers(selectdGraphGroup, userSubIds);
+        }
+
+        // Remove groups
+        foreach (var selectdGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
+        {
+            await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, GraphUser.SubjectIdentifier);
         }
     }
 
@@ -56,7 +70,7 @@
         this.GraphGroups = GenerateDataSource(graphGroups);
 
         var selectedGraphGroups = await YZPortalApiClient.GetGraphGroups(GraphUser.SubjectIdentifier);
-        this.SelectedGraphGroups = selectedGraphGroups.Results.Select(x => x.Id).ToList();
+        this.SelectedGraphGroups = ExistingGraphGroups = selectedGraphGroups.Results.Select(x => x.Id).ToList();
     }
 
     private void ClearListItems()
