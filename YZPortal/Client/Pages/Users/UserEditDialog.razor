@@ -29,7 +29,7 @@
 
 <div class="modal-footer">
     <button type="submit" form="@nameof(UserEditDialog)" class="btn btn-primary">Save</button>
-    <button type="button" class="btn btn-light">Cancel</button>
+    <button type="button" class="btn btn-light" @onclick="@CloseDialog">Cancel</button>
 </div>
 
 @code {
@@ -38,7 +38,7 @@
     private IEnumerable<string?> ExistingGraphGroups { get; set; } = Enumerable.Empty<string?>();
 
     [Parameter]
-    public EventCallback OnInvite { get; set; }
+    public EventCallback<MouseEventArgs> CloseDialog { get; set; }
 
     [Parameter]
     public UserModel GraphUser { get; set; } = new UserModel();
@@ -60,6 +60,8 @@
         {
             await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, GraphUser.SubjectIdentifier);
         }
+
+        await CloseDialog.InvokeAsync();
     }
 
     protected override async Task OnInitializedAsync()

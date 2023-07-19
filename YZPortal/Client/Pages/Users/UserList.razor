@@ -58,7 +58,7 @@
         diloagOpt.Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(new Dictionary<string, object?>
             {
                 [nameof(UserEditDialog.GraphUser)] = userModel,
-                //[nameof(UserEditDialog.GraphUser)] = EventCallback.Factory.Create<MouseEventArgs>(this, diloagOpt.on)
+                [nameof(UserEditDialog.CloseDialog)] = EventCallback.Factory.Create<MouseEventArgs>(this, diloagOpt.CloseDialogAsync)
             });
         await DialogService.Show(diloagOpt);
     }
