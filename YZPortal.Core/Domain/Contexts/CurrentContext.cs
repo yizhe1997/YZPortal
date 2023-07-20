@@ -28,6 +28,7 @@ namespace YZPortal.Core.Domain.Contexts
         public DateTime AuthTime => DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt32(_httpContext?.User.GetAuthTime())).DateTime;
         public DateTime AuthExpireTime => DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt32(_httpContext?.User.GetAuthExpireTime())).DateTime;
         public string? IdpAccessToken => _httpContext?.User.GetIdpAccessToken();
+        public string? IdentityProvider => _httpContext?.User.GetIdentityProvider();
         public string? IpAddress => _httpContext?.Request.Host.ToUriComponent();
         public IEnumerable<Claim>? Claims => _httpContext?.User.Claims ?? new List<Claim>();
 

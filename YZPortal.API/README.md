@@ -94,3 +94,10 @@ The setup for certain container option can be ignored if the associated module i
 | Swagger__IsAzureAdOAuth2Provider	   | Controls the OAuth2 provider for swagger UI. Swagger UI does not support both Azure Ad and Azure Ad B2C simultaneously. Take note that authorization policy "combinedScheme" will select only one Ad based on this option as well. Default value is false. |
 
 *disclaimer: certain configuration options are not included because they are not/rarely used or have the appropriate default values already.
+
+REFS:
+1. b2c accoun linkage Auto-linking sample gives error "server_error: AADB2C90051: No suitable claims providers were found." #430
+https://bytemeta.vip/repo/azure-ad-b2c/samples/issues/430
+
+2. b2c acc auto linK 
+https://github.com/azure-ad-b2c/samples/tree/master/policies/auto-account-linking

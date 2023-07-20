@@ -14,6 +14,7 @@ namespace YZPortal.API.Controllers.Users
                 .ForMember(c => c.DisplayName, opt => opt.MapFrom(src => src.DisplayName))
                 .ForMember(c => c.AuthTime, opt => opt.MapFrom(src => src.AuthTime))
                 .ForMember(c => c.LastidpAccessToken, opt => opt.MapFrom(src => src.IdpAccessToken))
+                .ForMember(c => c.IdentityProvider, opt => opt.MapFrom(src => src.IdentityProvider))
                 .ForMember(c => c.AuthExpireTime, opt => opt.MapFrom(src => src.AuthExpireTime))
                 .ForMember(c => c.AuthClassRef, opt => opt.MapFrom(src => src.AuthClassRef))
                 .ForMember(c => c.IpAddress, opt => opt.MapFrom(src => src.IpAddress))

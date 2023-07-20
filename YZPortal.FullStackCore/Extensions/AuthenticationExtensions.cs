@@ -52,6 +52,9 @@ namespace YZPortal.FullStackCore.Extensions
         public static string? GetNameIdentifier(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+        public static string? GetIdentityProvider(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirst("idp")?.Value;
+
         public static string? GetSubClaim(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindFirst("sub")?.Value;
 

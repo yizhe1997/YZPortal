@@ -1,0 +1,25 @@
+﻿<TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0" TenantId="yzorganization.onmicrosoft.com" PolicyId="B2C_1A_AccountLink_SUSI" PublicPolicyUri="http://yzorganization.onmicrosoft.com/B2C_1A_AccountLink_SUSI" TenantObjectId="4369f48a-7236-4eeb-b728-295446bfdec9">
+	<BasePolicy>
+		<TenantId>yzorganization.onmicrosoft.com</TenantId>
+		<PolicyId>B2C_1A_AccountLink_Extensions</PolicyId>
+	</BasePolicy>
+	<RelyingParty>
+		<DefaultUserJourney ReferenceId="AccountLinkSignUpOrSignIn" />
+		<TechnicalProfile Id="PolicyProfile">
+			<DisplayName>PolicyProfile</DisplayName>
+			<Protocol Name="OpenIdConnect" />
+			<OutputClaims>
+				<OutputClaim ClaimTypeReferenceId="displayName" />
+				<OutputClaim ClaimTypeReferenceId="givenName" />
+				<OutputClaim ClaimTypeReferenceId="surname" />
+				<OutputClaim ClaimTypeReferenceId="email" />
+				<OutputClaim ClaimTypeReferenceId="signInNames.emailAddress" PartnerClaimType="email"/>
+				<OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub"/>
+				<OutputClaim ClaimTypeReferenceId="identityProvider" />
+				<OutputClaim ClaimTypeReferenceId="currentUserIdentities" />
+				<OutputClaim ClaimTypeReferenceId="tenantId" AlwaysUseDefaultValue="true" DefaultValue="{Policy:TenantObjectId}" />
+			</OutputClaims>
+			<SubjectNamingInfo ClaimType="sub" />
+		</TechnicalProfile>
+	</RelyingParty>
+</TrustFrameworkPolicy>

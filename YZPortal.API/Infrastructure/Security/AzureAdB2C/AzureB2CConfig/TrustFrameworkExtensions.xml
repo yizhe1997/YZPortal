@@ -33,6 +33,19 @@
 	</BuildingBlocks>
 	<ClaimsProviders>
 		<ClaimsProvider>
+			<DisplayName>Azure Active Directory</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="AAD-Common">
+					<Metadata>
+						<!--Insert b2c-extensions-app application ID here, for example: 11111111-1111-1111-1111-111111111111-->
+						<Item Key="ClientId">e9fe2921-f613-40b5-a559-f280a9688d20</Item>
+						<!--Insert b2c-extensions-app application ObjectId here, for example: 22222222-2222-2222-2222-222222222222-->
+						<Item Key="ApplicationObjectId">ea58fe7e-90a1-406d-94d1-a4de70ca8b7e</Item>
+					</Metadata>
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+		<ClaimsProvider>
 			<DisplayName>RESTYZAPI</DisplayName>
 			<TechnicalProfiles>
 				<TechnicalProfile Id="RESTYZAPI-GetGroupsFromMSGraph">
@@ -59,6 +72,45 @@
 						<OutputClaim ClaimTypeReferenceId="groupDisplayNames" />
 					</OutputClaims>
 					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
+		<ClaimsProvider>
+			<Domain>google.com</Domain>
+			<DisplayName>Google</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="Google-OAuth2">
+					<DisplayName>Google</DisplayName>
+					<Protocol Name="OAuth2" />
+					<Metadata>
+						<Item Key="ProviderName">google</Item>
+						<Item Key="authorization_endpoint">https://accounts.google.com/o/oauth2/auth</Item>
+						<Item Key="AccessTokenEndpoint">https://accounts.google.com/o/oauth2/token</Item>
+						<Item Key="ClaimsEndpoint">https://www.googleapis.com/oauth2/v1/userinfo</Item>
+						<Item Key="scope">email profile</Item>
+						<Item Key="HttpBinding">POST</Item>
+						<Item Key="UsePolicyInRedirectUri">false</Item>
+						<Item Key="client_id">893986699704-u2q8th9vd2oanlpfsnckb3q9fmdg686e.apps.googleusercontent.com</Item>
+					</Metadata>
+					<CryptographicKeys>
+						<Key Id="client_secret" StorageReferenceId="B2C_1A_GoogleSecret" />
+					</CryptographicKeys>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="id" />
+						<OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="email" />
+						<OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="given_name" />
+						<OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="family_name" />
+						<OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+						<OutputClaim ClaimTypeReferenceId="identityProvider" DefaultValue="google.com" />
+						<OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="socialIdpAuthentication" />
+					</OutputClaims>
+					<OutputClaimsTransformations>
+						<OutputClaimsTransformation ReferenceId="CreateRandomUPNUserName" />
+						<OutputClaimsTransformation ReferenceId="CreateUserPrincipalName" />
+						<OutputClaimsTransformation ReferenceId="CreateAlternativeSecurityId" />
+						<OutputClaimsTransformation ReferenceId="CreateSubjectClaimFromAlternativeSecurityId" />
+					</OutputClaimsTransformations>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-SocialLogin" />
 				</TechnicalProfile>
 			</TechnicalProfiles>
 		</ClaimsProvider>
@@ -140,6 +192,9 @@
 						<Item Key="scope">email public_profile</Item>
 						<Item Key="ClaimsEndpoint">https://graph.facebook.com/me?fields=id,first_name,last_name,name,email</Item>
 					</Metadata>
+					<CryptographicKeys>
+						<Key Id="client_secret" StorageReferenceId="B2C_1A_FacebookSecret" />
+					</CryptographicKeys>
 				</TechnicalProfile>
 			</TechnicalProfiles>
 		</ClaimsProvider>
@@ -213,6 +268,7 @@
 						<ClaimsProviderSelection TargetClaimsExchangeId="FacebookExchange" />
 						<ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
 						<ClaimsProviderSelection TargetClaimsExchangeId="AzureADCommonExchange" />
+						<ClaimsProviderSelection TargetClaimsExchangeId="GoogleExchange" />
 					</ClaimsProviderSelections>
 					<ClaimsExchanges>
 						<ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
@@ -230,6 +286,7 @@
 						<ClaimsExchange Id="FacebookExchange" TechnicalProfileReferenceId="Facebook-OAUTH" />
 						<ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
 						<ClaimsExchange Id="AzureADCommonExchange" TechnicalProfileReferenceId="AADCommon-OpenIdConnect" />
+						<ClaimsExchange Id="GoogleExchange" TechnicalProfileReferenceId="Google-OAuth2" />
 					</ClaimsExchanges>
 				</OrchestrationStep>
 				<!-- For social IDP authentication, attempt to find the user account in the directory. -->
