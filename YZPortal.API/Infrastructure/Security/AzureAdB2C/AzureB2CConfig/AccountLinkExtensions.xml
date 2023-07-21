@@ -720,19 +720,16 @@
 						<Item Key="scope">email profile</Item>
 						<Item Key="HttpBinding">POST</Item>
 						<Item Key="UsePolicyInRedirectUri">0</Item>
-
-						<!--Sample action required: Change to your Google App Id-->
 						<Item Key="client_id">893986699704-u2q8th9vd2oanlpfsnckb3q9fmdg686e.apps.googleusercontent.com</Item>
 					</Metadata>
 					<CryptographicKeys>
 						<Key Id="client_secret" StorageReferenceId="B2C_1A_GoogleSecret" />
 					</CryptographicKeys>
 				</TechnicalProfile>
-
 				<TechnicalProfile Id="Google-OAUTH-SignIn">
 					<OutputClaims>
 						<OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="id" />
-						<OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="email" />
+						<OutputClaim ClaimTypeReferenceId="socialEmail" PartnerClaimType="email" />
 						<OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="given_name" />
 						<OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="family_name" />
 						<OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
@@ -748,11 +745,10 @@
 					<IncludeTechnicalProfile ReferenceId="Google-OAUTH-Base" />
 					<UseTechnicalProfileForSessionManagement ReferenceId="SM-SocialLogin" />
 				</TechnicalProfile>
-
 				<TechnicalProfile Id="Google-OAUTH-Link">
 					<DisplayName>Link Google</DisplayName>
 					<Metadata>
-						<Item Key="ClaimTypeOnWhichToEnable">issuers</Item>
+						<Item Key="ClaimTypeOnWhichToEnable">currentIssuers</Item>
 						<Item Key="ClaimValueOnWhichToEnable">google.com</Item>
 					</Metadata>
 					<OutputClaims>
@@ -766,7 +762,7 @@
 					</OutputClaimsTransformations>
 					<IncludeTechnicalProfile ReferenceId="Google-OAUTH-Base" />
 					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
-					<EnabledForUserJourneys>OnItemAbsenceInStringCollectionClaim</EnabledForUserJourneys>
+					<EnabledForUserJourneys>OnItemExistenceInStringCollectionClaim</EnabledForUserJourneys>
 				</TechnicalProfile>
 			</TechnicalProfiles>
 		</ClaimsProvider>
@@ -831,6 +827,65 @@
 				</TechnicalProfile>
 			</TechnicalProfiles>
 		</ClaimsProvider>
+		<!-- Twitter claims provider -->
+		<ClaimsProvider>
+			<Domain>twitter.com</Domain>
+			<DisplayName>Twitter</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="Twitter-OAUTH1-Base">
+					<DisplayName>Twitter</DisplayName>
+					<Protocol Name="OAuth1" />
+					<Metadata>
+						<Item Key="ProviderName">Twitter</Item>
+						<Item Key="authorization_endpoint">https://api.twitter.com/oauth/authenticate</Item>
+						<Item Key="access_token_endpoint">https://api.twitter.com/oauth/access_token</Item>
+						<Item Key="request_token_endpoint">https://api.twitter.com/oauth/request_token</Item>
+						<Item Key="ClaimsEndpoint">https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true</Item>
+						<Item Key="ClaimsResponseFormat">json</Item>
+						<Item Key="client_id">5t6Kb5tl2f70ua14FJcjICKqm</Item>
+					</Metadata>
+					<CryptographicKeys>
+						<Key Id="client_secret" StorageReferenceId="B2C_1A_TwitterSecret" />
+					</CryptographicKeys>
+				</TechnicalProfile>
+				<TechnicalProfile Id="Twitter-OAUTH1-SignIn">
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="user_id" />
+						<OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="screen_name" />
+						<OutputClaim ClaimTypeReferenceId="socialEmail" PartnerClaimType="email" />
+						<OutputClaim ClaimTypeReferenceId="identityProvider" DefaultValue="twitter.com" />
+						<OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="socialIdpAuthentication" />
+					</OutputClaims>
+					<OutputClaimsTransformations>
+						<OutputClaimsTransformation ReferenceId="CreateRandomUPNUserName" />
+						<OutputClaimsTransformation ReferenceId="CreateUserPrincipalName" />
+						<OutputClaimsTransformation ReferenceId="CreateUserIdentity" />
+						<OutputClaimsTransformation ReferenceId="AppendUserIdentity" />
+					</OutputClaimsTransformations>
+					<IncludeTechnicalProfile ReferenceId="Twitter-OAUTH1-Base" />
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-SocialLogin" />
+				</TechnicalProfile>
+				<TechnicalProfile Id="Twitter-OAUTH1-Link">
+					<DisplayName>Link Twitter</DisplayName>
+					<Metadata>
+						<Item Key="ClaimTypeOnWhichToEnable">currentIssuers</Item>
+						<Item Key="ClaimValueOnWhichToEnable">twitter.com</Item>
+					</Metadata>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="issuerUserIdToLink" PartnerClaimType="user_id" />
+						<OutputClaim ClaimTypeReferenceId="issuerToLink" DefaultValue="twitter.com" AlwaysUseDefaultValue="true" />
+						<OutputClaim ClaimTypeReferenceId="socialEmailLinkAttempt" PartnerClaimType="email" />
+					</OutputClaims>
+					<OutputClaimsTransformations>
+						<OutputClaimsTransformation ReferenceId="CreateUserIdentityToLink" />
+						<OutputClaimsTransformation ReferenceId="AppendUserIdentityToLink" />
+					</OutputClaimsTransformations>
+					<IncludeTechnicalProfile ReferenceId="Twitter-OAUTH1-Base" />
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+					<EnabledForUserJourneys>OnItemExistenceInStringCollectionClaim</EnabledForUserJourneys>
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
 	</ClaimsProviders>
 	<UserJourneys>
 		<UserJourney Id="AccountLinkSignUpOrSignIn" DefaultCpimIssuerTechnicalProfileReferenceId="JwtIssuer">
@@ -840,6 +895,7 @@
 						<ClaimsProviderSelection TargetClaimsExchangeId="FacebookExchange"/>
 						<ClaimsProviderSelection TargetClaimsExchangeId="GoogleExchange"/>
 						<ClaimsProviderSelection TargetClaimsExchangeId="MicrosoftAccountExchange"/>
+						<ClaimsProviderSelection TargetClaimsExchangeId="TwitterExchange"/>
 						<ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange"/>
 					</ClaimsProviderSelections>
 					<ClaimsExchanges>
@@ -858,6 +914,7 @@
 						<ClaimsExchange Id="FacebookExchange" TechnicalProfileReferenceId="Facebook-OAUTH-SignIn"/>
 						<ClaimsExchange Id="GoogleExchange" TechnicalProfileReferenceId="Google-OAUTH-SignIn"/>
 						<ClaimsExchange Id="MicrosoftAccountExchange" TechnicalProfileReferenceId="MSA-OIDC-SignIn"/>
+						<ClaimsExchange Id="TwitterExchange" TechnicalProfileReferenceId="Twitter-OAUTH1-SignIn"/>
 						<ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-HasEmailFlagged"/>
 					</ClaimsExchanges>
 				</OrchestrationStep>
@@ -933,7 +990,12 @@
 						<ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
 					</ClaimsExchanges>
 				</OrchestrationStep>
-				<OrchestrationStep Order="7" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
+				<OrchestrationStep Order="7" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="RESTYZAPI-GetGroupsFromMSGraph" TechnicalProfileReferenceId="RESTYZAPI-GetGroupsFromMSGraph" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+				<OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
 			</OrchestrationSteps>
 			<ClientDefinition ReferenceId="DefaultWeb"/>
 		</UserJourney>
@@ -1000,6 +1062,7 @@
 						<ClaimsProviderSelection TargetClaimsExchangeId="LinkFacebookExchange1"/>
 						<ClaimsProviderSelection TargetClaimsExchangeId="LinkGoogleExchange1"/>
 						<ClaimsProviderSelection TargetClaimsExchangeId="LinkMSAExchange1"/>
+						<ClaimsProviderSelection TargetClaimsExchangeId="LinkTwitterExchange1"/>
 					</ClaimsProviderSelections>
 				</OrchestrationStep>
 				<OrchestrationStep Order="2" Type="ClaimsExchange">
@@ -1020,6 +1083,7 @@
 						<ClaimsExchange Id="LinkFacebookExchange1" TechnicalProfileReferenceId="Facebook-OAUTH-Link"/>
 						<ClaimsExchange Id="LinkGoogleExchange1" TechnicalProfileReferenceId="Google-OAUTH-Link"/>
 						<ClaimsExchange Id="LinkMSAExchange1" TechnicalProfileReferenceId="MSA-OAUTH-Link"/>
+						<ClaimsExchange Id="LinkTwitterExchange1" TechnicalProfileReferenceId="Twitter-OAUTH1-Link"/>
 					</ClaimsExchanges>
 				</OrchestrationStep>
 				<OrchestrationStep Order="3" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
@@ -1045,6 +1109,7 @@
 						<ClaimsProviderSelection TargetClaimsExchangeId="LinkFacebookExchange2"/>
 						<ClaimsProviderSelection TargetClaimsExchangeId="LinkGoogleExchange2"/>
 						<ClaimsProviderSelection TargetClaimsExchangeId="LinkMSAExchange2"/>
+						<ClaimsProviderSelection TargetClaimsExchangeId="LinkTwitterExchange2"/>
 						<ClaimsProviderSelection TargetClaimsExchangeId="LocalAccountSigninEmailExchangeLink2"/>
 					</ClaimsProviderSelections>
 				</OrchestrationStep>
@@ -1066,6 +1131,7 @@
 						<ClaimsExchange Id="LinkFacebookExchange2" TechnicalProfileReferenceId="Facebook-OAUTH-Link"/>
 						<ClaimsExchange Id="LinkGoogleExchange2" TechnicalProfileReferenceId="Google-OAUTH-Link"/>
 						<ClaimsExchange Id="LinkMSAExchange2" TechnicalProfileReferenceId="MSA-OAUTH-Link"/>
+						<ClaimsExchange Id="LinkTwitterExchange2" TechnicalProfileReferenceId="Twitter-OAUTH1-Link"/>
 						<ClaimsExchange Id="LocalAccountSigninEmailExchangeLink2" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email-Link"/>
 					</ClaimsExchanges>
 				</OrchestrationStep>
