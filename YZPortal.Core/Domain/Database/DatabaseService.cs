@@ -17,7 +17,7 @@ namespace YZPortal.Core.Domain.Database
 {
     // TODO: maybe can do logging here? instead of logging from error middleware, but then again the http req url already has the info? idk
     // TODO: maybe can create partial class for each entity?
-    public class DatabaseService
+    public class DatabaseService : IDatabaseService
     {
         private readonly PortalContext _dbContext;
         private readonly DatabaseOptions _options;
@@ -35,7 +35,7 @@ namespace YZPortal.Core.Domain.Database
             _mapper = mapper;
         }
 
-        #region Create and update admin user on startup
+        #region Startup services
 
         public void UserAdmin()
         {
@@ -86,11 +86,6 @@ namespace YZPortal.Core.Domain.Database
                 }
             }
         }
-
-        #endregion
-
-        #region Create, update and delete entities via enum values
-
         public void EnumValues()
         {
             //var DealerRoleTypes = typeof(DealerRoleNames).GetEnumDataTypeValues();
@@ -151,33 +146,6 @@ namespace YZPortal.Core.Domain.Database
         {
             // AsQueryable allows dynamically build and refine query by adding additional LINQ operators
             return await _dbContext.GetUsersAsQueryable().CreateSearchListAsync(request, searchPredicate, cancellationToken);
-
-            //// Variables
-            //List<User> results;
-            //int pageNumber;
-            //int pageSize;
-            //int totalPages;
-            //int totalItems;
-
-            //results = users.Results;
-            //pageNumber = users.PageNumber;
-            //pageSize = users.PageSize;
-            //totalPages = users.TotalPages;
-            //totalItems = users.TotalItems;
-
-            //// Need to map this somehow
-            //return new SearchModel<Model>
-            //{
-            //    Results = _mapper.Map<List<Model>>(results),
-            //    SearchString = request.SearchString,
-            //    OrderBy = request.OrderBy,
-            //    PageNumber = pageNumber,
-            //    PageSize = pageSize,
-            //    TotalPages = totalPages,
-            //    TotalItems = totalItems,
-            //};
-
-            //return _mapper.Map<SearchModel<TModel>>(users);
         }
 
         /// <summary>
@@ -201,7 +169,6 @@ namespace YZPortal.Core.Domain.Database
 
             return user;
         }
-
 
         // TODO: use interface for type T to handle current context and etc, not sure if this will work? but theres similarity
         /// <summary>

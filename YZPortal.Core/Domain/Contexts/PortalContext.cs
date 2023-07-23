@@ -23,6 +23,10 @@ namespace YZPortal.Core.Domain.Contexts
             _httpContext = httpContextAccessor.HttpContext ?? null;
         }
 
+        public PortalContext(DbContextOptions<PortalContext> options) : base(options) 
+        { 
+        }
+
         #region Data Sets
 
         #region Sync
