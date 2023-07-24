@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -11,6 +12,7 @@ using Microsoft.IdentityModel.Logging;
 using Newtonsoft.Json;
 using Serilog;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using System.Reflection;
 using YZPortal.API.Infrastructure.AzureStorage;
 using YZPortal.API.Infrastructure.Mediatr.PipelineBehavior;
 using YZPortal.API.Infrastructure.Mvc;
@@ -82,10 +84,10 @@ builder.Services.AddApiVersioning(opts => { opts.AssumeDefaultVersionWhenUnspeci
 builder.Services.AddVersionedApiExplorer(opts => { opts.GroupNameFormat = "'v'VV"; opts.SubstituteApiVersionInUrl = true; opts.DefaultApiVersion = new ApiVersion(1, 0); });
 
 // MediatR
-builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies().Where(assembly => !assembly.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal)).ToArray());
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
 
 // AutoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies().Where(assembly => !assembly.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal)));
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 #region Context
 

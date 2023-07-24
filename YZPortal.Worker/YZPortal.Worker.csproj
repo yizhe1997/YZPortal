@@ -10,23 +10,23 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
-		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="CsvHelper" Version="30.0.1" />
-		<PackageReference Include="EFCore.BulkExtensions" Version="6.6.5" />
+		<PackageReference Include="EFCore.BulkExtensions" Version="7.1.4" />
 		<PackageReference Include="Flurl" Version="3.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Antiforgery" Version="2.2.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0-2.final" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.2">
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.9">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
 		<PackageReference Include="NCrontab" Version="3.3.1" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-		<PackageReference Include="Scriban" Version="5.5.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Scriban" Version="5.7.0" />
 		<PackageReference Include="SendGrid.Core" Version="2.0.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="6.1.1-dev-00293" />
+		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

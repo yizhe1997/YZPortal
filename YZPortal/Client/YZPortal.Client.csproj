@@ -20,11 +20,11 @@
 		<PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
 		<PackageReference Include="BootstrapBlazor" Version="7.8.9" />
 		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.4.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.15" />
-		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.15" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.15" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.15" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.20" />
+		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.20" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.20" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.9" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0-preview.2.23128.3" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
