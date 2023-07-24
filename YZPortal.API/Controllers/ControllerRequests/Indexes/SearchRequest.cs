@@ -2,7 +2,7 @@
 
 namespace YZPortal.API.Controllers.ControllerRequests.Indexes
 {
-    public abstract class SearchRequest<T> : PagedRequest<T>, ISearchParams
+    public class SearchRequest<T> : PagedRequest<T>, ISearchParams
     {
         public string SearchString { get; set; } = string.Empty;
         public string Lang { get; set; } = "en";

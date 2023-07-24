@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using YZPortal.Core.Domain.Contexts;
+using YZPortal.Core.Domain.Database;
+using YZPortal.Core.Domain.Database.Users;
 
 namespace YZPortal.UnitTest.Domain.Contexts
 {
-    internal class Context
+    internal class PortalContextHelpers
     {
         internal static PortalContext CreatePortalContext()
         {
@@ -18,6 +20,19 @@ namespace YZPortal.UnitTest.Domain.Contexts
             _portalContext.Database.EnsureCreated();
 
             return _portalContext;
+        }
+
+        public static void UsersAddToPortalContextViaAutoFixt(Fixture fixture, PortalContext portalContext, int count)
+        {
+            var users = fixture.CreateMany<User>(count).ToList();
+            portalContext.UsersAdd(users);
+            portalContext.SaveChanges();
+        }
+
+        public static void UsersDeleteAllFromPortalContext(PortalContext portalContext)
+        {
+            portalContext.UsersDeleteAll();
+            portalContext.SaveChanges();
         }
     }
 }

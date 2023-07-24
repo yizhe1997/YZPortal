@@ -202,6 +202,5 @@ namespace YZPortal.Core.Domain.Contexts
         }
 
         #endregion
-
     }
 }

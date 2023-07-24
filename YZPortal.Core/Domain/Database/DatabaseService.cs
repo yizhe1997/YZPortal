@@ -17,7 +17,7 @@ namespace YZPortal.Core.Domain.Database
 {
     // TODO: maybe can do logging here? instead of logging from error middleware, but then again the http req url already has the info? idk
     // TODO: maybe can create partial class for each entity?
-    public class DatabaseService : IDatabaseService
+    public class DatabaseService
     {
         private readonly PortalContext _dbContext;
         private readonly DatabaseOptions _options;
@@ -145,7 +145,7 @@ namespace YZPortal.Core.Domain.Database
         public async Task<SearchList<User>> UsersToSearchListAsync(ISearchParams request, System.Linq.Expressions.Expression<Func<User, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken())
         {
             // AsQueryable allows dynamically build and refine query by adding additional LINQ operators
-            return await _dbContext.GetUsersAsQueryable().CreateSearchListAsync(request, searchPredicate, cancellationToken);
+            return await _dbContext.UsersGetAsQueryable().CreateSearchListAsync(request, searchPredicate, cancellationToken);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace YZPortal.Core.Domain.Database
         public async Task<User> UserGetBySubIdAsync(string? subId, CancellationToken cancellationToken = new CancellationToken())
         {
             // Validate if user exist
-            var user = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
+            var user = await _dbContext.UserGetBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
 
             return user;
         }
@@ -165,7 +165,7 @@ namespace YZPortal.Core.Domain.Database
         public async Task<User> UserGetAsync(Guid Id, CancellationToken cancellationToken = new CancellationToken())
         {
             // Validate if user exist
-            var user = await _dbContext.GetUserByIdFirstOrDefaultAsync(Id, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
+            var user = await _dbContext.UserGetByIdFirstOrDefaultAsync(Id, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
 
             return user;
         }
@@ -176,12 +176,11 @@ namespace YZPortal.Core.Domain.Database
         /// </summary>
         public async Task<User> UserCreateAsync<T>(T body, CancellationToken cancellationToken = new CancellationToken()) where T : class
         {
-            // If T body is already user then dont map?
             // Map input body to new user
-            var newUser = _mapper.Map<User>(body);
+            var newUser = (typeof(T) == typeof(User)) ? body as User ?? new User() : _mapper.Map<User>(body);
 
             // Validate if user exist
-            var checkUser = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(newUser.SubjectIdentifier, cancellationToken);
+            var checkUser = await _dbContext.UserGetBySubIdFirstOrDefaultAsync(newUser.SubjectIdentifier, cancellationToken);
             if (checkUser != null)
                 throw new RestException(HttpStatusCode.BadRequest, "User already exist!");
 
@@ -203,7 +202,7 @@ namespace YZPortal.Core.Domain.Database
         public async Task<User> UserUpdateAsync<T>(string? subId, T body, CancellationToken cancellationToken = new CancellationToken()) where T : CurrentContext
         {
             // Validate if user exist
-            var user = await _dbContext.GetUserBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
+            var user = await _dbContext.UserGetBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");
 
             // Map fields to existing user and save
             _mapper.Map(body, user);
@@ -218,10 +217,10 @@ namespace YZPortal.Core.Domain.Database
         public async Task<User> UserDeleteAsync(Guid id, CancellationToken cancellationToken = new CancellationToken())
         {
             // Validate if user exist
-            var user = await _dbContext.GetUserByIdFirstOrDefaultAsync(id, cancellationToken) ?? throw new RestException(HttpStatusCode.NotFound, "User not found.");
+            var user = await _dbContext.UserGetByIdFirstOrDefaultAsync(id, cancellationToken) ?? throw new RestException(HttpStatusCode.NotFound, "User not found.");
 
             // If user exist then remove from db and save
-            _dbContext.Users.Remove(user);
+            _dbContext.UserDelete(user);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return user;

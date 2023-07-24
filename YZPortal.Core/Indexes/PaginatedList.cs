@@ -10,13 +10,14 @@
         public int EndPage { get; set; }
         public int StartIndex { get; set; }
         public int EndIndex { get; set; }
-        public IEnumerable<int> Pages { get; set; }
+        public IEnumerable<int> Pages { get; set; } = Enumerable.Empty<int>();
         public List<T> Results { get { return this; } }
 
         public PaginatedList(List<T> items, int totalItems, int pageNumber, int pageSize = 10, int maxPages = -1)
         {
             // calculate total pages
             var totalPages = (int)Math.Ceiling(totalItems / (float)pageSize);
+            totalPages = totalPages == 0 ? 1 : totalPages;
 
             // ensure current page isn't out of range
             if (pageNumber < 1)
