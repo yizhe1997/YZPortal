@@ -84,6 +84,7 @@ builder.Services.AddApiVersioning(opts => { opts.AssumeDefaultVersionWhenUnspeci
 builder.Services.AddVersionedApiExplorer(opts => { opts.GroupNameFormat = "'v'VV"; opts.SubstituteApiVersionInUrl = true; opts.DefaultApiVersion = new ApiVersion(1, 0); });
 
 // MediatR
+// https://github.com/jbogard/MediatR/wiki/Migration-Guide-11.x-to-12.0
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
 
 // AutoMapper

@@ -67,7 +67,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             Assert.Equal(totalPages, paginatedList.TotalPages);
 
             // Check if the pagination is completed within an acceptable time frame
-            Assert.True(stopwatch.ElapsedMilliseconds < 1000, "Pagination took too long."); // Adjust the time threshold as per your requirements
+            Assert.True(stopwatch.ElapsedMilliseconds < _expectedMaxElapsedMilliseconds, "Pagination took too long."); // Adjust the time threshold as per your requirements
 
             #endregion
         }
@@ -124,7 +124,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             Assert.Equal(totalPages, paginatedList.TotalPages);
 
             // Check if the pagination is completed within an acceptable time frame
-            Assert.True(stopwatch.ElapsedMilliseconds < 1000, "Pagination took too long."); // Adjust the time threshold as per your requirements
+            Assert.True(stopwatch.ElapsedMilliseconds < _expectedMaxElapsedMilliseconds, "Pagination took too long."); // Adjust the time threshold as per your requirements
 
             #endregion
         }
@@ -181,7 +181,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             Assert.Equal(totalPages, paginatedList.TotalPages);
 
             // Check if the pagination is completed within an acceptable time frame
-            Assert.True(stopwatch.ElapsedMilliseconds < 1000, "Pagination took too long."); // Adjust the time threshold as per your requirements
+            Assert.True(stopwatch.ElapsedMilliseconds < _expectedMaxElapsedMilliseconds, "Pagination took too long."); // Adjust the time threshold as per your requirements
 
             #endregion
         }
