@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YZPortal.Core.Domain.Contexts;
 
@@ -11,9 +12,11 @@ using YZPortal.Core.Domain.Contexts;
 namespace YZPortal.Core.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    partial class PortalContextModelSnapshot : ModelSnapshot
+    [Migration("20230806070322_AddUserIdentities")]
+    partial class AddUserIdentities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,13 +210,34 @@ namespace YZPortal.Core.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("newid()");
+
+                    b.Property<string>("CreatedBy")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("unknown");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getutcdate()");
 
                     b.Property<string>("Issuer")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IssuerUserId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("unknown");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("null");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -222,7 +246,7 @@ namespace YZPortal.Core.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Identities");
+                    b.ToTable("Identity");
                 });
 
             modelBuilder.Entity("YZPortal.Core.Domain.Database.Users.User", b =>

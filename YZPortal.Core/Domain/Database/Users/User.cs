@@ -29,6 +29,7 @@ namespace YZPortal.Core.Domain.Database.Users
 
         public string? IdentityProvider { get; set; } // TODO
         public string? LastidpAccessToken { get; set; } // TODO
+        public List<Identity> Identities { get; set; } = new List<Identity>();
 
         #endregion
 

@@ -29,6 +29,12 @@ namespace YZPortal.Core.Domain.Contexts
 
         #region Data Sets
 
+        #region
+
+        public DbSet<Identity> Identities { get; set; }
+
+        #endregion
+
         #region Sync
 
         public DbSet<SyncStatus> SyncStatuses { get; set; }

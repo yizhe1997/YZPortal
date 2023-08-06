@@ -53,10 +53,13 @@ namespace YZPortal.FullStackCore.Extensions
             claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         public static string? GetIdentityProvider(this ClaimsPrincipal claimsPrincipal) =>
-            claimsPrincipal.FindFirst("idp")?.Value;
+            claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/identityprovider")?.Value;
 
         public static string? GetSubClaim(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindFirst("sub")?.Value;
+
+        public static string[] GetUserIdentities(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindAll("currentUserIdentities").Select(x => x.Value).ToArray() ?? Array.Empty<string>();
 
         public static string[] GetRoleClaim(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindAll(ClaimTypes.Role).Select(x => x.Value).ToArray() ?? Array.Empty<string>();

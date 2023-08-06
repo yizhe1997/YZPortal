@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System.Security.Claims;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.FullStackCore.Extensions;
@@ -31,6 +32,7 @@ namespace YZPortal.Core.Domain.Contexts
         public string? IdentityProvider => _httpContext?.User.GetIdentityProvider();
         public string? IpAddress => _httpContext?.Request.Host.ToUriComponent();
         public IEnumerable<Claim>? Claims => _httpContext?.User.Claims ?? new List<Claim>();
+        public List<Identity?> Identities => _httpContext?.User.GetUserIdentities().Select(x => JsonConvert.DeserializeObject<Identity>(x)).ToList() ?? new List<Identity?>();
 
         #endregion
 

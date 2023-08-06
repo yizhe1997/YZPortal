@@ -15,10 +15,11 @@ namespace YZPortal.API.Controllers.Users
                 .ForMember(c => c.AuthTime, opt => opt.MapFrom(src => src.AuthTime))
                 .ForMember(c => c.LastidpAccessToken, opt => opt.MapFrom(src => src.IdpAccessToken))
                 .ForMember(c => c.IdentityProvider, opt => opt.MapFrom(src => src.IdentityProvider))
+                .ForMember(c => c.Identities, opt => opt.MapFrom(src => src.Identities))
                 .ForMember(c => c.AuthExpireTime, opt => opt.MapFrom(src => src.AuthExpireTime))
                 .ForMember(c => c.AuthClassRef, opt => opt.MapFrom(src => src.AuthClassRef))
                 .ForMember(c => c.IpAddress, opt => opt.MapFrom(src => src.IpAddress))
-                .ForMember(c => c.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(c => c.Email, opt => opt.MapFrom(src => src.Email ?? src.NameIdentifier))
                 // If new user or id is guid empty then map created date and created by with latest info, else map itself
                 .ForMember(c => c.CreatedDate, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? DateTime.UtcNow : dest.CreatedDate))
                 .ForMember(c => c.CreatedBy, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? src.NameIdentifier : dest.CreatedBy))
