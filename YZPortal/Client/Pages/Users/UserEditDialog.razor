@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Diagnostics.CodeAnalysis;
 @using YZPortal.Client.Clients.YZPortalApi
+@using YZPortal.FullStackCore.Commands.Users;
 @using YZPortal.FullStackCore.Infrastructure.Security.Authorization
 @using YZPortal.FullStackCore.Models.Graph.Groups;
 @using YZPortal.FullStackCore.Models.Users;
@@ -14,7 +15,16 @@
         <BootstrapInput @bind-Value="@GraphUser.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
     </div>
     <div class="col-12">
-        <BootstrapInput @bind-Value="@GraphUser.DisplayName" DisplayText="Name" ShowLabel="true" />
+        <BootstrapInput @bind-Value="@GraphUser.DisplayName" DisplayText="Display Name" ShowLabel="true" />
+    </div>
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@GraphUser.FirstName" DisplayText="First Name" ShowLabel="true" />
+    </div>
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@GraphUser.LastName" DisplayText="Last Name" ShowLabel="true" />
+    </div>
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@GraphUser.MobilePhone" DisplayText="MobilePhone" ShowLabel="true" />
     </div>
     <div class="row g-3">
         <Divider Text="Groups" Alignment="Alignment.Left" style="margin: 2rem 0;" />
@@ -43,6 +53,8 @@
     [Parameter]
     public UserModel GraphUser { get; set; } = new UserModel();
 
+    public UpdateUserCommand UpdateUserCommand { get; set; } = new UpdateUserCommand();
+
     private static List<SelectedItem> GenerateDataSource(GraphGroupsModel source) => source.Results.Select(i => new SelectedItem(i.Id, i.DisplayName ?? string.Empty)).ToList();
 
     private async Task OnValidSubmit()
@@ -60,6 +72,14 @@
         {
             await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, GraphUser.SubjectIdentifier);
         }
+
+        await YZPortalApiClient.UserUpdate(GraphUser.SubjectIdentifier, new UpdateUserCommand()
+        {
+            DisplayName = GraphUser.DisplayName,
+            FirstName = GraphUser.FirstName,
+            LastName = GraphUser.LastName,
+            MobilePhone = GraphUser.MobilePhone
+        });
 
         await CloseDialog.InvokeAsync();
     }

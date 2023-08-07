@@ -27,6 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Domain\Database\EntityConfigurations\" />
 	  <Folder Include="FluentValidation\FluentValidators\" />
 	</ItemGroup>
 

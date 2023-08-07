@@ -40,6 +40,12 @@ namespace YZPortal.FullStackCore.Extensions
         public static string? GetDisplayName(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindFirst("name")?.Value;
 
+        public static string? GetFirstName(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirst(ClaimTypes.GivenName)?.Value;
+
+        public static string? GetLastName(this ClaimsPrincipal claimsPrincipal) =>
+            claimsPrincipal.FindFirst(ClaimTypes.Surname)?.Value;
+
         public static string? GetAuthTime(this ClaimsPrincipal claimsPrincipal) =>
             claimsPrincipal.FindFirst("iat")?.Value;
 

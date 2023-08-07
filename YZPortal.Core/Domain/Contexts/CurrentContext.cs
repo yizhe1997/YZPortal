@@ -24,6 +24,8 @@ namespace YZPortal.Core.Domain.Contexts
 
         public string? NameIdentifier => _httpContext?.User.GetNameIdentifier();
         public string? DisplayName => _httpContext?.User.GetDisplayName();
+        public string? FirstName => _httpContext?.User.GetFirstName();
+        public string? LastName => _httpContext?.User.GetLastName();
         public string? AuthClassRef => _httpContext?.User.GetAuthClassRef();
         public string? Email => _httpContext?.User.GetEmail();
         public DateTime AuthTime => DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt32(_httpContext?.User.GetAuthTime())).DateTime;

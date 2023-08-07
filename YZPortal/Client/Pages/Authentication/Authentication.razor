@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using YZPortal.Client.Clients.YZPortalApi;
 @using YZPortal.Client.Services.Authentication;
+@using YZPortal.FullStackCore.Commands.Users;
 @using YZPortal.FullStackCore.Extensions;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -28,7 +29,7 @@
                 }
                 else
                 {
-                    var newUser = await YZPortalApiClient.UserUpdate(userId);
+                    var newUser = await YZPortalApiClient.UserUpdate(userId, new UpdateUserCommand { IsAuthenEvent = true });
                 }
 
             }

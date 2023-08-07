@@ -1,4 +1,5 @@
-﻿using Azure.Identity;
+﻿using AutoMapper;
+using Azure.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -13,12 +14,14 @@ namespace YZPortal.Core.Graph
         // Variables
         private readonly AzureAdB2CManagementOptions _azureAdB2CManagementOptions;
         private readonly GraphOptions _graphOptions;
+        private readonly IMapper _mapper;
 
         // Constructor
-        public GraphClientProvider(IOptions<AzureAdB2CManagementOptions> azureAdB2CManagementOptions, IOptions<GraphOptions> graphOptions)
+        public GraphClientProvider(IOptions<AzureAdB2CManagementOptions> azureAdB2CManagementOptions, IOptions<GraphOptions> graphOptions, IMapper mapper)
         {
             _azureAdB2CManagementOptions = azureAdB2CManagementOptions.Value;
             _graphOptions = graphOptions.Value;
+            _mapper = mapper;
         }
 
         #region Users
@@ -72,6 +75,19 @@ namespace YZPortal.Core.Graph
 
             return user ?? new User();
         }
+
+        public async Task<User> UserUpdateAsync<T>(string? userSubId, T body, CancellationToken cancellationToken = new CancellationToken())
+        {
+            var graphClient = GetGraphClient();
+
+            // Map fields to existing user and save
+            var requestBody = _mapper.Map(body, new User());
+
+            var user = await graphClient.Users[userSubId].PatchAsync(requestBody, cancellationToken : cancellationToken);
+
+            return user ?? new User();
+        }
+
 
         public async Task<User> UserDeleteAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
         {

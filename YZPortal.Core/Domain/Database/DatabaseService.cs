@@ -199,7 +199,7 @@ namespace YZPortal.Core.Domain.Database
         /// <summary>
         ///     Async update user if user with subject identifier exist.
         /// </summary>
-        public async Task<User> UserUpdateAsync<T>(string? subId, T body, CancellationToken cancellationToken = new CancellationToken()) where T : CurrentContext
+        public async Task<User> UserUpdateAsync<T>(string? subId, T body, CancellationToken cancellationToken = new CancellationToken()) where T : class
         {
             // Validate if user exist
             var user = await _dbContext.UserGetBySubIdFirstOrDefaultAsync(subId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "User not found.");

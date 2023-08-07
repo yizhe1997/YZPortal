@@ -5,6 +5,7 @@ using YZPortal.FullStackCore.Models.Abstracts;
 using YZPortal.FullStackCore.Models.Users;
 using YZPortal.FullStackCore.Models.Graph.Users;
 using YZPortal.FullStackCore.Models.Graph.Groups;
+using YZPortal.FullStackCore.Commands.Users;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
@@ -156,9 +157,9 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new UserModel();
         }
 
-        public async Task<UserModel> UserUpdate(string subClaim)
+        public async Task<UserModel> UserUpdate(string? subClaim, UpdateUserCommand? updateUserCommand = null)
         {
-            using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subClaim}", new { });
+            using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subClaim}", updateUserCommand);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<UserModel>() ?? new();
