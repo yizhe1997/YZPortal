@@ -87,7 +87,7 @@ builder.Services.AddVersionedApiExplorer(opts => { opts.GroupNameFormat = "'v'VV
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
 
 // AutoMapper
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 #region Context
 

@@ -1,8 +1,6 @@
-﻿using YZPortal.Core.Indexes;
-
-namespace YZPortal.API.Controllers.ControllerRequests.Indexes
+﻿namespace YZPortal.FullStackCore.Requests.Indexes
 {
-    public class SearchRequest<T> : PagedRequest<T>, ISearchParams
+    public class SearchRequest : PagedRequest, ISearchParams
     {
         public string SearchString { get; set; } = string.Empty;
         public string Lang { get; set; } = "en";

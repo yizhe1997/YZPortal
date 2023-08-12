@@ -13,7 +13,7 @@ namespace YZPortal.Client.Services.Authentication
 			{
 				configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
                 options.UserOptions.RoleClaim = "roles";
-                options.ProviderOptions.DefaultAccessTokenScopes.Add(yzPortalApiOptions.Scope);
+                options.ProviderOptions.DefaultAccessTokenScopes.Add(yzPortalApiOptions.Scope ?? string.Empty);
 			}).AddAccountClaimsPrincipalFactory<RemoteAuthenticationState, CustomUserAccount, CustomUserFactory>();
 		}
 	}

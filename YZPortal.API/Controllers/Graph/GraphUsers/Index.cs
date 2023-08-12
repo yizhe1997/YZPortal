@@ -1,17 +1,18 @@
 ﻿using AutoMapper;
-using YZPortal.API.Controllers.ControllerRequests.Indexes;
+using MediatR;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Graph;
 using YZPortal.FullStackCore.Models.Abstracts;
 using YZPortal.FullStackCore.Models.Graph.Users;
+using YZPortal.FullStackCore.Requests.Indexes;
 
 namespace YZPortal.API.Controllers.Graph.GraphUsers
 {
     public class Index
     {
-        public class Request : SearchRequest<SearchModel<GraphUserModel>>
+        public class Request : SearchRequest, IRequest<SearchModel<GraphUserModel>>
         {
         }
         public class RequestHandler : SearchRequestHandler<Request, SearchModel<GraphUserModel>>

@@ -3,10 +3,10 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Diagnostics.CodeAnalysis;
 @using YZPortal.Client.Clients.YZPortalApi
-@using YZPortal.FullStackCore.Commands.Users;
 @using YZPortal.FullStackCore.Infrastructure.Security.Authorization
 @using YZPortal.FullStackCore.Models.Graph.Groups;
 @using YZPortal.FullStackCore.Models.Users;
+@using YZPortal.FullStackCore.Requests.Users;
 
 @inject YZPortalApiHttpClient YZPortalApiClient
 
@@ -53,7 +53,7 @@
     [Parameter]
     public UserModel GraphUser { get; set; } = new UserModel();
 
-    public UpdateUserCommand UpdateUserCommand { get; set; } = new UpdateUserCommand();
+    public UpdateUserRequest UpdateUserRequest { get; set; } = new UpdateUserRequest();
 
     private static List<SelectedItem> GenerateDataSource(GraphGroupsModel source) => source.Results.Select(i => new SelectedItem(i.Id, i.DisplayName ?? string.Empty)).ToList();
 
@@ -73,7 +73,7 @@
             await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, GraphUser.SubjectIdentifier);
         }
 
-        await YZPortalApiClient.UserUpdate(GraphUser.SubjectIdentifier, new UpdateUserCommand()
+        await YZPortalApiClient.UserUpdate(GraphUser.SubjectIdentifier, new UpdateUserRequest()
         {
             DisplayName = GraphUser.DisplayName,
             FirstName = GraphUser.FirstName,

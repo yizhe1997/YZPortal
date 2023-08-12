@@ -1,11 +1,11 @@
 ﻿using System.Net.Http.Json;
 using YZPortal.Client.Services.LocalStorage;
 using YZPortal.FullStackCore.Extensions;
-using YZPortal.FullStackCore.Models.Abstracts;
 using YZPortal.FullStackCore.Models.Users;
 using YZPortal.FullStackCore.Models.Graph.Users;
 using YZPortal.FullStackCore.Models.Graph.Groups;
-using YZPortal.FullStackCore.Commands.Users;
+using YZPortal.FullStackCore.Requests.Users;
+using YZPortal.FullStackCore.Requests.Indexes;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
@@ -25,32 +25,34 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Helpers
 
-        public HttpRequestMessage CreateAuthHttpRequestMessage(string relativeUri, HttpMethod httpMethod)
+        public HttpRequestMessage CreateSearchHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
-            // Construct HttpRequestMessage with Uri
-            var requestMsg = new HttpRequestMessage(httpMethod, _http.BaseAddress + relativeUri);
+            // Construct HttpRequestMessage with GET Http method
+            var requestMsg = CreatePaginationHttpRequestMessage(relativeUri, pageSize, pageNumber);
 
-            return requestMsg;
-        }
-
-        public HttpRequestMessage CreatePaginatedAuthHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
-        {
-            // Construct authenticated/authorized HttpRequestMessage with Uri
-            var requestMsg = CreateAuthHttpRequestMessage(relativeUri, HttpMethod.Get);
-
-            // Add pagination query params to HttpRequestMessage
-            requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageSize), pageSize.ToString());
-            requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.PageNumber), pageNumber.ToString());
+            // Add search query params to HttpRequestMessage
             if (!string.IsNullOrEmpty(searchString))
-                requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.SearchString), searchString);
+                requestMsg.AddQueryParam(nameof(SearchRequest.SearchString), searchString);
 
             if (orderBy != null)
             {
                 foreach (var val in orderBy)
                 {
-                    requestMsg.AddQueryParam(nameof(SearchModel<UserModel>.OrderBy), val);
+                    requestMsg.AddQueryParam(nameof(SearchRequest.OrderBy), val);
                 }
             }
+
+            return requestMsg;
+        }
+
+        public HttpRequestMessage CreatePaginationHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1)
+        {
+            // Construct HttpRequestMessage with GET Http method
+            var requestMsg = new HttpRequestMessage(HttpMethod.Get, _http.BaseAddress + relativeUri);
+
+            // Add pagination query params to HttpRequestMessage
+            requestMsg.AddQueryParam(nameof(PagedRequest.PageSize), pageSize.ToString());
+            requestMsg.AddQueryParam(nameof(PagedRequest.PageNumber), pageNumber.ToString());
 
             return requestMsg;
         }
@@ -63,7 +65,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         public async Task<GraphUsersModel> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
-            var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphUsers", pageSize, pageNumber, searchString, orderBy);
+            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/GraphUsers", pageSize, pageNumber, searchString, orderBy);
 
             using var response = await _http.SendAsync(requestMsg);
             try
@@ -91,7 +93,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         public async Task<GraphGroupsModel> GetGraphGroups(string? userSubId = null, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
-            var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
+            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
 
             if (!string.IsNullOrEmpty(userSubId))
                 requestMsg.AddQueryParam("userSubjectId", userSubId);
@@ -157,7 +159,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new UserModel();
         }
 
-        public async Task<UserModel> UserUpdate(string? subClaim, UpdateUserCommand? updateUserCommand = null)
+        public async Task<UserModel> UserUpdate(string? subClaim, UpdateUserRequest? updateUserCommand = null)
         {
             using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subClaim}", updateUserCommand);
             try
@@ -198,7 +200,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         public async Task<UsersSearchModel> GetUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
         {
-            var requestMsg = CreatePaginatedAuthHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
+            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
 
             using var response = await _http.SendAsync(requestMsg);
             try

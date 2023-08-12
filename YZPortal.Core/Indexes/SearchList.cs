@@ -1,4 +1,6 @@
-﻿namespace YZPortal.Core.Indexes
+﻿using YZPortal.FullStackCore.Requests.Indexes;
+
+namespace YZPortal.Core.Indexes
 {
     public class SearchList<T> : PaginatedList<T>
     {

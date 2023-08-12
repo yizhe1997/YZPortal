@@ -5,14 +5,14 @@ using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.Core.Graph;
-using YZPortal.FullStackCore.Commands.Users;
 using YZPortal.FullStackCore.Models.Users;
+using YZPortal.FullStackCore.Requests.Users;
 
 namespace YZPortal.API.Controllers.Users
 {
     public class Update
 	{
-		public class Request : UpdateUserCommand, IRequest<UserModel>
+		public class Request : UpdateUserRequest, IRequest<UserModel>
         {
 		}
 		public class RequestHandler : BaseRequestHandler<Request, UserModel>

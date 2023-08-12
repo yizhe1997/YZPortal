@@ -5,6 +5,7 @@ using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Kiota.Abstractions;
 using YZPortal.Core.Indexes;
+using YZPortal.FullStackCore.Requests.Indexes;
 
 namespace YZPortal.Core.Graph
 {

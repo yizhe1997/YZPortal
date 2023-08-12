@@ -2,8 +2,8 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using YZPortal.Client.Clients.YZPortalApi;
 @using YZPortal.Client.Services.Authentication;
-@using YZPortal.FullStackCore.Commands.Users;
 @using YZPortal.FullStackCore.Extensions;
+@using YZPortal.FullStackCore.Requests.Users;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
 <RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
@@ -29,7 +29,7 @@
                 }
                 else
                 {
-                    var newUser = await YZPortalApiClient.UserUpdate(userId, new UpdateUserCommand { IsAuthenEvent = true });
+                    var newUser = await YZPortalApiClient.UserUpdate(userId, new UpdateUserRequest { IsAuthenEvent = true });
                 }
 
             }

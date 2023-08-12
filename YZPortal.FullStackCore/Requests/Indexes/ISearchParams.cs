@@ -1,4 +1,4 @@
-﻿namespace YZPortal.Core.Indexes
+﻿namespace YZPortal.FullStackCore.Requests.Indexes
 {
     public interface ISearchParams : IPaginationParams
     {

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database.Users;
-using YZPortal.FullStackCore.Commands.Users;
 using YZPortal.FullStackCore.Models.Users;
+using YZPortal.FullStackCore.Requests.Users;
 
 namespace YZPortal.API.Controllers.Users
 {
@@ -31,10 +31,10 @@ namespace YZPortal.API.Controllers.Users
                 .ForMember(c => c.UpdatedBy, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? dest.UpdatedBy : src.NameIdentifier));
             CreateMap<Identity, IdentityModel>();
             CreateMap<User, UserModel>();
-            CreateMap<UpdateUserCommand, Microsoft.Graph.Models.User>()
+            CreateMap<UpdateUserRequest, Microsoft.Graph.Models.User>()
                 .ForMember(c => c.Surname, opt => opt.MapFrom(src => src.LastName))
                 .ForMember(c => c.GivenName, opt => opt.MapFrom(src => src.FirstName));
-            CreateMap<UpdateUserCommand, User>()
+            CreateMap<UpdateUserRequest, User>()
                 .ForMember(x => x.SubjectIdentifier, opt => opt.Ignore());
         }
 	}

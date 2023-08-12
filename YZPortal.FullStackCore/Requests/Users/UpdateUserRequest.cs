@@ -1,6 +1,6 @@
-﻿namespace YZPortal.FullStackCore.Commands.Users
+﻿namespace YZPortal.FullStackCore.Requests.Users
 {
-    public class UpdateUserCommand
+    public class UpdateUserRequest
     {
         public bool IsAuthenEvent { get; set; }
         public string? SubjectId { get; set; }

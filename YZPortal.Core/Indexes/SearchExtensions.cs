@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using YZPortal.FullStackCore.Requests.Indexes;
 
 namespace YZPortal.Core.Indexes
 {

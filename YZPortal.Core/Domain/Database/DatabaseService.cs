@@ -12,6 +12,7 @@ using YZPortal.Core.Error;
 using AutoMapper;
 using System.Linq.Dynamic.Core;
 using YZPortal.Core.Indexes;
+using YZPortal.FullStackCore.Requests.Indexes;
 
 namespace YZPortal.Core.Domain.Database
 {

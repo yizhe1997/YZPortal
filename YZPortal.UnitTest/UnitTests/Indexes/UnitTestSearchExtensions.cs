@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using Xunit.Abstractions;
 using static YZPortal.UnitTest.UnitTests.Indexes.Enums.PageType;
-using YZPortal.API.Controllers.ControllerRequests.Indexes;
 using YZPortal.Core.Indexes;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.UnitTest.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
+using YZPortal.FullStackCore.Requests.Indexes;
 
 namespace YZPortal.UnitTest.UnitTests.Indexes
 {
@@ -37,7 +37,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             totalPages = totalPages == 0 ? 1 : totalPages;
 
             var pageNumber = GetPageNumber(pageType, totalPages);
-            var paginationParams = new SearchRequest<User> { PageSize = pageSize, PageNumber = pageNumber };
+            var paginationParams = new SearchRequest { PageSize = pageSize, PageNumber = pageNumber };
 
             #endregion
 
@@ -94,7 +94,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             totalPages = totalPages == 0 ? 1 : totalPages;
 
             var pageNumber = GetPageNumber(pageType, totalPages);
-            var paginationParams = new SearchRequest<User> { PageSize = pageSize, PageNumber = pageNumber };
+            var paginationParams = new SearchRequest { PageSize = pageSize, PageNumber = pageNumber };
 
             #endregion
 
@@ -151,7 +151,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             totalPages = totalPages == 0 ? 1 : totalPages;
 
             var pageNumber = GetPageNumber(pageType, totalPages);
-            var paginationParams = new SearchRequest<User> { PageSize = pageSize, PageNumber = pageNumber };
+            var paginationParams = new SearchRequest { PageSize = pageSize, PageNumber = pageNumber };
 
             #endregion
 

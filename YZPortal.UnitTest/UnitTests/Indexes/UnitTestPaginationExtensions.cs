@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using Xunit.Abstractions;
-using YZPortal.API.Controllers.ControllerRequests.Indexes;
 using YZPortal.Core.Domain.Database;
 using YZPortal.Core.Domain.Database.Users;
 using YZPortal.Core.Indexes;
+using YZPortal.FullStackCore.Requests.Indexes;
 using YZPortal.UnitTest.Domain.Contexts;
 using static YZPortal.UnitTest.UnitTests.Indexes.Enums.PageType;
 
@@ -36,7 +36,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             totalPages = totalPages == 0 ? 1 : totalPages;
 
             var pageNumber = GetPageNumber(pageType, totalPages);
-            var paginationParams = new PagedRequest<User> { PageSize = pageSize, PageNumber = pageNumber };
+            var paginationParams = new PagedRequest { PageSize = pageSize, PageNumber = pageNumber };
 
             #endregion
 
@@ -92,7 +92,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             totalPages = totalPages == 0 ? 1 : totalPages;
 
             var pageNumber = GetPageNumber(pageType, totalPages);
-            var paginationParams = new PagedRequest<User> { PageSize = pageSize, PageNumber = pageNumber };
+            var paginationParams = new PagedRequest { PageSize = pageSize, PageNumber = pageNumber };
 
             #endregion
 
@@ -148,7 +148,7 @@ namespace YZPortal.UnitTest.UnitTests.Indexes
             totalPages = totalPages == 0 ? 1 : totalPages;
 
             var pageNumber = GetPageNumber(pageType, totalPages);
-            var paginationParams = new PagedRequest<User> { PageSize = pageSize, PageNumber = pageNumber };
+            var paginationParams = new PagedRequest { PageSize = pageSize, PageNumber = pageNumber };
 
             #endregion
 
