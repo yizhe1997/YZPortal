@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Web.Helpers;
-using YZPortal.Core.Domain.Database.Users;
-using YZPortal.Core.Domain.Database.Sync;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.FullStackCore.Enums.Memberships;
 using YZPortal.FullStackCore.Extensions;
@@ -13,9 +11,17 @@ using AutoMapper;
 using System.Linq.Dynamic.Core;
 using YZPortal.Core.Indexes;
 using YZPortal.FullStackCore.Requests.Indexes;
+using YZPortal.Core.Domain.Database.EntityTypes.Sync;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users.Configs;
+using Microsoft.EntityFrameworkCore;
 
 namespace YZPortal.Core.Domain.Database
 {
+    // TODO: maybe dont validate if exist or not here? let the throw exception handled in controller? ive tried.. still in consideration what is best choice.... since this is a db service .... hmm....
+    // from gpt: Considerations:
+    // If you anticipate reusing the same error-handling logic in multiple places, centralizing it in the service layer can be beneficial for maintainability and consistency.
+    // If you prefer to have explicit control over error messages, handling exceptions in the controller might be more suitable.
     // TODO: maybe can do logging here? instead of logging from error middleware, but then again the http req url already has the info? idk
     // TODO: maybe can create partial class for each entity?
     public class DatabaseService
@@ -136,9 +142,27 @@ namespace YZPortal.Core.Domain.Database
             }
         }
 
+        /// <summary>
+        /// To seed config for existing users. Not intended for newly created db as the user would already
+        /// have the configs on creation as defined in the db schema.
+        /// </summary>
+        public async Task UserSeedConfigsAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            if (!_dbContext.PortalConfigs.Any())
+            {
+                var usersWithoutPortalConfig = await _dbContext.Users.Where(x => x.PortalConfig == null).ToListAsync();
+                foreach (var user in usersWithoutPortalConfig)
+                {
+                    user.PortalConfig = new PortalConfig() { User = user };
+                }
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+        }
+
         #endregion
 
-        #region User
+        #region Users
 
         /// <summary>
         ///     Async get users.
@@ -150,7 +174,7 @@ namespace YZPortal.Core.Domain.Database
         }
 
         /// <summary>
-        ///     Async update user if user with subject identifier exist.
+        ///     Async get user with subject identifier.
         /// </summary>
         public async Task<User> UserGetBySubIdAsync(string? subId, CancellationToken cancellationToken = new CancellationToken())
         {
@@ -161,7 +185,7 @@ namespace YZPortal.Core.Domain.Database
         }
 
         /// <summary>
-        ///     Async update user if user with Id exist.
+        ///     Async get user with Id.
         /// </summary>
         public async Task<User> UserGetAsync(Guid Id, CancellationToken cancellationToken = new CancellationToken())
         {
@@ -198,7 +222,7 @@ namespace YZPortal.Core.Domain.Database
         // config in mapping profile is more flexible than defining it for an interface only? issue with interface is i have 
         // to add evrything right?
         /// <summary>
-        ///     Async update user if user with subject identifier exist.
+        ///     Async update user with subject identifier.
         /// </summary>
         public async Task<User> UserUpdateAsync<T>(string? subId, T body, CancellationToken cancellationToken = new CancellationToken()) where T : class
         {
@@ -213,7 +237,7 @@ namespace YZPortal.Core.Domain.Database
         }
 
         /// <summary>
-        ///     Async delete user if user with the given id exist.
+        ///     Async delete user with id.
         /// </summary>
         public async Task<User> UserDeleteAsync(Guid id, CancellationToken cancellationToken = new CancellationToken())
         {
@@ -226,6 +250,47 @@ namespace YZPortal.Core.Domain.Database
 
             return user;
         }
+
+        #region Configs
+
+        /// <summary>
+        ///     Async update user's portal configuration with subject identifier.
+        /// </summary>
+        public async Task<PortalConfig> UpdatePortalConfigAsync<T>(string? userSubId, T body, CancellationToken cancellationToken = new CancellationToken()) where T : class
+        {
+            // Validate if portal config exist
+            var portalConfig = await _dbContext.PortalConfigGetByUserSubIdFirstOrDefaultAsync(userSubId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "Portal configuration for user not found.");
+
+            // Map fields to existing portal config and save
+            _mapper.Map(body, portalConfig);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return portalConfig;
+        }
+
+        /// <summary>
+        ///     Async get user's portal configuration with subject identifier.
+        /// </summary>
+        public async Task<PortalConfig> GetPortalConfigAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
+        {
+            // Validate if portal config exist
+            var portalConfig = await _dbContext.PortalConfigGetByUserSubIdFirstOrDefaultAsync(userSubId, cancellationToken) ?? throw new RestException(HttpStatusCode.BadRequest, "Portal configuration for user not found.");
+
+            return portalConfig;
+        }
+
+        /// <summary>
+        ///     Get configurations for current user
+        /// </summary>
+        public async Task<Tuple<PortalConfig>> GetConfigsAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
+        {
+            // Return new config for any config group if not exist
+            var portalConfig = await _dbContext.PortalConfigGetByUserSubIdFirstOrDefaultAsync(userSubId, cancellationToken) ?? new PortalConfig();
+
+            return Tuple.Create(portalConfig);
+        }
+
+        #endregion
 
         #endregion
     }

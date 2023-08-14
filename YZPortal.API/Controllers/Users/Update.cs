@@ -3,7 +3,7 @@ using MediatR;
 using YZPortal.API.Infrastructure.Mediatr;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
-using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
 using YZPortal.Core.Graph;
 using YZPortal.FullStackCore.Models.Users;
 using YZPortal.FullStackCore.Requests.Users;
@@ -14,7 +14,8 @@ namespace YZPortal.API.Controllers.Users
 	{
 		public class Request : UpdateUserRequest, IRequest<UserModel>
         {
-		}
+            public string? SubjectId { get; set; }
+        }
 		public class RequestHandler : BaseRequestHandler<Request, UserModel>
 		{
             private readonly GraphClientProvider _graphClientProvider;

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YZPortal.Core.Domain.Contexts;
 
@@ -11,9 +12,11 @@ using YZPortal.Core.Domain.Contexts;
 namespace YZPortal.Core.Migrations
 {
     [DbContext(typeof(PortalContext))]
-    partial class PortalContextModelSnapshot : ModelSnapshot
+    [Migration("20230812154214_AddPortalConfig")]
+    partial class AddPortalConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,6 +230,9 @@ namespace YZPortal.Core.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsFullSide")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOpen")
                         .HasColumnType("bit");
 
                     b.Property<bool>("ShowFooter")

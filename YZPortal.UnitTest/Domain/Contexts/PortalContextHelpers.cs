@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
-using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
 
 namespace YZPortal.UnitTest.Domain.Contexts
 {

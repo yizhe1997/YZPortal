@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Xunit.Abstractions;
 using YZPortal.Core.Domain.Database;
-using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
 using YZPortal.Core.Indexes;
 using YZPortal.FullStackCore.Requests.Indexes;
 using YZPortal.UnitTest.Domain.Contexts;

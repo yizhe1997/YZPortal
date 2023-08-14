@@ -1,7 +1,7 @@
 using Serilog;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
-using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
 using YZPortal.Worker.Infrastructure.Email;
 using YZPortal.Worker.Infrastructure.Email.OfficeSmtp;
 using YZPortal.Worker.Infrastructure.Email.SendGrid;
@@ -73,7 +73,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseDatabaseService();
+await app.UseDatabaseServiceAsync();
 
 app.UseRouting();
 

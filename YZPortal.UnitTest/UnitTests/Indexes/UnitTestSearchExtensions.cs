@@ -2,10 +2,10 @@
 using Xunit.Abstractions;
 using static YZPortal.UnitTest.UnitTests.Indexes.Enums.PageType;
 using YZPortal.Core.Indexes;
-using YZPortal.Core.Domain.Database.Users;
 using YZPortal.UnitTest.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
 using YZPortal.FullStackCore.Requests.Indexes;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
 
 namespace YZPortal.UnitTest.UnitTests.Indexes
 {

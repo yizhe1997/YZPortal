@@ -5,6 +5,7 @@ using YZPortal.FullStackCore.Requests.Indexes;
 namespace YZPortal.Core.Indexes
 {
     // TODO: fix the select param
+    // TODO: make all of these as iqueryable and list extension instead???
     public static class SearchExtensions
     {
         public static async Task<SearchList<TEntity>> CreateSearchListAsync<TEntity>(this IQueryable<TEntity> query, ISearchParams searchParams, System.Linq.Expressions.Expression<Func<TEntity, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken()) where TEntity : class

@@ -1,6 +1,4 @@
-﻿using YZPortal.Core.Domain.Database.EntityTypes;
-
-namespace YZPortal.Core.Domain.Database.Users
+﻿namespace YZPortal.Core.Domain.Database.EntityTypes.Users
 {
     public class Identity : BaseEntity
     {

@@ -23,7 +23,7 @@ using YZPortal.API.Infrastructure.Security.Jwt;
 using YZPortal.API.Infrastructure.Swagger;
 using YZPortal.Core.Domain.Contexts;
 using YZPortal.Core.Domain.Database;
-using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
 using YZPortal.Core.Error;
 using YZPortal.Core.Graph;
 using YZPortal.Core.StorageConnection;
@@ -179,7 +179,7 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader());
 
-app.UseDatabaseService();
+await app.UseDatabaseServiceAsync();
 
 app.UseRouting();
 

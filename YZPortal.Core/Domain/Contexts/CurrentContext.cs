@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Security.Claims;
-using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
 using YZPortal.FullStackCore.Extensions;
 
 namespace YZPortal.Core.Domain.Contexts

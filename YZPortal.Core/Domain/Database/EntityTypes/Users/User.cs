@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
+using YZPortal.Core.Domain.Database.EntityTypes.Users.Configs;
 
-namespace YZPortal.Core.Domain.Database.Users
+namespace YZPortal.Core.Domain.Database.EntityTypes.Users
 {
     // Microsoft.AspNetCore.Identity Tables:
     //+------------------+------------------+------------------+
@@ -14,7 +15,7 @@ namespace YZPortal.Core.Domain.Database.Users
     //| AspNetRoleClaims | Claims by roles. | No               | 
     //+------------------+------------------+------------------+
 
-	public class User : IdentityUser<Guid>, IAuditableEntity
+    public class User : IdentityUser<Guid>, IAuditableEntity
     {
         //public virtual ICollection<Logs> Logs { get; set; } = new HashSet<Logs>();
 
@@ -51,5 +52,7 @@ namespace YZPortal.Core.Domain.Database.Users
         public string? UpdatedBy { get; set; }
 
         #endregion
+
+        public PortalConfig? PortalConfig { get; set; }
     }
 }

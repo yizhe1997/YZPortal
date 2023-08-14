@@ -1,31 +1,14 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Microsoft.AspNetCore.Components;
+using YZPortal.FullStackCore.Models.Users.Configs;
 
 namespace YZPortal.Client.Shared
 {
     public sealed partial class MainLayout
     {
-        private bool UseTabSet { get; set; } = false;
-
-        private string Theme { get; set; } = "";
-
-        private bool IsOpen { get; set; }
-
-        private bool IsFixedHeader { get; set; } = true;
-
-        private bool IsFixedFooter { get; set; } = true;
-
-        private bool IsFullSide { get; set; } = true;
-
-        private bool ShowFooter { get; set; } = true;
-
+        private ConfigsModel ConfigsModel { get; set; } = new ConfigsModel();
         private List<MenuItem> Menus { get; set; } = new List<MenuItem>();
-		private string NotAuthorizeUrl { get; set; } = "/Authentication/Login";
-        [Inject] 
-        NavigationManager Navigation { get; set; }
-        [Inject] 
-        SignOutSessionStateManager SignOutManager { get; set; }
+        public bool IsRightDrawerOpen { get; set; }
+        public string? Action { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -34,7 +17,7 @@ namespace YZPortal.Client.Shared
             GetMenuItems(Menus);
         }
 
-        // will upgrade this to fetch the menuitems from the server since language is a thing
+        // TODO: will upgrade this to fetch the menuitems from the server since language is a thing
         private void GetMenuItems(List<MenuItem> Menus)
         {
             // Clear menus
@@ -55,13 +38,9 @@ namespace YZPortal.Client.Shared
 
         private async Task OnLogout()
         {
+            // TODO: Make sure all the infos on log out is removed
             await LocalStorageService.ClearLocalStorage();
 
-            //await GetMenuItems(Menus);
-
-            //AuthenticationStateProvider.StateChanged();
-
-            //StateHasChanged();
             await SignOutManager.SetSignOutState();
             Navigation.NavigateTo("authentication/logout");
         }

@@ -2,7 +2,7 @@
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
 using YZPortal.FullStackCore.Extensions;
 
-namespace YZPortal.Core.Domain.Database.Sync
+namespace YZPortal.Core.Domain.Database.EntityTypes.Sync
 {
     public class SyncStatus : AuditableEntity
     {

@@ -1,0 +1,187 @@
+﻿@using YZPortal.Client.Clients.YZPortalApi;
+@using YZPortal.FullStackCore.Models.Users.Configs;
+@using YZPortal.FullStackCore.Extensions;
+@using BootstrapBlazor.Components;
+@using YZPortal.FullStackCore.Requests.Users.Configs;
+@inject YZPortalApiHttpClient YZPortalApiClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<Drawer Placement="Placement.Right" @bind-IsOpen="@IsRightDrawerOpen" IsBackdrop="true">
+    <div class="layout-drawer-body">
+        <div class="page-layout-demo-option">
+            <p>Layout</p>
+            <div class="row">
+                <div class="col-6">
+                    <div class="layout-item @(PortalConfig.IsFullSide ? "active d-flex" : "d-flex")" @onclick='() => OnLayoutChanged(true)' data-toggle="tooltip" title="Left-Right">
+                        <div class="layout-left d-flex flex-column">
+                            <div class="layout-left-header"></div>
+                            <div class="layout-left-body flex-fill"></div>
+                        </div>
+                        <div class="layout-right d-flex flex-column flex-fill">
+                            <div class="layout-right-header"></div>
+                            <div class="layout-right-body flex-fill"></div>
+                            <div class="layout-right-footer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="layout-item flex-column @(PortalConfig.IsFullSide ? "d-flex" : "active d-flex")" @onclick='() => OnLayoutChanged(false)' data-toggle="tooltip" title="Top-Btm">
+                        <div class="layout-top">
+                        </div>
+                        <div class="layout-body d-flex flex-fill">
+                            <div class="layout-left">
+                            </div>
+                            <div class="layout-right flex-fill">
+                            </div>
+                        </div>
+                        <div class="layout-footer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-layout-demo-option">
+            <p>Header Footer</p>
+            <div class="row">
+                <div class="col-6 d-flex align-items-center">
+                    <Switch @bind-Value="@PortalConfig.IsFixedHeader" OnColor="@Color.Success" OffColor="@Color.Secondary" @bind-Value:after='() => OnFixedHeaderChanged(PortalConfig.IsFixedHeader)'></Switch>
+                </div>
+                <div class="col-6 text-right">
+                    <span class="cell-label">Fixed Header</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-6 d-flex align-items-center">
+                    <Switch @bind-Value="@PortalConfig.IsFixedFooter" OnColor="@Color.Success" OffColor="@Color.Secondary" @bind-Value:after='() => OnFixedFooterChanged(PortalConfig.IsFixedFooter)'></Switch>
+                </div>
+                <div class="col-6 text-right">
+                    <span class="cell-label">Fixed Footer</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-6 d-flex align-items-center">
+                    <Switch @bind-Value="@PortalConfig.ShowFooter" OnColor="@Color.Success" OffColor="@Color.Primary" @bind-Value:after='() => OnShowFooterChanged(PortalConfig.ShowFooter)'></Switch>
+                </div>
+                <div class="col-6 text-right">
+                    <span class="cell-label">Display Footer</span>
+                </div>
+            </div>
+        </div>
+        <div class="page-layout-demo-option">
+            <p>Theme</p>
+            <div class="row">
+                <div class="col-2">
+                    <span class="color color1" @onclick='() => OnThemeChanged("color1")'></span>
+                </div>
+                <div class="col-2">
+                    <span class="color color2" @onclick='() => OnThemeChanged("color2")'></span>
+                </div>
+                <div class="col-2">
+                    <span class="color color3" @onclick='() => OnThemeChanged("color3")'></span>
+                </div>
+                <div class="col-2">
+                    <span class="color color4" @onclick='() => OnThemeChanged("color4")'></span>
+                </div>
+                <div class="col-2">
+                    <span class="color color5" @onclick='() => OnThemeChanged("color5")'></span>
+                </div>
+                <div class="col-2">
+                    <span class="color color6" @onclick='() => OnThemeChanged("color6")'></span>
+                </div>
+            </div>
+        </div>
+        <div class="page-layout-demo-option">
+            <p>Other Settings</p>
+            <div class="row">
+                <div class="col-6 d-flex align-items-center">
+                    <Switch @bind-Value="@PortalConfig.UseTabSet" OnColor="@Color.Success" OffColor="@Color.Primary" @bind-Value:after='() => OnMultiTabChanged(PortalConfig.UseTabSet)'></Switch>
+                </div>
+                <div class="col-6 text-right">
+                    <span class="cell-label">@(PortalConfig.UseTabSet ? "Multi-Tab" : "Single Page")</span>
+                </div>
+            </div>
+        </div>
+        <div class="btn btn-info w-100" @onclick="@OnSave">Save Settings</div>
+        <div class="btn btn-info w-100" @onclick="@OnCancel">Cancel</div>
+    </div>
+</Drawer>
+
+@code {
+    [Parameter]
+    public PortalConfigModel PortalConfig { get; set; } = new PortalConfigModel();
+    [Parameter]
+    public bool IsRightDrawerOpen { get; set; }
+    [Parameter]
+    public EventCallback<PortalConfigModel> PortalConfigChanged { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsRightDrawerOpenChanged { get; set; }
+
+    /// <summary>
+    /// Save new configs if user save changes
+    /// </summary>
+    private async Task OnSave()
+    {
+        // Update portal config
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var newPortalConfig = await YZPortalApiClient.UpdatePortalConfigAsync(authState.User.GetSubClaim() ?? string.Empty, new UpdatePortalConfigRequest
+        {
+            IsFixedFooter = PortalConfig.IsFixedFooter,
+            IsFixedHeader = PortalConfig.IsFixedHeader,
+            IsFullSide = PortalConfig.IsFullSide,
+            Theme = PortalConfig.Theme,
+            ShowFooter = PortalConfig.ShowFooter,
+            UseTabSet = PortalConfig.UseTabSet,
+        });
+
+        IsRightDrawerOpen = false;
+
+        await IsRightDrawerOpenChanged.InvokeAsync(IsRightDrawerOpen);
+    }
+
+    /// <summary>
+    /// Restore default configs if user cancel changes
+    /// </summary>
+    private async Task OnCancel()
+    {
+        IsRightDrawerOpen = false;
+
+        await PortalConfigChanged.InvokeAsync(PortalConfig);
+        await IsRightDrawerOpenChanged.InvokeAsync(IsRightDrawerOpen);
+    }
+
+    private async Task OnLayoutChanged(bool isDefault)
+    {
+        PortalConfig.IsFullSide = isDefault;
+        await PortalConfigChanged.InvokeAsync(PortalConfig);
+    }
+
+    private async Task OnThemeChanged(string theme)
+    {
+        PortalConfig.Theme = theme;
+        await PortalConfigChanged.InvokeAsync(PortalConfig);
+    }
+
+    private async Task OnMultiTabChanged(bool isEnabled)
+    {
+        PortalConfig.UseTabSet = isEnabled;
+        await PortalConfigChanged.InvokeAsync(PortalConfig);
+    }
+
+    private async Task OnFixedFooterChanged(bool isEnabled)
+    {
+        PortalConfig.IsFixedFooter = isEnabled;
+        await PortalConfigChanged.InvokeAsync(PortalConfig);
+    }
+
+    private async Task OnFixedHeaderChanged(bool isEnabled)
+    {
+        PortalConfig.IsFixedHeader = isEnabled;
+        await PortalConfigChanged.InvokeAsync(PortalConfig);
+    }
+
+    private async Task OnShowFooterChanged(bool isEnabled)
+    {
+        PortalConfig.ShowFooter = isEnabled;
+        await PortalConfigChanged.InvokeAsync(PortalConfig);
+    }
+}

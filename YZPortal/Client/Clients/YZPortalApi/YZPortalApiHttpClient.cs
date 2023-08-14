@@ -1,11 +1,12 @@
 ﻿using System.Net.Http.Json;
-using YZPortal.Client.Services.LocalStorage;
 using YZPortal.FullStackCore.Extensions;
 using YZPortal.FullStackCore.Models.Users;
 using YZPortal.FullStackCore.Models.Graph.Users;
 using YZPortal.FullStackCore.Models.Graph.Groups;
 using YZPortal.FullStackCore.Requests.Users;
 using YZPortal.FullStackCore.Requests.Indexes;
+using YZPortal.FullStackCore.Models.Users.Configs;
+using YZPortal.FullStackCore.Requests.Users.Configs;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
@@ -14,13 +15,11 @@ namespace YZPortal.Client.Clients.YZPortalApi
     {
         private readonly ILogger<YZPortalApiHttpClient> _logger;
         private readonly HttpClient _http;
-        private readonly ILocalStorageService _localStorageService;
 
-        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService tokenService)
+        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http)
         {
             _logger = logger;
             _http = http;
-            _localStorageService = tokenService;
         }
 
         #region Helpers
@@ -63,18 +62,17 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Users
 
-        public async Task<GraphUsersModel> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
+        public async Task<GraphUsersModel> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
         {
             var requestMsg = CreateSearchHttpRequestMessage($"api/v1/GraphUsers", pageSize, pageNumber, searchString, orderBy);
 
-            using var response = await _http.SendAsync(requestMsg);
+            using var response = await _http.SendAsync(requestMsg, cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<GraphUsersModel>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<GraphUsersModel>(cancellationToken: cancellationToken) ?? new();
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
-                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
                 }
 
                 return output;
@@ -91,21 +89,20 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Groups
 
-        public async Task<GraphGroupsModel> GetGraphGroups(string? userSubId = null, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
+        public async Task<GraphGroupsModel> GetGraphGroups(string? userSubId = null, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
         {
             var requestMsg = CreateSearchHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
 
             if (!string.IsNullOrEmpty(userSubId))
                 requestMsg.AddQueryParam("userSubjectId", userSubId);
 
-            using var response = await _http.SendAsync(requestMsg);
+            using var response = await _http.SendAsync(requestMsg, cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<GraphGroupsModel>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<GraphGroupsModel>(cancellationToken: cancellationToken) ?? new();
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
-                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
                 }
 
                 return output;
@@ -118,22 +115,24 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new GraphGroupsModel();
         }
 
-        public async Task GraphGroupAddUsers(string? groupId = null, string[]? userSubIds = null)
+        public async Task GraphGroupAddUsers(string? groupId = null, string[]? userSubIds = null, CancellationToken cancellationToken = new CancellationToken())
         {
             using var response = await _http.PostAsJsonAsync("/api/v1/GraphGroups/AddUser", new
             {
                 GroupId = groupId,
                 UserSubjectIds = userSubIds ?? Array.Empty<string>()
-            });
+            },
+            cancellationToken);
         }
 
-        public async Task GraphGroupRemoveUser(string? groupId = null, string? userSubId = null)
+        public async Task GraphGroupRemoveUser(string? groupId = null, string? userSubId = null, CancellationToken cancellationToken = new CancellationToken())
         {
             using var response = await _http.PostAsJsonAsync("/api/v1/GraphGroups/RemoveUser", new
             {
                 GroupId = groupId,
                 UserSubjectId = userSubId
-            });
+            },
+            cancellationToken);
         }
 
         #endregion
@@ -142,12 +141,12 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Users
 
-        public async Task<UserModel> UserCreate()
+        public async Task<UserModel> CreateUserAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             using var response = await _http.PostAsJsonAsync("/api/v1/Users", new { });
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<UserModel>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<UserModel>(cancellationToken: cancellationToken) ?? new();
 
                 return output;
             }
@@ -159,12 +158,12 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new UserModel();
         }
 
-        public async Task<UserModel> UserUpdate(string? subClaim, UpdateUserRequest? updateUserCommand = null)
+        public async Task<UserModel> UpdateUserAsync(string? subClaim, UpdateUserRequest? updateUserCommand = null, CancellationToken cancellationToken = new CancellationToken())
         {
             using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subClaim}", updateUserCommand);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<UserModel>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<UserModel>(cancellationToken: cancellationToken) ?? new();
 
                 return output;
             }
@@ -176,16 +175,15 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new UserModel();
         }
 
-        public async Task<UserModel> GetUser(string subClaim)
+        public async Task<UserModel> GetUserAsync(string subClaim, CancellationToken cancellationToken = new CancellationToken())
         {
             using var response = await _http.GetAsync($"api/v1/Users/{subClaim}");
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<UserModel>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<UserModel>(cancellationToken: cancellationToken) ?? new();
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
-                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
                 }
 
                 return output;
@@ -198,18 +196,17 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new UserModel();
         }
 
-        public async Task<UsersSearchModel> GetUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
+        public async Task<UsersSearchModel> GetUsersAsync(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
         {
             var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
 
             using var response = await _http.SendAsync(requestMsg);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<UsersSearchModel>() ?? new();
+                var output = await response.Content.ReadFromJsonAsync<UsersSearchModel>(cancellationToken: cancellationToken) ?? new();
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
-                    await _localStorageService.RemoveUserAuthenToken().ConfigureAwait(false);
                 }
 
                 return output;
@@ -222,11 +219,53 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new UsersSearchModel();
         }
 
-        public async Task<HttpResponseMessage> DeleteUser(Guid userId)
+        public async Task<HttpResponseMessage> DeleteUserAsync(Guid userId, CancellationToken cancellationToken = new CancellationToken())
         {
-            var response = await _http.DeleteAsync($"api/v1/Users/{userId}");
+            var response = await _http.DeleteAsync($"api/v1/Users/{userId}", cancellationToken);
             return response;
         }
+
+        #region Configs
+
+        public async Task<ConfigsModel> GetConfigsAsync(string subClaim, CancellationToken cancellationToken = new CancellationToken())
+        {
+            using var response = await _http.GetAsync($"api/v1/Configs/{subClaim}");
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<ConfigsModel>(cancellationToken: cancellationToken) ?? new();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+                {
+                }
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new ConfigsModel();
+        }
+
+        public async Task<PortalConfigModel> UpdatePortalConfigAsync(string? subClaim, UpdatePortalConfigRequest? updatePortalConfigCommand = null, CancellationToken cancellationToken = new CancellationToken())
+        {
+            using var response = await _http.PutAsJsonAsync($"/api/v1/Configs/portalConfiguration/{subClaim}", updatePortalConfigCommand);
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<PortalConfigModel>(cancellationToken: cancellationToken) ?? new();
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new PortalConfigModel();
+        }
+
+        #endregion
 
         #endregion
     }

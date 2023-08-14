@@ -62,18 +62,18 @@
         var userSubIds = new string[] { GraphUser.SubjectIdentifier ?? string.Empty };
 
         // Add groups
-        foreach (var selectdGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
+        foreach (var selectedGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
         {
-            await YZPortalApiClient.GraphGroupAddUsers(selectdGraphGroup, userSubIds);
+            await YZPortalApiClient.GraphGroupAddUsers(selectedGraphGroup, userSubIds);
         }
 
         // Remove groups
-        foreach (var selectdGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
+        foreach (var selectedGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
         {
-            await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, GraphUser.SubjectIdentifier);
+            await YZPortalApiClient.GraphGroupRemoveUser(selectedGraphGroup, GraphUser.SubjectIdentifier);
         }
 
-        await YZPortalApiClient.UserUpdate(GraphUser.SubjectIdentifier, new UpdateUserRequest()
+        await YZPortalApiClient.UpdateUserAsync(GraphUser.SubjectIdentifier, new UpdateUserRequest()
         {
             DisplayName = GraphUser.DisplayName,
             FirstName = GraphUser.FirstName,

@@ -14,7 +14,7 @@ namespace YZPortal.Core.Domain.Database
             services.AddTransient<DatabaseService>();
         }
 
-        public static void UseDatabaseService(this WebApplication app)
+        public static async Task UseDatabaseServiceAsync(this WebApplication app, CancellationToken cancellationToken = new CancellationToken())
         {
 			using (var scope = app.Services.CreateScope())
 			{
@@ -22,15 +22,13 @@ namespace YZPortal.Core.Domain.Database
 
 				// Make sure the latest EFCore migration is applied everytime the API is initiated
 				var dbContext = services.GetRequiredService<PortalContext>();
-				dbContext.Database.Migrate();
+                await dbContext.Database.MigrateAsync(cancellationToken);
 
-				// Applied before migration so that DatabaseService transaction can take place for new/existing DB.
-				// Make sure to arrange the database service sequentially as chronology affects the functionality
-				var service = services.GetRequiredService<DatabaseService>();
-				//service.UserAdmin();
-				//service.EnumValues();
-				//service.SyncStatuses();
-			}
+                // Applied before migration so that DatabaseService transaction can take place for new/existing DB.
+                // Make sure to arrange the database services sequentially as chronology affects the functionality
+                var service = services.GetRequiredService<DatabaseService>();
+                await service.UserSeedConfigsAsync(cancellationToken);
+            }
         }
     }
 }

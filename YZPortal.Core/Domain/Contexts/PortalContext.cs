@@ -7,12 +7,17 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
 using System.Reflection;
 using System.Security.Claims;
+using YZPortal.Core.Domain.Database.EntityConfigurations.Users;
+using YZPortal.Core.Domain.Database.EntityConfigurations.Users.Configs;
+using YZPortal.Core.Domain.Database.EntityConfigurations.Users.Sync;
 using YZPortal.Core.Domain.Database.EntityTypes.Auditable;
-using YZPortal.Core.Domain.Database.Sync;
-using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Sync;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users.Configs;
 
 namespace YZPortal.Core.Domain.Contexts
 {
+    // TODO: clean the auditable vs the standard stuff...
     public class PortalContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         private IDbContextTransaction? _currentTransaction;
@@ -29,9 +34,15 @@ namespace YZPortal.Core.Domain.Contexts
 
         #region Data Sets
 
-        #region
+        #region Users
 
         public DbSet<Identity> Identities { get; set; }
+
+        #region Configs
+
+        public DbSet<PortalConfig> PortalConfigs { get; set; }
+
+        #endregion
 
         #endregion
 
@@ -44,35 +55,31 @@ namespace YZPortal.Core.Domain.Contexts
         #endregion
 
         #region DBContext Overrides
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            // Define keys for models
-            DefineDomainModels(builder);
+            #region Entity configs
+
+            builder.ApplyConfiguration(new UserEntityConfig());
+            builder.ApplyConfiguration(new SyncStatusEntityConfig());
+            builder.ApplyConfiguration(new PortalConfigEntityConfig());
+
+            #endregion
+
+            #region Auditable Entity configs
 
             // Configuration on interface for IAuditableEntity
             // Allows for default behaviours for AuditEntities during creation
-            var configureAuditableMethod = GetType().GetTypeInfo().DeclaredMethods
-                .Single(m => m.Name == nameof(OnCreateAuditableEntity));
-
+            var configureAuditableMethod = GetType().GetTypeInfo().DeclaredMethods.Single(m => m.Name == nameof(OnCreateAuditableEntity));
             var args = new object[] { builder };
-
-            var auditableEntityTypes = builder.Model.GetEntityTypes()
-                .Where(t => typeof(AuditableEntity).IsAssignableFrom(t.ClrType));
+            var auditableEntityTypes = builder.Model.GetEntityTypes().Where(t => typeof(AuditableEntity).IsAssignableFrom(t.ClrType));
             foreach (var entityType in auditableEntityTypes)
             {
                 configureAuditableMethod.MakeGenericMethod(entityType.ClrType).Invoke(this, args);
                 // TO DO: extend auditable to include concurrenct, and etc...?
             }
-        }
-
-        private void DefineDomainModels(ModelBuilder builder)
-        {
-            #region Sync
-
-            builder.Entity<SyncStatus>()
-                .HasKey(x => new { x.Type, x.Name });
 
             #endregion
         }
@@ -91,7 +98,7 @@ namespace YZPortal.Core.Domain.Contexts
 
         #endregion
 
-        #region AuditableEntity Overrides CRUD
+        #region AuditableEntity CRUD configs
 
         // Behaviour for when creating and updating models
         private void OnCreateUpdateAuditEntries()

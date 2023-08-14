@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using YZPortal.Core.Domain.Contexts;
-using YZPortal.Core.Domain.Database.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users;
+using YZPortal.Core.Domain.Database.EntityTypes.Users.Configs;
 
 namespace YZPortal.Core.Domain.Database
 {
     public static class DatabaseExtensions
     {
-        #region User
+        #region Users
 
         public static async Task<User?> UserGetByIdFirstOrDefaultAsync(this PortalContext portalContext, Guid id, CancellationToken cancellationToken = new CancellationToken()) => 
             await portalContext.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
@@ -23,6 +24,13 @@ namespace YZPortal.Core.Domain.Database
         public static void UserDelete(this PortalContext portalContext, User user) => portalContext.Users.Remove(user);
 
         public static int UsersGetCount(this PortalContext portalContext) => portalContext.Users.Count();
+
+        #region Configs
+
+        public static async Task<PortalConfig?> PortalConfigGetByUserSubIdFirstOrDefaultAsync(this PortalContext portalContext, string? userSubId, CancellationToken cancellationToken = new CancellationToken()) =>
+            await portalContext.PortalConfigs.FirstOrDefaultAsync(u => u.UserSubjectIdentifier == userSubId, cancellationToken);
+
+        #endregion
 
         #endregion
     }

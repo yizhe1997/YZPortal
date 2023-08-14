@@ -3,13 +3,26 @@
 @using YZPortal.Client.Clients.YZPortalApi;
 @using YZPortal.Client.Services.Authentication;
 @using YZPortal.FullStackCore.Extensions;
+@using YZPortal.FullStackCore.Models.Users.Configs;
 @using YZPortal.FullStackCore.Requests.Users;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
-<RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
+
+
+@if (!string.IsNullOrEmpty(Action))
+{
+    <RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
+}
 
 @code{
-    [Parameter] public string? Action { get; set; }
+    [Parameter] 
+    public string? Action { get; set; }
+    [Parameter]
+    public ConfigsModel ConfigsModel { get; set; } = new ConfigsModel();
+    [Parameter]
+    public EventCallback<ConfigsModel> ConfigsModelChanged { get; set; }
+    [Parameter]
+    public EventCallback<string?> ActionChanged { get; set; }
 
     private async Task HandleAuthenticationAsync()
     {
@@ -22,17 +35,23 @@
 
             if (!string.IsNullOrEmpty(userId))
             {
-                var user = await YZPortalApiClient.GetUser(userId);
+                var user = await YZPortalApiClient.GetUserAsync(userId);
                 if (user.Id == Guid.Empty)
                 {
-                    var newUser = await YZPortalApiClient.UserCreate();
+                    var newUser = await YZPortalApiClient.CreateUserAsync();
                 }
                 else
                 {
-                    var newUser = await YZPortalApiClient.UserUpdate(userId, new UpdateUserRequest { IsAuthenEvent = true });
+                    var newUser = await YZPortalApiClient.UpdateUserAsync(userId, new UpdateUserRequest { IsAuthenEvent = true });
                 }
 
+                // Get user's configurations
+                ConfigsModel = await YZPortalApiClient.GetConfigsAsync(authState.User.GetSubClaim() ?? string.Empty);
+                await ConfigsModelChanged.InvokeAsync(ConfigsModel);
             }
         }
+
+        // Reset action state
+        await ActionChanged.InvokeAsync(string.Empty);
     }
 }
