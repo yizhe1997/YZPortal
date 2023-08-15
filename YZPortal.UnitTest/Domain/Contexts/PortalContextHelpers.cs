@@ -24,7 +24,12 @@ namespace YZPortal.UnitTest.Domain.Contexts
 
         public static void UsersAddToPortalContextViaAutoFixt(Fixture fixture, PortalContext portalContext, int count)
         {
-            var users = fixture.CreateMany<User>(count).ToList();
+            // https://github.com/AutoFixture/AutoFixture/discussions/1229
+            fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+            fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+
+            // https://stackoverflow.com/questions/18346803/how-can-i-instruct-autofixture-to-not-bother-filling-out-some-properties
+            var users = fixture.Build<User>().Without(p => p.Identities).Without(p => p.PortalConfig).CreateMany(count).ToList();
             portalContext.UsersAdd(users);
             portalContext.SaveChanges();
         }
