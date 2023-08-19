@@ -1,14 +1,11 @@
 ﻿using YZPortal.FullStackCore.Extensions;
+using YZPortal.FullStackCore.Models.Users.Configs;
 
 namespace YZPortal.Client.Services.LocalStorage
 {
     public class LocalStorageProperties
 	{
-		internal const string UserAuthToken = "authToken";
-		internal const string UserId = "sub";
-		internal const string UserDisplayName = "displayName";
-		internal const string UserEmail = "email";
-		internal const string UserdealerId = "dealerId";
+		internal const string UserConfigs = "userConfigs";
 	}
 
 	public class LocalStorageService : ILocalStorageService
@@ -22,111 +19,39 @@ namespace YZPortal.Client.Services.LocalStorage
 
         #region User
 
-        #region Authentication
+        #region Config
 
-		public async Task RemoveUserAuthenToken()
+        public async Task SetUserConfigs(ConfigsModel data, CancellationToken cancellationToken = new CancellationToken())
+        {
+            await _localStorageService.SetItemAsync(LocalStorageProperties.UserConfigs, data, cancellationToken);
+        }
+
+        public async Task RemoveUserConfigs(CancellationToken cancellationToken = new CancellationToken())
 		{
-			await _localStorageService.RemoveItemAsync(LocalStorageProperties.UserAuthToken);
+			await _localStorageService.RemoveItemAsync(LocalStorageProperties.UserConfigs, cancellationToken);
 		}
 
-		public async Task<string> GetUserAuthenToken()
+		public async Task<ConfigsModel> GetUserConfigs(CancellationToken cancellationToken = new CancellationToken())
 		{
-			return await _localStorageService.GetItemAsync<string>(LocalStorageProperties.UserAuthToken);
+			if (await _localStorageService.ContainKeyAsync(LocalStorageProperties.UserConfigs, cancellationToken))
+			{
+                return await _localStorageService.GetItemAsync<ConfigsModel>(LocalStorageProperties.UserConfigs, cancellationToken);
+            }
+
+			return new ConfigsModel();
 		}
 
-		public async Task ClearLocalStorage()
+		public async Task ClearLocalStorage(CancellationToken cancellationToken = new CancellationToken())
 		{
 			var localStorageServiceConsts = typeof(LocalStorageProperties).GetConstants();
 
 			foreach(var constant in localStorageServiceConsts)
 			{
-				await _localStorageService.RemoveItemAsync(constant).ConfigureAwait(false);
+				await _localStorageService.RemoveItemAsync(constant, cancellationToken).ConfigureAwait(false);
 			}
 		}
 
 		#endregion
-
-		#region General Info
-
-		#region Id
-
-		public async Task SetUserId(Guid Id)
-		{
-			await _localStorageService.SetItemAsync(LocalStorageProperties.UserId, Id);
-		}
-
-		public async Task<Guid> GetUserId()
-		{
-			var stringUserId = await _localStorageService.GetItemAsync<string>(LocalStorageProperties.UserId);
-			return stringUserId == null ? Guid.Empty : Guid.Parse(stringUserId);
-		}
-
-		public async Task RemoveUserId()
-		{
-			await _localStorageService.RemoveItemAsync(LocalStorageProperties.UserId);
-		}
-
-		#endregion
-
-		#region DisplayName
-
-		public async Task SetUserDisplayName(string DisplayName)
-		{
-			await _localStorageService.SetItemAsync(LocalStorageProperties.UserDisplayName, DisplayName);
-		}
-
-		public async Task<string> GetUserDisplayName()
-		{
-			return await _localStorageService.GetItemAsync<string>(LocalStorageProperties.UserDisplayName);
-		}
-
-		public async Task RemoveUserDisplayName()
-		{
-			await _localStorageService.RemoveItemAsync(LocalStorageProperties.UserDisplayName);
-		}
-
-		#endregion
-
-		#region Email
-
-		public async Task SetUserEmail(string email)
-		{
-			await _localStorageService.SetItemAsync(LocalStorageProperties.UserEmail, email);
-		}
-
-		public async Task<string> GetUserEmail()
-		{
-			return await _localStorageService.GetItemAsync<string>(LocalStorageProperties.UserEmail);
-		}
-
-		public async Task RemoveUserEmail()
-		{
-			await _localStorageService.RemoveItemAsync(LocalStorageProperties.UserEmail);
-		}
-
-        #endregion
-
-        #region DealerId
-
-        public async Task SetUserDealerId(Guid dealerId)
-        {
-            await _localStorageService.SetItemAsync(LocalStorageProperties.UserdealerId, dealerId);
-        }
-
-        public async Task<Guid> GetUserDealerId()
-        {
-            var stringUserId = await _localStorageService.GetItemAsync<string>(LocalStorageProperties.UserdealerId);
-            return stringUserId == null ? Guid.Empty : Guid.Parse(stringUserId);
-        }
-
-        public async Task RemoveUserDealerId()
-        {
-            await _localStorageService.RemoveItemAsync(LocalStorageProperties.UserdealerId);
-        }
-
-        #endregion
-
-        #endregion
 
         #endregion
     }

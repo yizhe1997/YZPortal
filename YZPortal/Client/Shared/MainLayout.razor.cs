@@ -14,6 +14,9 @@ namespace YZPortal.Client.Shared
         {
             await base.OnInitializedAsync();
 
+            // On refresh try to fetch user configs
+            ConfigsModel = await LocalStorageService.GetUserConfigs();
+
             GetMenuItems(Menus);
         }
 

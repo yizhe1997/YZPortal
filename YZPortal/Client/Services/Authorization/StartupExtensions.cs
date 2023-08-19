@@ -6,8 +6,8 @@ namespace YZPortal.Client.Services.Authorization
     {
         public static void AddAuthorization(this IServiceCollection services)
         {
-            // i forgot why we need this... can remove if dont need
-			services.AddApiAuthorization();
+            // Probably needed for RemoteAuthenticationState in Authentication.StartupExtensions
+            services.AddApiAuthorization();
 
 			services.AddAuthorizationCore(opts =>
             {

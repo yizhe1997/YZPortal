@@ -8,7 +8,6 @@ namespace YZPortal.Client.Services.LocalStorage
         {
             services.AddBlazoredLocalStorage();
             services.AddScoped<YZPortal.Client.Services.LocalStorage.ILocalStorageService, LocalStorageService>();
-
         }
     }
 }

@@ -2,12 +2,13 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using YZPortal.Client.Clients.YZPortalApi;
 @using YZPortal.Client.Services.Authentication;
+@using YZPortal.Client.Services.LocalStorage;
 @using YZPortal.FullStackCore.Extensions;
 @using YZPortal.FullStackCore.Models.Users.Configs;
 @using YZPortal.FullStackCore.Requests.Users;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
+@inject ILocalStorageService LocalStorageService
 
 @if (!string.IsNullOrEmpty(Action))
 {
@@ -45,8 +46,9 @@
                     var newUser = await YZPortalApiClient.UpdateUserAsync(userId, new UpdateUserRequest { IsAuthenEvent = true });
                 }
 
-                // Get user's configurations
+                // Get user's configurations and store in local storage as well
                 ConfigsModel = await YZPortalApiClient.GetConfigsAsync(authState.User.GetSubClaim() ?? string.Empty);
+                await LocalStorageService.SetUserConfigs(ConfigsModel);
                 await ConfigsModelChanged.InvokeAsync(ConfigsModel);
             }
         }
