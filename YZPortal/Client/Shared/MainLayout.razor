@@ -5,6 +5,7 @@
 @using YZPortal.Client.Services.Authentication;
 @using YZPortal.Client.Services.LocalStorage;
 @using YZPortal.FullStackCore.Infrastructure.Security.Authorization;
+@using YZPortal.FullStackCore.Models.Users.Configs;
 @inherits LayoutComponentBase
 @inject IAuthorizationService _authorizationService
 @inject ILocalStorageService LocalStorageService
@@ -72,4 +73,4 @@
     </Footer>
 </Layout>
 
-<RightDrawer @bind-PortalConfig="ConfigsModel.PortalConfigModel" @bind-IsRightDrawerOpen="IsRightDrawerOpen"></RightDrawer>
+<RightDrawer PortalConfigChanged="@((PortalConfigModel newValue) => SetPortalConfig(newValue))" PortalConfig="@ConfigsModel.PortalConfigModel" @bind-IsRightDrawerOpen="IsRightDrawerOpen"></RightDrawer>

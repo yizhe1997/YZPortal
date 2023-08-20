@@ -47,5 +47,11 @@ namespace YZPortal.Client.Shared
             await SignOutManager.SetSignOutState();
             Navigation.NavigateTo("authentication/logout");
         }
+
+        private async Task SetPortalConfig(PortalConfigModel portalConfig)
+        {
+            ConfigsModel.PortalConfigModel = portalConfig;
+            await LocalStorageService.SetUserConfigs(ConfigsModel);
+        }
     }
 }

@@ -21,6 +21,11 @@ namespace YZPortal.Client.Services.LocalStorage
 
         #region Config
 
+        public async Task SetUserPortalConfig(PortalConfigModel data, CancellationToken cancellationToken = new CancellationToken())
+        {
+            await _localStorageService.SetItemAsync("PortalConfigModel", data, cancellationToken);
+        }
+
         public async Task SetUserConfigs(ConfigsModel data, CancellationToken cancellationToken = new CancellationToken())
         {
             await _localStorageService.SetItemAsync(LocalStorageProperties.UserConfigs, data, cancellationToken);

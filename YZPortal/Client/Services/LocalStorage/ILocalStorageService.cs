@@ -9,6 +9,7 @@ namespace YZPortal.Client.Services.LocalStorage
         #region Config
 
         // TODO: use interface for the config for better management
+        Task SetUserPortalConfig(PortalConfigModel data, CancellationToken cancellationToken = new CancellationToken());
         Task SetUserConfigs(ConfigsModel data, CancellationToken cancellationToken = new CancellationToken());
         Task<ConfigsModel> GetUserConfigs(CancellationToken cancellationToken = new CancellationToken());
         Task RemoveUserConfigs(CancellationToken cancellationToken = new CancellationToken());
