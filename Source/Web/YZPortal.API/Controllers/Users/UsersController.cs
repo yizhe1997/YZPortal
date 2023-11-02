@@ -5,15 +5,21 @@ using Application.Models.Identity;
 using Application.Requests.Indexes;
 using Application.Requests.Users;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
+using Microsoft.Identity.Web;
 
 namespace YZPortal.API.Controllers.Users
 {
+    [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
+    [RequiredScope(_)]
     public class UsersController : ControllerBase
     {
         private readonly IGraphService _graphService;
         private readonly IUserService _userService;
         private readonly ICurrentUserService _currentUserService;
+        private const string _ = "API.Access";
 
         public UsersController(IGraphService graphService, IUserService userService, ICurrentUserService currentUserService, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {

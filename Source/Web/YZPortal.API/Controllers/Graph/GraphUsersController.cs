@@ -6,12 +6,17 @@ using Domain.Enums.Memberships;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
+using Microsoft.Identity.Web;
 
 namespace YZPortal.API.Controllers.Graph
 {
+    [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
+    [RequiredScope(_)]
     public class GraphUsersController : ControllerBase
     {
         private readonly IGraphService _graphService;
+        private const string _ = "API.Access";
 
         public GraphUsersController(IGraphService graphService, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {

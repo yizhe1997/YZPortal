@@ -86,7 +86,8 @@ namespace Infrastructure.Extensions
             services.AddJwt(configuration);
             services.AddAzureAdB2C(configuration);
             services.AddBasicAuth(configuration);
-            
+
+            // TODO: fix this to catter for basic auth.... cause GraphGroups/DisplayNames needs it
             // Policy Scheme
             services.AddAuthentication(options =>
             {

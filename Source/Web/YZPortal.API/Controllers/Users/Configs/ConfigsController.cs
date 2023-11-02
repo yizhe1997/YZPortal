@@ -2,12 +2,19 @@
 using Application.Features.Users.Configs.Queries.GetConfigs;
 using Application.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.Resource;
 
 namespace YZPortal.API.Controllers.Users.Configs
 {
+    [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
+    [RequiredScope(_)]
     public class ConfigsController : ControllerBase
     {
+        private const string _ = "API.Access";
+
         public ConfigsController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {
         }

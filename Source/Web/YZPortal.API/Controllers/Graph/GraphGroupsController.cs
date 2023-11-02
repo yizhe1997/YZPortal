@@ -5,28 +5,35 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Application.Requests.Graph.Groups;
+using Microsoft.Identity.Web.Resource;
+using Microsoft.Identity.Web;
 
 namespace YZPortal.API.Controllers.Graph
 {
     public class GraphGroupsController : ControllerBase
     {
         private readonly IGraphService _graphService;
+        private const string _ = "API.Access";
 
         public GraphGroupsController(IGraphService graphService, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {
             _graphService = graphService;
         }
 
+        [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
+        [RequiredScope(_)]
         [HttpGet]
         public async Task<ActionResult<SearchResult<GroupModel>>> GetGraphGroups([FromQuery] GetGraphGroupsRequest request)
         {
-            var response = string.IsNullOrEmpty(request.UserSubId) ?  
-                await _graphService.GroupsToSearchResultAsync(request) : 
+            var response = string.IsNullOrEmpty(request.UserSubId) ?
+                await _graphService.GroupsToSearchResultAsync(request) :
                 await _graphService.UserGroupsToSearchResultAsync(request.UserSubId, request);
 
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
+        [RequiredScope(_)]
         [HttpPost("AddUser")]
         public async Task<ActionResult<Result>> AddUserToGraphGroup([FromBody] AddUsersToGroupRequest request)
         {
@@ -34,6 +41,8 @@ namespace YZPortal.API.Controllers.Graph
             return Ok(response);
         }
 
+        [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
+        [RequiredScope(_)]
         [HttpPost("RemoveUser")]
         public async Task<ActionResult<Result>> RemoveUserFromGraphGroup([FromBody] RemoveUserFromGroupRequest request)
         {
