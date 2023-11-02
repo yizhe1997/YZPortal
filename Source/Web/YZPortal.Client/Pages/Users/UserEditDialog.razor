@@ -1,0 +1,102 @@
+﻿@using Application.Models;
+@using Application.Requests.Users;
+﻿@using BootstrapBlazor.Components
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Diagnostics.CodeAnalysis;
+@using YZPortal.Client.Clients.YZPortalApi
+@using GraphModel = Application.Models.Graph;
+@using IdentityModel = Application.Models.Identity;
+
+@inject YZPortalApiHttpClient YZPortalApiClient
+
+<EditForm id="@nameof(UserEditDialog)" Model="@User" OnValidSubmit="OnValidSubmit">
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@User.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
+    </div>
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@User.DisplayName" DisplayText="Display Name" ShowLabel="true" />
+    </div>
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@User.FirstName" DisplayText="First Name" ShowLabel="true" />
+    </div>
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@User.LastName" DisplayText="Last Name" ShowLabel="true" />
+    </div>
+    <div class="col-12">
+        <BootstrapInput @bind-Value="@User.MobilePhone" DisplayText="MobilePhone" ShowLabel="true" />
+    </div>
+    <div class="row g-3">
+        <Divider Text="Groups" Alignment="Alignment.Left" style="margin: 2rem 0;" />
+        <div class="col-12 col-sm-6">
+            <MultiSelect Items="@GraphGroups" @bind-Value="SelectedGraphGroups" />
+        </div>
+        <div class="col-12 col-sm-6">
+            <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
+        </div>
+    </div>
+</EditForm>
+
+<div class="modal-footer">
+    <button type="submit" form="@nameof(UserEditDialog)" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-light" @onclick="@CloseDialog">Cancel</button>
+</div>
+
+@code {
+    private List<SelectedItem> GraphGroups = new List<SelectedItem>();
+    private IEnumerable<string?> SelectedGraphGroups { get; set; } = Enumerable.Empty<string?>();
+    private IEnumerable<string?> ExistingGraphGroups { get; set; } = Enumerable.Empty<string?>();
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> CloseDialog { get; set; }
+
+    [Parameter]
+    public IdentityModel.UserModel User { get; set; } = new IdentityModel.UserModel();
+
+    public UpdateUserRequest UpdateUserRequest { get; set; } = new UpdateUserRequest();
+
+    private static List<SelectedItem> GenerateDataSource(List<GraphModel.GroupModel> source) => source.Select(i => new SelectedItem(i.Id, i.DisplayName ?? string.Empty)).ToList();
+
+    private async Task OnValidSubmit()
+    {
+        var userSubIds = new string[] { User.SubjectIdentifier ?? string.Empty };
+
+        // Add groups
+        foreach (var selectedGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
+        {
+            await YZPortalApiClient.GraphGroupAddUsers(selectedGraphGroup, userSubIds);
+        }
+
+        // Remove groups
+        foreach (var selectedGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
+        {
+            await YZPortalApiClient.GraphGroupRemoveUser(selectedGraphGroup, User.SubjectIdentifier);
+        }
+
+        await YZPortalApiClient.UpdateUserAsync(User.SubjectIdentifier, new UpdateUserRequest()
+        {
+            DisplayName = User.DisplayName,
+            FirstName = User.FirstName,
+            LastName = User.LastName,
+            MobilePhone = User.MobilePhone
+        });
+
+        await CloseDialog.InvokeAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var graphGroups = await YZPortalApiClient.GetGraphGroups();
+        this.GraphGroups = GenerateDataSource(graphGroups.Data);
+
+        var selectedGraphGroups = await YZPortalApiClient.GetGraphGroups(User.SubjectIdentifier);
+        this.SelectedGraphGroups = ExistingGraphGroups = selectedGraphGroups.Data.Select(x => x.Id).ToList();
+    }
+
+    private void ClearListItems()
+    {
+        SelectedGraphGroups = Enumerable.Empty<string?>();
+    }
+}

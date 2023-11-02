@@ -1,0 +1,38 @@
+{
+  "profiles": {
+    "YZPortal.API": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      //"launchUrl": "swagger", // allow default redirect to /docs
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      //"launchUrl": "swagger", // allow default redirect to /docs
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "publishAllPorts": true,
+      "useSSL": true
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:17524",
+      "sslPort": 44331
+    }
+  }
+}

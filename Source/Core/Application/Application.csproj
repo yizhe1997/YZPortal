@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Configurations\**" />
+	  <EmbeddedResource Remove="Configurations\**" />
+	  <None Remove="Configurations\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="12.0.1" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+		<PackageReference Include="FluentValidation" Version="11.8.0" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.8.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.3" />
+		<PackageReference Include="MediatR" Version="12.1.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.9" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Domain\Domain.csproj" />
+	</ItemGroup>
+
+</Project>
