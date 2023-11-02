@@ -52,10 +52,14 @@ namespace YZPortal.API.Controllers.Graph
 
         [Authorize(AuthenticationSchemes = "Basic")]
         [HttpGet("DisplayNames")]
-        public async Task<ActionResult<string[]>> GetGraphGroupDisplayNamesForUser([FromQuery] string ObjectId)
+        public async Task<IActionResult> GetGraphGroupDisplayNamesForUser([FromQuery] string ObjectId)
         {
             var response = await _graphService.UserGroupDisplayNamesGetAsync(ObjectId);
-            return Ok(response);
+
+            return Ok(new
+            {
+                GroupDisplayNames = response
+            });
         }
     }
 }
