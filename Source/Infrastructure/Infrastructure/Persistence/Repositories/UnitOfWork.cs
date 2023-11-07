@@ -16,7 +16,7 @@ namespace Infrastructure.Persistence.Repositories
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public IGenericRepository<TEntity, TId> Repository<TEntity>() where TEntity : BaseEntity<TId>
+        public IGenericRepository<TEntity, TId> Repository<TEntity>() where TEntity : class, IEntity<TId>
         {
             var type = typeof(TEntity).Name;
 

@@ -4,6 +4,7 @@ using Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231107000623_CleanArchAndAddFileEntity")]
+    partial class CleanArchAndAddFileEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,8 +52,8 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int>("RefType")
                         .HasColumnType("int");
 
-                    b.Property<long>("Size")
-                        .HasColumnType("bigint");
+                    b.Property<string>("Size")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -59,8 +62,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RefId");
 
                     b.ToTable("Files");
                 });
@@ -254,9 +255,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ProfileImageId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -286,8 +284,6 @@ namespace Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("ProfileImageId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -423,17 +419,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Misc.File", b =>
-                {
-                    b.HasOne("Domain.Entities.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("RefId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Domain.Entities.Users.Configs.PortalConfig", b =>
                 {
                     b.HasOne("Domain.Entities.Users.User", "User")
@@ -451,15 +436,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasOne("Domain.Entities.Users.User", null)
                         .WithMany("Identities")
                         .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Users.User", b =>
-                {
-                    b.HasOne("Domain.Entities.Misc.File", "ProfileImage")
-                        .WithMany()
-                        .HasForeignKey("ProfileImageId");
-
-                    b.Navigation("ProfileImage");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

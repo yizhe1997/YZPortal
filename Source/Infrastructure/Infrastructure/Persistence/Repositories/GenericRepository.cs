@@ -1,12 +1,12 @@
 ﻿using Application.Interfaces.Repositories;
-using Domain.Entities.Auditable;
+using Domain.Entities;
 using Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories
 {
     // TODO: testing
-    public class GenericRepository<T, TId> : IGenericRepository<T, TId> where T : AuditableEntity<TId>
+    public class GenericRepository<T, TId> : IGenericRepository<T, TId> where T : class, IEntity<TId>
     {
         private readonly ApplicationDbContext _dbContext;
 
@@ -23,6 +23,12 @@ namespace Infrastructure.Persistence.Repositories
             return entity;
         }
 
+        public async Task<List<T>> AddRangeAsync(List<T> entity, CancellationToken cancellationToken)
+        {
+            await _dbContext.Set<T>().AddRangeAsync(entity, cancellationToken);
+            return entity;
+        }
+
         public Task UpdateAsync(T entity, CancellationToken cancellationToken)
         {
             T exist = _dbContext.Set<T>().Find(entity.Id);
@@ -36,14 +42,25 @@ namespace Infrastructure.Persistence.Repositories
             return Task.CompletedTask;
         }
 
+        public Task DeleteRangeAsync(List<T> entity, CancellationToken cancellationToken)
+        {
+            _dbContext.Set<T>().RemoveRange(entity);
+            return Task.CompletedTask;
+        }
+
         public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
         {
             return await _dbContext.Set<T>().ToListAsync(cancellationToken);
         }
 
-        public async Task<T?> GetByIdAsync(TId id, CancellationToken cancellationToken)
+        public async Task<T?> GetByIdAsync(TId id, CancellationToken cancellationToken = new CancellationToken())
         {
             return await _dbContext.Set<T>().FindAsync(new object?[] { id }, cancellationToken: cancellationToken);
+        }
+
+        public async Task<List<T>> GetByIdsAsync(List<TId> ids, CancellationToken cancellationToken = new CancellationToken())
+        {
+            return await _dbContext.Set<T>().Where(entity => ids.Contains(entity.Id)).ToListAsync(cancellationToken);
         }
     }
 }

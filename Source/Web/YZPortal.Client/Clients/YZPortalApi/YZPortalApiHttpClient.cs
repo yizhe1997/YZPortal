@@ -159,7 +159,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
             return new Result();
         }
 
-        public async Task<Result> UpdateUserAsync(string? subClaim, UpdateUserRequest? updateUserCommand = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> UpdateUserAsync(string? subClaim, UpdateUserCommand? updateUserCommand = null, CancellationToken cancellationToken = new CancellationToken())
         {
             using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subClaim}", updateUserCommand, cancellationToken: cancellationToken);
             try

@@ -35,7 +35,7 @@ namespace YZPortal.API.Controllers.Graph
         [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
         [RequiredScope(_)]
         [HttpPost("AddUser")]
-        public async Task<ActionResult<Result>> AddUserToGraphGroup([FromBody] AddUsersToGroupRequest request)
+        public async Task<ActionResult<Result>> AddUserToGraphGroup([FromBody] AddUsersToGroupCommand request)
         {
             var response = await _graphService.GroupAddUsersAsync(request);
             return Ok(response);
@@ -44,7 +44,7 @@ namespace YZPortal.API.Controllers.Graph
         [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
         [RequiredScope(_)]
         [HttpPost("RemoveUser")]
-        public async Task<ActionResult<Result>> RemoveUserFromGraphGroup([FromBody] RemoveUserFromGroupRequest request)
+        public async Task<ActionResult<Result>> RemoveUserFromGraphGroup([FromBody] RemoveUserFromGroupCommand request)
         {
             var response = await _graphService.GroupRemoveUserAsync(request);
             return Ok(response);

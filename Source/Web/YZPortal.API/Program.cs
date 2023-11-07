@@ -6,6 +6,8 @@ using Serilog;
 using Infrastructure.Extensions;
 using Application.Extensions;
 using YZPortal.API.Extensions;
+using Infrastructure.Persistence.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -25,6 +27,16 @@ builder.Services.AddWebLayer(configuration);
 #endregion
 
 var app = builder.Build();
+
+// TODO: clean this find a place to store
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    // Make sure the latest EFCore migration is applied everytime the API is initiated
+    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
 
 app.UseMiddlewareExceptionHandler();
 

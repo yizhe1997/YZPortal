@@ -31,7 +31,7 @@ namespace Application.Mappings.Users
                 .ForMember(dest => dest.UpdatedBy, opt => opt.MapFrom((src, dest) => dest.Id == Guid.Empty ? dest.UpdatedBy : src.NameIdentifier));
             CreateMap<Identity, IdentityModel>();
             CreateMap<User, UserModel>();
-            CreateMap<UpdateUserRequest, User>(MemberList.Source)
+            CreateMap<UpdateUserCommand, User>(MemberList.Source)
                 .ForMember(dest => dest.SubjectIdentifier, opt => opt.Ignore());
         }
     }

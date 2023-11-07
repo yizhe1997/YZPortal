@@ -50,6 +50,12 @@ namespace Infrastructure.Persistence.Contexts
 
         #endregion
 
+        #region Misc
+
+        public DbSet<Domain.Entities.Misc.File> Files { get; set; }
+
+        #endregion
+
         #endregion
 
         #region DBContext Overrides

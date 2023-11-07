@@ -1,14 +1,17 @@
-﻿using Application.Extensions;
+﻿using Application.Exceptions;
+using Application.Extensions;
 using Application.Interfaces.Contexts;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Interfaces.Services.Identity;
+using Azure.Storage.Blobs;
 using Domain.Entities.Users;
 using Infrastructure.Authentication;
 using Infrastructure.Configurations;
 using Infrastructure.Persistence.Contexts;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
+using Infrastructure.Services.Azure;
 using Infrastructure.Services.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,6 +25,7 @@ using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Text;
 
 namespace Infrastructure.Extensions
@@ -38,6 +42,7 @@ namespace Infrastructure.Extensions
             services.AddTransient<ICurrentUserService, CurrentUserService>();
             services.AddTransient<IUserService, UserService>();
             services.AddGraph(configuration);
+            services.AddAzureStorage(configuration);
 
             // Authentication
             services.AddAuthentication(configuration);
@@ -71,7 +76,9 @@ namespace Infrastructure.Extensions
             services
                 .AddTransient(typeof(IGenericRepository<,>), typeof(GenericRepository<,>))
                 .AddTransient(typeof(IUnitOfWork<>), typeof(UnitOfWork<>))
-                .AddTransient<IPortalConfigRepository, PortalConfigRepository>();
+                .AddTransient<IPortalConfigRepository, PortalConfigRepository>()
+                .AddTransient<IFileRepository, FileRepository>()
+                .AddTransient<IUserRepository, UserRepository>();
         }
 
         #endregion
@@ -216,6 +223,29 @@ namespace Infrastructure.Extensions
             services.Configure<GraphConfig>(configuration.GetSection("Graph"));
 
             services.AddTransient<IGraphService, GraphService>();
+        }
+
+        public static void AddAzureStorage(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<AzureStorageConfig>(configuration.GetSection("AzureStorage"));
+
+            services.AddScoped(x =>
+            {
+                try
+                {
+                    var connectionString = configuration.GetConnectionString("AzureStorage");
+
+                    var blobServiceClient = new BlobServiceClient(connectionString);
+
+                    return blobServiceClient;
+                }
+                catch (Exception ex)
+                {
+                    throw new RestException(HttpStatusCode.InternalServerError, ex.Message);
+                }
+            });
+
+            services.AddScoped<IFileStorageService, FileStorageService>();
         }
 
         #endregion

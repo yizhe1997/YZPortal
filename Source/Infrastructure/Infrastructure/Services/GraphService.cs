@@ -204,7 +204,7 @@ namespace Infrastructure.Services
         }
 
         // Ref https://learn.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=csharp
-        public async Task<Result> GroupAddUsersAsync(AddUsersToGroupRequest request, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> GroupAddUsersAsync(AddUsersToGroupCommand request, CancellationToken cancellationToken = new CancellationToken())
         {
             var graphClient = GetGraphClient();
 
@@ -229,7 +229,7 @@ namespace Infrastructure.Services
             return await Result.SuccessAsync();
         }
 
-        public async Task<Result> GroupRemoveUserAsync(RemoveUserFromGroupRequest request, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> GroupRemoveUserAsync(RemoveUserFromGroupCommand request, CancellationToken cancellationToken = new CancellationToken())
         {
             var graphClient = GetGraphClient();
 

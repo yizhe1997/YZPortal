@@ -67,5 +67,20 @@ namespace Application.Extensions
             // Type without parameterless constructor
             return FormatterServices.GetUninitializedObject(type);
         }
+
+        public static List<string> GetPropertyNames(this Type type, BindingFlags binding = BindingFlags.Public | BindingFlags.Instance)
+        {
+            return type.GetProperties(binding)?.Select(propertyInfo => propertyInfo.Name)?.ToList() ?? new();
+        }
+
+        public static bool CheckIfPropertyNameExist(this Type type, string Name, BindingFlags binding = BindingFlags.Public | BindingFlags.Instance)
+        {
+            return type.GetPropertyNames(binding).Exists(x => x == Name);
+        }
+
+        public static object? GetPropertyValByName(this Type type, object src, string Name)
+        {
+            return type.GetType()?.GetProperty(Name)?.GetValue(src, null);
+        }
     }
 }

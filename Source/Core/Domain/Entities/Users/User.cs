@@ -15,7 +15,7 @@ namespace Domain.Entities.Users
     //| AspNetRoleClaims | Claims by roles. | No               | 
     //+------------------+------------------+------------------+
 
-    public class User : IdentityUser<Guid>, IAuditableEntity
+    public class User : IdentityUser<Guid>, IAuditableEntity<Guid>
     {
         //public virtual ICollection<Logs> Logs { get; set; } = new HashSet<Logs>();
 
@@ -54,5 +54,6 @@ namespace Domain.Entities.Users
         #endregion
 
         public PortalConfig PortalConfig { get; set; } = new();
+        public Domain.Entities.Misc.File? ProfileImage { get; set; }
     }
 }

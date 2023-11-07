@@ -67,7 +67,7 @@ namespace YZPortal.API.Controllers.Users
         /// Create a new application user associated with the current user context.
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult> CreateUser()
+        public async Task<ActionResult<Result>> CreateUser()
         {
             var response = await _userService.CreateAsync(_currentUserService);
 
@@ -78,7 +78,7 @@ namespace YZPortal.API.Controllers.Users
         /// Updates the details of the application user.
         /// </summary>
         [HttpPut("{userSubId}")]
-        public async Task<ActionResult<Result>> UpdateUser([FromRoute] string userSubId, [FromBody] UpdateUserRequest request)
+        public async Task<ActionResult<Result>> UpdateUser([FromRoute] string userSubId, [FromBody] UpdateUserCommand request)
         {
             var response = await _graphService.UserUpdateAsync(userSubId, request);
 

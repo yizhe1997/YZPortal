@@ -27,7 +27,7 @@ namespace Application.UnitTests.Mappings.Users
         //[InlineData(typeof(ICurrentUserService), typeof(User))] // TODO: look into this
         [InlineData(typeof(Identity), typeof(IdentityModel))]
         [InlineData(typeof(User), typeof(UserModel))]
-        [InlineData(typeof(UpdateUserRequest), typeof(User))]
+        [InlineData(typeof(UpdateUserCommand), typeof(User))]
         public void ShouldSupportMappingFromSourceToDestination(Type sourceType, Type destinationType)
         {
             // arrange

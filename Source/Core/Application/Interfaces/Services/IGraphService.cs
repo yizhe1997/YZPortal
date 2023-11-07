@@ -39,9 +39,9 @@ namespace Application.Interfaces.Services
         Task<SearchResult<UserModel>> GroupUsersToSearchResultAsync(string? groupId, ISearchParams request, System.Linq.Expressions.Expression<Func<UserModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken());
 
         // Ref https://learn.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=csharp
-        Task<Result> GroupAddUsersAsync(AddUsersToGroupRequest request, CancellationToken cancellationToken = new CancellationToken());
+        Task<Result> GroupAddUsersAsync(AddUsersToGroupCommand request, CancellationToken cancellationToken = new CancellationToken());
 
-        Task<Result> GroupRemoveUserAsync(RemoveUserFromGroupRequest request, CancellationToken cancellationToken = new CancellationToken());
+        Task<Result> GroupRemoveUserAsync(RemoveUserFromGroupCommand request, CancellationToken cancellationToken = new CancellationToken());
 
         #endregion
     }

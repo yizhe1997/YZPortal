@@ -53,7 +53,7 @@
     [Parameter]
     public IdentityModel.UserModel User { get; set; } = new IdentityModel.UserModel();
 
-    public UpdateUserRequest UpdateUserRequest { get; set; } = new UpdateUserRequest();
+    public UpdateUserCommand UpdateUserRequest { get; set; } = new UpdateUserCommand();
 
     private static List<SelectedItem> GenerateDataSource(List<GraphModel.GroupModel> source) => source.Select(i => new SelectedItem(i.Id, i.DisplayName ?? string.Empty)).ToList();
 
@@ -73,7 +73,7 @@
             await YZPortalApiClient.GraphGroupRemoveUser(selectedGraphGroup, User.SubjectIdentifier);
         }
 
-        await YZPortalApiClient.UpdateUserAsync(User.SubjectIdentifier, new UpdateUserRequest()
+        await YZPortalApiClient.UpdateUserAsync(User.SubjectIdentifier, new UpdateUserCommand()
         {
             DisplayName = User.DisplayName,
             FirstName = User.FirstName,

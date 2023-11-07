@@ -9,7 +9,7 @@ namespace Infrastructure.Mappings
     {
         public GraphUserMappingProfile() 
         {
-            CreateMap<UpdateUserRequest, Microsoft.Graph.Models.User>()
+            CreateMap<UpdateUserCommand, Microsoft.Graph.Models.User>()
                 .ForMember(dest => dest.Surname, opt => opt.MapFrom(src => src.LastName))
                 .ForMember(dest => dest.GivenName, opt => opt.MapFrom(src => src.FirstName));
             CreateMap<User, UserModel>();
