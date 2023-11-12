@@ -1,9 +1,11 @@
 ﻿using Application.Exceptions;
 using Application.Models;
 using Infrastructure.Configurations;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Graph.Models.ODataErrors;
+using Serilog;
 using System.Net;
 using YZPortal.API.Extensions;
 
@@ -11,6 +13,31 @@ namespace YZPortal.API.Extensions
 {
     internal static class IApplicationBuilderExtensions
     {
+        internal static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder) =>
+            builder
+                .UseMiddlewareExceptionHandler()
+                .UseSerilogRequestLogging()
+                .UseCors(x => x
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader())
+                .UseRouting()
+                .UseHttpsRedirection()
+                .UseAuthentication()
+                .UseRequestLocalization(options =>
+                {
+                    var supportedCultures = new[] { "en", "de" };
+                    options.SetDefaultCulture(supportedCultures[0])
+                        .AddSupportedCultures(supportedCultures)
+                        .AddSupportedUICultures(supportedCultures);
+                })
+                .UseAuthorization()
+                .UseCookiePolicy(new CookiePolicyOptions
+                {
+                    Secure = CookieSecurePolicy.Always,
+                    HttpOnly = HttpOnlyPolicy.Always
+                });
+
         internal static IApplicationBuilder UseSwagger(this IApplicationBuilder app, IApiVersionDescriptionProvider provider, IConfiguration configuration)
         {
             var azureAdB2CSwaggerOptions = configuration.GetSection("AzureAdB2CSwagger").Get<AzureAdB2CSwaggerConfig>() ?? new();
@@ -78,7 +105,6 @@ namespace YZPortal.API.Extensions
 
                             await context.Response.WriteAsync(new Result()
                             {
-                                Code = context.Response.StatusCode,
                                 Messages = new List<string>() { ex.Error }
                             }.ToJSONString());
 
@@ -94,7 +120,6 @@ namespace YZPortal.API.Extensions
 
                             await context.Response.WriteAsync(new Result()
                             {
-                                Code = statusCode,
                                 Messages = new List<string>() { errMsg }
                             }.ToJSONString());
 
@@ -104,7 +129,6 @@ namespace YZPortal.API.Extensions
                         {
                             await context.Response.WriteAsync(new Result()
                             {
-                                Code = context.Response.StatusCode,
                                 Messages = new List<string>() { $"Error message - {contextFeature.Error.Message}, inner error message - {(innerException != null ? innerException.Message : "")}" }
                             }.ToJSONString());
 

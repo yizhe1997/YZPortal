@@ -1,5 +1,4 @@
-﻿using Application.Interfaces.Services.Identity;
-using Application.Mappings.Users;
+﻿using Application.Mappings.Users;
 using Application.Models.Identity;
 using Application.Requests.Users;
 using Domain.Entities.Users;

@@ -2,6 +2,7 @@
 using Application.Models;
 using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Localization;
 using System.Text.Json.Serialization;
 
 namespace Application.Features.Users.Configs.Commands.UpdatePortalConfig
@@ -22,17 +23,17 @@ namespace Application.Features.Users.Configs.Commands.UpdatePortalConfig
     {
         private readonly IPortalConfigRepository _portalConfigRepository;
         private readonly IUnitOfWork<Guid> _unitOfWork;
-        //private readonly IStringLocalizer<UpdatePortalConfigCommandHandler> _localizer;
+        private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly IMapper _mapper;
 
         public UpdatePortalConfigCommandHandler(
-            IUnitOfWork<Guid> unitOfWork, 
-            //IStringLocalizer<UpdatePortalConfigCommandHandler> localizer, 
+            IUnitOfWork<Guid> unitOfWork,
+            IStringLocalizer<SharedResource> localizer,
             IMapper mapper, 
             IPortalConfigRepository portalConfigRepository)
         {
             _unitOfWork = unitOfWork;
-            //_localizer = localizer;
+            _localizer = localizer;
             _mapper = mapper;
             _portalConfigRepository = portalConfigRepository;
         }
@@ -50,7 +51,7 @@ namespace Application.Features.Users.Configs.Commands.UpdatePortalConfig
             }
             else
             {
-                return await Result.FailAsync("Portal Config Not Found.");
+                return await Result.FailAsync(_localizer["Not Found"]);
             }
         }
     }

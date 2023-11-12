@@ -15,6 +15,8 @@ namespace YZPortal.Client.Services.LocalStorage
         Task RemoveUserConfigs(CancellationToken cancellationToken = new CancellationToken());
         #endregion
 
+        Task<string> GetUserCulture(CancellationToken cancellationToken = new CancellationToken());
+
         #endregion
 
         Task ClearLocalStorage(CancellationToken cancellationToken = new CancellationToken());

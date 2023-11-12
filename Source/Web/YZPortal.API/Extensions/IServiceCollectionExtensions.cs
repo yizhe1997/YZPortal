@@ -41,6 +41,7 @@ namespace YZPortal.API.Extensions
 
             services.AddAPIVersioning();
             services.AddSwagger(configuration);
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
         }
 
         internal static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration)

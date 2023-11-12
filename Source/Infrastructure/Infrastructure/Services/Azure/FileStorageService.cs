@@ -10,7 +10,6 @@ using DomainEntity = Domain.Entities.Misc;
 using Domain.Enums;
 using Domain.Entities.Users;
 using Application.Requests;
-using System.IO;
 
 namespace Infrastructure.Services.Azure
 {

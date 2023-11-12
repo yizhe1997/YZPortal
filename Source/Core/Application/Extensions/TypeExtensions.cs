@@ -68,6 +68,7 @@ namespace Application.Extensions
             return FormatterServices.GetUninitializedObject(type);
         }
 
+        // Ref: https://code-maze.com/csharp-get-list-of-properties/
         public static List<string> GetPropertyNames(this Type type, BindingFlags binding = BindingFlags.Public | BindingFlags.Instance)
         {
             return type.GetProperties(binding)?.Select(propertyInfo => propertyInfo.Name)?.ToList() ?? new();

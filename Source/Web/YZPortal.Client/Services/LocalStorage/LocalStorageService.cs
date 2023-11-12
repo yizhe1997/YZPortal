@@ -46,18 +46,28 @@ namespace YZPortal.Client.Services.LocalStorage
 			return new ConfigsDto();
 		}
 
-		public async Task ClearLocalStorage(CancellationToken cancellationToken = new CancellationToken())
-		{
-			var localStorageServiceConsts = typeof(LocalStorageProperties).GetConstants();
+        #endregion
 
-			foreach(var constant in localStorageServiceConsts)
-			{
-				await _localStorageService.RemoveItemAsync(constant, cancellationToken).ConfigureAwait(false);
-			}
-		}
+        public async Task<string> GetUserCulture(CancellationToken cancellationToken = new CancellationToken())
+        {
+            if (await _localStorageService.ContainKeyAsync("BlazorCulture", cancellationToken))
+            {
+                return await _localStorageService.GetItemAsync<string>("BlazorCulture", cancellationToken);
+            }
 
-		#endregion
+            return string.Empty;
+        }
 
         #endregion
+
+        public async Task ClearLocalStorage(CancellationToken cancellationToken = new CancellationToken())
+        {
+            var localStorageServiceConsts = typeof(LocalStorageProperties).GetConstants();
+
+            foreach (var constant in localStorageServiceConsts)
+            {
+                await _localStorageService.RemoveItemAsync(constant, cancellationToken).ConfigureAwait(false);
+            }
+        }
     }
 }

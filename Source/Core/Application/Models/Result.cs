@@ -9,8 +9,6 @@ namespace Application.Models
 
         public bool Succeeded { get; set; }
 
-        public int Code { get; set; }
-
         #region Non-Async Methods
 
         #region Success Methods
