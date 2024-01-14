@@ -33,7 +33,7 @@ namespace YZPortal.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> CreateWarrantyClaimAttachment([FromForm] UploadFileCommand command)
+        public async Task<ActionResult<Result>> UploadFile([FromForm] UploadFileCommand command)
         {
             var result = await _fileStorageService.UploadFileAsync(command);
 

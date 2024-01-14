@@ -4,6 +4,7 @@ using Application.Interfaces.Contexts;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Application.Interfaces.Services.Identity;
+using Application.Interfaces.Services.Mailing;
 using Azure.Storage.Blobs;
 using Domain.Entities.Users;
 using Infrastructure.Authentication;
@@ -13,6 +14,7 @@ using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Services.Azure;
 using Infrastructure.Services.Identity;
+using Infrastructure.Services.Mailing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
+using SendGrid.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
@@ -38,17 +41,20 @@ namespace Infrastructure.Extensions
             services.AddDbContext(configuration);
             services.AddRepositories();
 
-            // General
-            services.AddTransient<ICurrentUserService, CurrentUserService>();
-            services.AddTransient<IUserService, UserService>();
-            services.AddGraph(configuration);
-            services.AddAzureStorage(configuration);
+            // Identity
+            services.AddIdentity(configuration);
 
             // Authentication
             services.AddAuthentication(configuration);
 
             // Authorization
             services.AddAuthorization();
+
+            // Mailing
+            services.AddMailing(configuration);
+
+            // Storage
+            services.AddAzureStorage(configuration);
         }
 
         #region Persistence
@@ -215,27 +221,44 @@ namespace Infrastructure.Extensions
 
         #endregion
 
-        #region Misc
+        #region Mailing
 
-        private static void AddGraph(this IServiceCollection services, IConfiguration configuration)
+        public static void AddMailing(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<AzureAdB2CManagementConfig>(configuration.GetSection("AzureAdB2CManagement"));
-            services.Configure<GraphConfig>(configuration.GetSection("Graph"));
+            services.Configure<MailConfig>(configuration.GetSection("Mail"));
 
-            services.AddTransient<IGraphService, GraphService>();
+            // TODO: logic to select SMTP service
+            services.AddScoped<IMailService, GoogleMailService>();
+            //services.AddSendGridMailService(configuration);
         }
+
+        public static void AddSendGridMailService(this IServiceCollection services, IConfiguration configuration)
+        {
+            var mailConfig = configuration.GetSection("Mail").Get<MailConfig>() ?? new();
+
+            services.AddSendGrid(options =>
+            {
+                options.ApiKey = mailConfig.SendGridSMTP.ApiKey;
+            });
+
+            services.AddScoped<IMailService, SendGridMailService>();
+        }
+
+        #endregion
+
+        #region Storage
 
         public static void AddAzureStorage(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<AzureStorageConfig>(configuration.GetSection("AzureStorage"));
 
+            var azureStorageConfig = configuration.GetSection("AzureStorage").Get<AzureStorageConfig>() ?? new();
+
             services.AddScoped(x =>
             {
                 try
                 {
-                    var connectionString = configuration.GetConnectionString("AzureStorage");
-
-                    var blobServiceClient = new BlobServiceClient(connectionString);
+                    var blobServiceClient = new BlobServiceClient(azureStorageConfig.ConnectionString);
 
                     return blobServiceClient;
                 }
@@ -246,6 +269,25 @@ namespace Infrastructure.Extensions
             });
 
             services.AddScoped<IFileStorageService, FileStorageService>();
+        }
+
+        #endregion
+
+        #region Identity
+
+        private static void AddIdentity(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddTransient<ICurrentUserService, CurrentUserService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddGraph(configuration);
+        }
+
+        private static void AddGraph(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<AzureAdB2CManagementConfig>(configuration.GetSection("AzureAdB2CManagement"));
+            services.Configure<GraphConfig>(configuration.GetSection("Graph"));
+
+            services.AddTransient<IGraphService, GraphService>();
         }
 
         #endregion

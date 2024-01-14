@@ -1,22 +1,31 @@
-﻿# YZ Portal - Client
+﻿## 3. Configurations
+To ensure a smooth startup and runtime experience, it's crucial to configure the settings before hosting. 
+You can set up the backend API by defining configurations through either environment variables on the hosting server or user secrets 
+on the local host. Presently, the backend API supports the following configurations:
 
-## 3. References
+|Configurations|Description|
+|
+|YZPortalApi|Configure options for the main API.|
+|AzureAdB2C|Configure Azure AD B2C options.|
 
-// nav menu
-https://stackoverflow.com/questions/58914389/how-to-create-navmenu-with-collapsible-submenu-in-net-core-blazor-app
+### 3.1 Configuration options
+#### 3.1.1 JWT
+|Options|Description|
+|
+|YZPortalApi__BaseAddress|Base address of the main API.|
+|YZPortalApi__Scope|The secret key used to create signing credentials.|
 
-// Authorization, local storage, JWT, custome validation, etc.
-https://trystanwilcock.com/2022/09/28/net-6-0-blazor-webassembly-jwt-token-authentication-from-scratch-c-sharp-wasm-tutorial/
+#### 3.1.2 ConnectionStrings
+|Options|Description|
+|
+|AzureAdB2C__Authority|Authority endpoint for portal sign-up/sign-in policy|
+|AzureAdB2C__ClientId|Application ID (clientId) of the application copied from the Azure portal.|
+|AzureAdB2C__ValidateAuthority|[MSAL.NET ValidateAuthority property](AzureAdB2C__Authority)|
 
-// Policy based authorization
-https://chrissainty.com/securing-your-blazor-apps-configuring-policy-based-authorization-with-blazor/
+## 4. References
 
+- [Nav menu](https://stackoverflow.com/questions/58914389/how-to-create-navmenu-with-collapsible-submenu-in-net-core-blazor-app)
 
-// Custom policy app insights
-https://learn.microsoft.com/en-us/azure/active-directory-b2c/troubleshoot-with-application-insights?pivots=b2c-custom-policy
-// azure ad b2c samples
-https://github.com/azure-ad-b2c/samples
-// b2c email claim
-https://stackoverflow.com/questions/46778129/azure-ad-b2c-emails-claim-in-custom-policy?rq=3
-https://learn.microsoft.com/en-us/answers/questions/738212/b2c-custom-policy-unable-to-see-email-address-in-c
+- [JWT token authentication](https://trystanwilcock.com/2022/09/28/net-6-0-blazor-webassembly-jwt-token-authentication-from-scratch-c-sharp-wasm-tutorial/)
 
+- [Policy based authorization](https://chrissainty.com/securing-your-blazor-apps-configuring-policy-based-authorization-with-blazor/)

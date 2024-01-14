@@ -18,6 +18,8 @@
 		<PackageReference Include="Microsoft.Graph" Version="5.19.0" />
 		<PackageReference Include="Microsoft.Identity.Web" Version="2.13.0" />
 		<PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="2.13.0" />
+		<PackageReference Include="SendGrid" Version="9.28.1" />
+		<PackageReference Include="SendGrid.Extensions.DependencyInjection" Version="1.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
