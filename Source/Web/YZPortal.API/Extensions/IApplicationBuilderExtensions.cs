@@ -32,8 +32,8 @@ namespace YZPortal.API.Extensions
                 .UseAuthorization()
                 .UseCookiePolicy(new CookiePolicyOptions
                 {
-                    Secure = CookieSecurePolicy.Always,
-                    HttpOnly = HttpOnlyPolicy.Always
+                    Secure = CookieSecurePolicy.SameAsRequest,
+                    HttpOnly = HttpOnlyPolicy.None,
                 })
                 .UseHangfire(configuration);
 

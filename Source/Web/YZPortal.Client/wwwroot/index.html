@@ -32,7 +32,7 @@
     </script>
     <script>
         window.setHangFireCookie = function (token) {
-            document.cookie = `HangFireCookie=${token}`;
+            document.cookie = `HangFireCookie=${token}; samesite=None; secure`;
         };
     </script>
     <script src="_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js"></script>
