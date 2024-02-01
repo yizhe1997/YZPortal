@@ -109,3 +109,13 @@ on the local host. Presently, the backend API supports the following configurati
 #### 4.2.4. twillio 
 - [How to](https://docs.sendgrid.com/api-reference/mail-send/mail-send)
 - [How to](https://github.com/sendgrid/sendgrid-csharp)
+
+### 4.3. Background Jobs
+- [Official Site](https://www.hangfire.io/)
+- [Setup](https://docs.hangfire.io/en/latest/getting-started/aspnet-core-applications.html)
+- [Allow the Antiforgery cookie to be sent with cross-origin requests for Dashboard UI iframe](https://stackoverflow.com/questions/52669145/antiforgery-token-cookie-not-appearing-in-request-headers-only-in-when-embeded-i/52709829#52709829)
+- [Integrate Azure AD B2C Authen cookie](https://medium.com/we-code/integrate-hangfire-dashboard-with-angular-using-azure-ad-and-azure-ad-b2c-tokens-a13449e0bbd4)
+
+### 4.4. Security
+#### 4.4.1 CORS
+- [Middleware](https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-8.0) 

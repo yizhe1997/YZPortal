@@ -1,0 +1,45 @@
+﻿@page "/backgroundjobs"
+@using Domain.Enums.Memberships;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@using YZPortal.Client.Clients.YZPortalApi;
+@inject Microsoft.Extensions.Configuration.IConfiguration config
+@inject YZPortalApiConfig YZPortalApiConfig
+@inject IJSRuntime JSRuntime
+@inject IAccessTokenProvider AccessTokenProvider
+@implements IAsyncDisposable
+@attribute [Authorize(Policy = nameof(Role.Administrator))]
+
+<PageTitle>Hangfire dashboard UI</PageTitle>
+
+@if (IsHangfireCookieSet)
+{
+    <iframe src="@($"{YZPortalApiConfig.BaseAddress}{YZPortalApiConfig.HangfireDashboardUrl}")" style="width: 100%; height: 100%;" frameborder="0"></iframe>
+}
+
+@code {
+    private bool IsHangfireCookieSet { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var tokenResult = await AccessTokenProvider.RequestAccessToken();
+        if (tokenResult.TryGetToken(out var token))
+        {
+            var accessToken = token.Value;
+
+            var js = (IJSInProcessRuntime)JSRuntime;
+            await js.InvokeVoidAsync("setHangFireCookie", accessToken);
+
+            IsHangfireCookieSet = true;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        var js = (IJSInProcessRuntime)JSRuntime;
+        await js.InvokeVoidAsync("setHangFireCookie", "");
+    }
+}

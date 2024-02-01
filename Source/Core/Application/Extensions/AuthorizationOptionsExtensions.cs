@@ -13,13 +13,13 @@ namespace Application.Extensions
         public static AuthorizationPolicy CreateAdministratorPolicy()
         {
             return new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
-                                                   .RequireRole(DealerRoleNames.Administrator.ToString())
+                                                   .RequireRole(Role.Administrator.ToString())
                                                    .Build();
         }
 
         public static void AddAdministratorPolicy(this AuthorizationOptions opts)
         {
-            opts.AddPolicy(DealerRoleNames.Administrator.ToString(), CreateAdministratorPolicy());
+            opts.AddPolicy(Role.Administrator.ToString(), CreateAdministratorPolicy());
         }
 
         #endregion
@@ -29,13 +29,13 @@ namespace Application.Extensions
         public static AuthorizationPolicy CreateGeneralPolicy()
         {
             return new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
-                                                   .RequireRole(DealerRoleNames.General.ToString())
+                                                   .RequireRole(Role.General.ToString())
                                                    .Build();
         }
 
         public static void AddGeneralPolicy(this AuthorizationOptions opts)
         {
-            opts.AddPolicy(DealerRoleNames.General.ToString(), CreateGeneralPolicy());
+            opts.AddPolicy(Role.General.ToString(), CreateGeneralPolicy());
         }
 
 
@@ -54,13 +54,13 @@ namespace Application.Extensions
         public static AuthorizationPolicy CreateBadmintonSubscriptionPolicy()
         {
             return new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
-                                                   .RequireRole(ContentAccessLevelNames.Badminton.ToString())
+                                                   .RequireRole(Module.Badminton.ToString())
                                                    .Build();
         }
 
         public static void AddBadmintonSubscriptionPolicy(this AuthorizationOptions opts)
         {
-            opts.AddPolicy(ContentAccessLevelNames.All.ToString(), CreateBadmintonSubscriptionPolicy());
+            opts.AddPolicy(Module.All.ToString(), CreateBadmintonSubscriptionPolicy());
         }
 
         #endregion

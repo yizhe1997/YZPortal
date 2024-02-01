@@ -8,7 +8,7 @@
 @using YZPortal.Client.Pages.Users;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject DialogService DialogService
-@attribute [Authorize(Policy = nameof(DealerRoleNames.Administrator))]
+@attribute [Authorize(Policy = nameof(Role.Administrator))]
 
 <h1>Users</h1>
 

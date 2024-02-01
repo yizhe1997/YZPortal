@@ -11,6 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Hangfire" Version="1.8.9" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
 		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
@@ -24,6 +25,10 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Infrastructure\Infrastructure\Infrastructure.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="EmailTemplates\" />
 	</ItemGroup>
 
 </Project>

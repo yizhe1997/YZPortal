@@ -29,3 +29,5 @@ on the local host. Presently, the backend API supports the following configurati
 - [JWT token authentication](https://trystanwilcock.com/2022/09/28/net-6-0-blazor-webassembly-jwt-token-authentication-from-scratch-c-sharp-wasm-tutorial/)
 
 - [Policy based authorization](https://chrissainty.com/securing-your-blazor-apps-configuring-policy-based-authorization-with-blazor/)
+
+- [Razor component lifecycle](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-8.0)

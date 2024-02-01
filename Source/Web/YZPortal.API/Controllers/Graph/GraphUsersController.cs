@@ -23,7 +23,7 @@ namespace YZPortal.API.Controllers.Graph
             _graphService = graphService;
         }
 
-        [Authorize(Policy = nameof(DealerRoleNames.Administrator))]
+        [Authorize(Policy = nameof(Role.Administrator))]
         [HttpGet("Graph")]
         public async Task<ActionResult<SearchResult<UserModel>>> GetGraphUsers([FromQuery] SearchRequest request)
         {

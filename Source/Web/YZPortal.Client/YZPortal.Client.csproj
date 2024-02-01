@@ -11,7 +11,7 @@
 	<ItemGroup>
 	  <Content Include="Clients\YZPortalApi\StartupExtensions.cs" />
 	  <Content Include="Clients\YZPortalApi\YZPortalApiHttpClient.cs" />
-	  <Content Include="Clients\YZPortalApi\YZPortalApiOptions.cs" />
+	  <Content Include="Clients\YZPortalApi\YZPortalApiConfig.cs" />
 	  <Content Include="Services\LocalStorage\ILocalStorageService.cs" />
 	  <Content Include="Services\LocalStorage\LocalStorageService.cs" />
 	  <Content Include="Services\LocalStorage\StartupExtensions.cs" />

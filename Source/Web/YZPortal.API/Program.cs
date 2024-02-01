@@ -27,7 +27,7 @@ var app = builder.Build();
 
 await app.Services.MigrateDatabaseAsync();
 
-app.UseInfrastructure();
+app.UseInfrastructure(configuration);
 
 // Make the default route redirect to Swagger documentation
 var option = new RewriteOptions();

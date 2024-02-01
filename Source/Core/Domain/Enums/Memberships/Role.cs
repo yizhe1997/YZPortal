@@ -1,7 +1,7 @@
 ﻿namespace Domain.Enums.Memberships
 {
     [Flags]
-    public enum DealerRoleNames
+    public enum Role
     {
         None = 0,
         Administrator = 1,

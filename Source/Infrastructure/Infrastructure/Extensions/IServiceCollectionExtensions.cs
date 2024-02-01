@@ -7,6 +7,7 @@ using Application.Interfaces.Services.Identity;
 using Application.Interfaces.Services.Mailing;
 using Azure.Storage.Blobs;
 using Domain.Entities.Users;
+using Hangfire;
 using Infrastructure.Authentication;
 using Infrastructure.Configurations;
 using Infrastructure.Persistence.Contexts;
@@ -30,6 +31,7 @@ using SendGrid.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Infrastructure.Extensions
 {
@@ -55,6 +57,15 @@ namespace Infrastructure.Extensions
 
             // Storage
             services.AddAzureStorage(configuration);
+
+            // BackgroundJobs
+            services.AddBackgroundJobs(configuration);
+
+            // CORS
+            services.AddCorsPolicy(configuration);
+
+            // Antiforgery
+            services.AddAntiforgery();
         }
 
         #region Persistence
@@ -197,7 +208,7 @@ namespace Infrastructure.Extensions
 
         #region Authorization
 
-        public static void AddAuthorization(this IServiceCollection services)
+        private static void AddAuthorization(this IServiceCollection services)
         {
             services.AddAuthorization(opts =>
             {
@@ -223,16 +234,19 @@ namespace Infrastructure.Extensions
 
         #region Mailing
 
-        public static void AddMailing(this IServiceCollection services, IConfiguration configuration)
+        private static void AddMailing(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<MailConfig>(configuration.GetSection("Mail"));
 
             // TODO: logic to select SMTP service
             services.AddScoped<IMailService, GoogleMailService>();
             //services.AddSendGridMailService(configuration);
+
+
+            services.AddTransient<IEmailTemplateService, EmailTemplateService>();
         }
 
-        public static void AddSendGridMailService(this IServiceCollection services, IConfiguration configuration)
+        private static void AddSendGridMailService(this IServiceCollection services, IConfiguration configuration)
         {
             var mailConfig = configuration.GetSection("Mail").Get<MailConfig>() ?? new();
 
@@ -248,7 +262,7 @@ namespace Infrastructure.Extensions
 
         #region Storage
 
-        public static void AddAzureStorage(this IServiceCollection services, IConfiguration configuration)
+        private static void AddAzureStorage(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<AzureStorageConfig>(configuration.GetSection("AzureStorage"));
 
@@ -291,5 +305,46 @@ namespace Infrastructure.Extensions
         }
 
         #endregion
+
+        private static void AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
+        {
+            // Add Hangfire services.
+            services.AddHangfire(x => x
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(configuration.GetConnectionString("Primary")));
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
+        }
+
+        private static void AddCorsPolicy(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<CORSConfig>(configuration.GetSection("CORS"));
+
+            var cORSConfig = configuration.GetSection("CORS").Get<CORSConfig>() ?? new();
+            var origins = new List<string>();
+
+            if (cORSConfig.Blazor.Any())
+                origins.AddRange(cORSConfig.Blazor);
+
+            services.AddCors(opt =>
+                opt.AddPolicy("CORS", policy =>
+                    policy.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .WithOrigins(origins.ToArray())));
+        }
+
+        private static void AddAntiforgery(this IServiceCollection services)
+        {
+            services.AddAntiforgery(options =>
+            {
+                options.SuppressXFrameOptionsHeader = true;
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            });
+        }
     }
 }

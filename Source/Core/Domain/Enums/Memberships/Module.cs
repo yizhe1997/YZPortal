@@ -1,7 +1,7 @@
 ﻿namespace Domain.Enums.Memberships
 {
     [Flags]
-    public enum ContentAccessLevelNames
+    public enum Module
     {
         None = 0,
         All = 1,

@@ -3,7 +3,6 @@ using Application.Requests;
 using Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 using SendGrid;
-using SendGrid.Helpers.Mail;
 
 namespace Infrastructure.Services.Mailing
 {

@@ -46,7 +46,7 @@
                 <span>YZPortal</span>
             </div>
         </div>
-        <AuthorizeView Policy="@DealerRoleNames.Administrator.ToString()">
+        <AuthorizeView Policy="@Role.Administrator.ToString()">
             <div class="layout-menu">
                 <div class="scroll">
                     <Menu Items="@Menus" IsVertical="true" class="menu is-vertical is-collapsed" />

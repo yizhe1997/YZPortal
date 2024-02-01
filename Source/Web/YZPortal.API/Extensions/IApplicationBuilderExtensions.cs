@@ -1,6 +1,7 @@
 ﻿using Application.Exceptions;
 using Application.Models;
 using Infrastructure.Configurations;
+using Infrastructure.Extensions;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -13,14 +14,11 @@ namespace YZPortal.API.Extensions
 {
     internal static class IApplicationBuilderExtensions
     {
-        internal static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder) =>
+        internal static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder, IConfiguration configuration) =>
             builder
                 .UseMiddlewareExceptionHandler()
                 .UseSerilogRequestLogging()
-                .UseCors(x => x
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader())
+                .UseCorsPolicy()
                 .UseRouting()
                 .UseHttpsRedirection()
                 .UseAuthentication()
@@ -36,7 +34,8 @@ namespace YZPortal.API.Extensions
                 {
                     Secure = CookieSecurePolicy.Always,
                     HttpOnly = HttpOnlyPolicy.Always
-                });
+                })
+                .UseHangfire(configuration);
 
         internal static IApplicationBuilder UseSwagger(this IApplicationBuilder app, IApiVersionDescriptionProvider provider, IConfiguration configuration)
         {
