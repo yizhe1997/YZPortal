@@ -34,6 +34,7 @@ namespace YZPortal.API.Extensions
                 {
                     Secure = CookieSecurePolicy.SameAsRequest,
                     HttpOnly = HttpOnlyPolicy.None,
+                    MinimumSameSitePolicy = SameSiteMode.None
                 })
                 .UseHangfire(configuration);
 
