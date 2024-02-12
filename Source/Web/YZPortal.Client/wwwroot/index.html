@@ -30,11 +30,6 @@
             set: (value) => localStorage['BlazorCulture'] = value
         };
     </script>
-    <script>
-        window.setHangFireCookie = function (token) {
-            document.cookie = `HangFireCookie=${token}; samesite=None; secure`;
-        };
-    </script>
     <script src="_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js"></script>
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
 </body>

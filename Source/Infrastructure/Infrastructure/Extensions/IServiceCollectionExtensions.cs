@@ -7,6 +7,7 @@ using Application.Interfaces.Services.Identity;
 using Application.Interfaces.Services.Mailing;
 using Azure.Storage.Blobs;
 using Domain.Entities.Users;
+using Domain.Enums.Memberships;
 using Hangfire;
 using Infrastructure.Authentication;
 using Infrastructure.Configurations;
@@ -18,13 +19,16 @@ using Infrastructure.Services.Identity;
 using Infrastructure.Services.Mailing;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using SendGrid.Extensions.DependencyInjection;
@@ -66,6 +70,11 @@ namespace Infrastructure.Extensions
 
             // Antiforgery
             services.AddAntiforgery();
+
+            // MVC
+            services.AddControllersWithViews()
+                .AddMicrosoftIdentityUI();
+            services.AddRazorPages();
         }
 
         #region Persistence
@@ -186,14 +195,28 @@ namespace Infrastructure.Extensions
             services.Configure<AzureAdB2CApiConfig>(configuration.GetSection("AzureAdB2CApi"));
 
             services.AddAuthentication()
-            .AddMicrosoftIdentityWebApi(x =>
+                .AddMicrosoftIdentityWebApi(x =>
+                {
+                    configuration.Bind("AzureAdB2CApi", x);
+                    x.TokenValidationParameters.NameClaimType = "name";
+                }, x =>
+                {
+                    configuration.Bind("AzureAdB2CApi", x);
+                }, jwtBearerScheme: Constants.AzureAdB2C)
+                ;
+
+            services.Configure<CookiePolicyOptions>(options =>
             {
-                configuration.Bind("AzureAdB2CApi", x);
-                x.TokenValidationParameters.NameClaimType = "name";
-            }, x =>
-            {
-                configuration.Bind("AzureAdB2CApi", x);
-            }, jwtBearerScheme: Constants.AzureAdB2C);
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                // Handling SameSite cookie according to https://docs.microsoft.com/en-us/aspnet/core/security/samesite?view=aspnetcore-3.1
+                options.HandleSameSiteCookieCompatibility();
+            });
+
+            services.Configure<OpenIdConnectOptions>(configuration.GetSection("AzureAdB2CApi"));
+
+            services.AddMicrosoftIdentityWebAppAuthentication(configuration, "AzureAdB2CApi");
         }
 
         private static void AddBasicAuth(this IServiceCollection services, IConfiguration configuration)
@@ -201,7 +224,7 @@ namespace Infrastructure.Extensions
             services.Configure<BasicAuthenticationConfig>(configuration.GetSection("BasicAuthentication"));
 
             services.AddAuthentication()
-            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
         }
 
         #endregion
@@ -226,7 +249,16 @@ namespace Infrastructure.Extensions
                 opts.AddPolicy("AllAuthenSchemes", allAuthenSchemes
                     .RequireAuthenticatedUser()
                     .Build());
+
+                opts.AddPolicy("Hangfire", builder =>
+                {
+                    builder
+                        .AddAuthenticationSchemes(OpenIdConnectDefaults.AuthenticationScheme)
+                        .RequireRole(Role.Administrator.ToString())
+                        .RequireAuthenticatedUser();
+                });
             });
+
             services.AddRequiredScopeAuthorization();
         }
 

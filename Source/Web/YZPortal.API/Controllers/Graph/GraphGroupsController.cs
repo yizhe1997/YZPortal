@@ -10,7 +10,7 @@ using Microsoft.Identity.Web;
 
 namespace YZPortal.API.Controllers.Graph
 {
-    public class GraphGroupsController : ControllerBase
+    public class GraphGroupsController : ApiControllerBase
     {
         private readonly IGraphService _graphService;
         private const string _ = "API.Access";

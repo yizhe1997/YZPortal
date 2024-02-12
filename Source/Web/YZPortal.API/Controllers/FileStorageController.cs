@@ -11,7 +11,7 @@ namespace YZPortal.API.Controllers
 {
     [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
     [RequiredScope(_)]
-    public class FileStorageController : ControllerBase
+    public class FileStorageController : ApiControllerBase
     {
         private readonly IFileStorageService _fileStorageService;
         private const string _ = "API.Access";

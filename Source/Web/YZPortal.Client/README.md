@@ -20,7 +20,7 @@ on the local host. Presently, the backend API supports the following configurati
 |
 |AzureAdB2C__Authority|Authority endpoint for portal sign-up/sign-in policy|
 |AzureAdB2C__ClientId|Application ID (clientId) of the application copied from the Azure portal.|
-|AzureAdB2C__ValidateAuthority|[MSAL.NET ValidateAuthority property](AzureAdB2C__Authority)|
+|AzureAdB2C__ValidateAuthority|[MSAL.NET ValidateAuthority property](https://learn.microsoft.com/en-us/dotnet/api/microsoft.authentication.webassembly.msal.msalauthenticationoptions.validateauthority?view=aspnetcore-8.0)|
 
 ## 4. References
 

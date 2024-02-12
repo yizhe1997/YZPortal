@@ -11,7 +11,7 @@ namespace YZPortal.API.Controllers
 {
     [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
     [RequiredScope(_)]
-    public class MailController : ControllerBase
+    public class MailController : ApiControllerBase
     {
         private readonly IMailService _mailService;
         private const string _ = "API.Access";

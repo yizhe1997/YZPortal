@@ -31,4 +31,15 @@
 	  <Folder Include="EmailTemplates\" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Remove="AppCreationScripts\**" />
+		<Compile Remove="ReadmeFiles\**" />
+		<Content Remove="AppCreationScripts\**" />
+		<Content Remove="ReadmeFiles\**" />
+		<EmbeddedResource Remove="AppCreationScripts\**" />
+		<EmbeddedResource Remove="ReadmeFiles\**" />
+		<None Remove="AppCreationScripts\**" />
+		<None Remove="ReadmeFiles\**" />
+	</ItemGroup>
+
 </Project>

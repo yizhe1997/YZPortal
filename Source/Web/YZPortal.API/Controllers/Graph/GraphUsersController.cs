@@ -13,7 +13,7 @@ namespace YZPortal.API.Controllers.Graph
 {
     [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
     [RequiredScope(_)]
-    public class GraphUsersController : ControllerBase
+    public class GraphUsersController : ApiControllerBase
     {
         private readonly IGraphService _graphService;
         private const string _ = "API.Access";

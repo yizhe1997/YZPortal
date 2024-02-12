@@ -14,7 +14,7 @@ namespace YZPortal.API.Controllers.Users
 {
     [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
     [RequiredScope(_)]
-    public class UsersController : ControllerBase
+    public class UsersController : ApiControllerBase
     {
         private readonly IGraphService _graphService;
         private readonly IUserService _userService;

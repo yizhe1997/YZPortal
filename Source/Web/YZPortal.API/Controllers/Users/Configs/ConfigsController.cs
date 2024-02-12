@@ -11,7 +11,7 @@ namespace YZPortal.API.Controllers.Users.Configs
 {
     [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
     [RequiredScope(_)]
-    public class ConfigsController : ControllerBase
+    public class ConfigsController : ApiControllerBase
     {
         private const string _ = "API.Access";
 

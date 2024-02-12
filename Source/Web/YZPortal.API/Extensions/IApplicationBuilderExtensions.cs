@@ -2,7 +2,6 @@
 using Application.Models;
 using Infrastructure.Configurations;
 using Infrastructure.Extensions;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Graph.Models.ODataErrors;
@@ -19,22 +18,18 @@ namespace YZPortal.API.Extensions
                 .UseMiddlewareExceptionHandler()
                 .UseSerilogRequestLogging()
                 .UseCorsPolicy()
-                .UseRouting()
+                .UseHsts()
                 .UseHttpsRedirection()
+                .UseStaticFiles()
+                .UseRouting()
                 .UseAuthentication()
+                .UseAuthorization()
                 .UseRequestLocalization(options =>
                 {
                     var supportedCultures = new[] { "en", "de" };
                     options.SetDefaultCulture(supportedCultures[0])
                         .AddSupportedCultures(supportedCultures)
                         .AddSupportedUICultures(supportedCultures);
-                })
-                .UseAuthorization()
-                .UseCookiePolicy(new CookiePolicyOptions
-                {
-                    Secure = CookieSecurePolicy.SameAsRequest,
-                    HttpOnly = HttpOnlyPolicy.None,
-                    MinimumSameSitePolicy = SameSiteMode.None
                 })
                 .UseHangfire(configuration);
 

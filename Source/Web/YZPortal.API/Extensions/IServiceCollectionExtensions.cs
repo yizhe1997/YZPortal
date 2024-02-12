@@ -15,10 +15,6 @@ namespace YZPortal.API.Extensions
     {
         internal static void AddWebLayer(this IServiceCollection services, IConfiguration configuration)
         {
-            // TODO: declutter?
-            // Add cross-origin resource sharing to IServiceCollection
-            services.AddCors();
-
             services.AddMvc(opts =>
             {
                 opts.Filters.Add(typeof(ValidatorActionFilter));
@@ -32,7 +28,7 @@ namespace YZPortal.API.Extensions
             })
             .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
-            // Max Value Allowed Content Length
+            //Max Value Allowed Content Length
             services.Configure<KestrelServerOptions>(options =>
             {
                 // Increase for file size limit. if don't set default value is: 30 MB

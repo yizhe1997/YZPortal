@@ -1,7 +1,5 @@
 ﻿using Hangfire;
-using Hangfire.Dashboard;
 using Infrastructure.Configurations;
-using Infrastructure.Services.BackgroundJob;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 
@@ -13,18 +11,15 @@ namespace Infrastructure.Extensions
         {
             var azureAdB2CManagementConfig = configuration.GetSection("AzureAdB2CManagement").Get<AzureAdB2CManagementConfig>() ?? new();
 
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            app.UseEndpoints(endpoints =>
             {
-                DashboardTitle = "Scheduler",
-                // To remove back link
-                AppPath = null,
-                Authorization = new IDashboardAuthorizationFilter[]
-                    {
-                        new DashboardOpenIdAuthorizationFilter(azureAdB2CManagementConfig)
-                    }
+                endpoints.MapControllers();
+                endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions()
+                {
+                    // To remove back link
+                    AppPath = null
+                }).RequireAuthorization("Hangfire");
             });
-
-            // TODO: add another hangfire dashboard accessible from swagger which requires authentication
 
             return app;
         }
