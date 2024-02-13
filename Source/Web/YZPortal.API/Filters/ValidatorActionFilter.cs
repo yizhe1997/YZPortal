@@ -39,11 +39,6 @@ namespace YZPortal.API.Filters
                 filterContext.HttpContext.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
                 filterContext.HttpContext.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
                 filterContext.HttpContext.Response.Headers.Add("Referrer-Policy", "no-referrer");
-
-                // To resolve azure ad b2c "Error message - An item with the same key has already been added. Key: Strict-Transport-Security, inner error message - "
-                var actionName = filterContext.RouteData.Values["action"]?.ToString() ?? "";
-                if (actionName != nameof(GraphGroupsController.GetGraphGroupDisplayNamesForUser))
-                    filterContext.HttpContext.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000");
             }
         }
 
