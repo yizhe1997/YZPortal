@@ -13,7 +13,7 @@ namespace YZPortal.API.Extensions
 {
     internal static class IApplicationBuilderExtensions
     {
-        internal static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder, IConfiguration configuration) =>
+        internal static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder) =>
             builder
                 .UseMiddlewareExceptionHandler()
                 .UseSerilogRequestLogging()
@@ -31,11 +31,7 @@ namespace YZPortal.API.Extensions
                         .AddSupportedCultures(supportedCultures)
                         .AddSupportedUICultures(supportedCultures);
                 })
-                .UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                })
-                .UseHangfireDashboard(configuration);
+                .UseHangfireDashboard();
 
         internal static IApplicationBuilder UseSwagger(this IApplicationBuilder app, IApiVersionDescriptionProvider provider, IConfiguration configuration)
         {

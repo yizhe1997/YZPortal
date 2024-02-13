@@ -26,7 +26,7 @@ var app = builder.Build();
 
 await app.Services.MigrateDatabaseAsync();
 
-app.UseInfrastructure(configuration);
+app.UseInfrastructure();
 
 // Expose Swagger documentation
 app.UseSwagger(app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), configuration);
