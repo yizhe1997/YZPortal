@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
-using YZPortal.API.Controllers.Graph;
 
 namespace YZPortal.API.Filters
 {
