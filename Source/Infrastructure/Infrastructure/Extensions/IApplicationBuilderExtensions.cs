@@ -16,6 +16,7 @@ namespace Infrastructure.Extensions
                 endpoints.MapControllers();
                 endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions()
                 {
+                    IgnoreAntiforgeryToken = true,
                     // To remove back link
                     AppPath = null
                 }).RequireAuthorization("Hangfire");
