@@ -4,20 +4,20 @@ You can set up the backend API by defining configurations through either environ
 on the local host. Presently, the backend API supports the following configurations:
 
 |Configurations|Description|
-|
+|-|-|
 |YZPortalApi|Configure options for the main API.|
 |AzureAdB2C|Configure Azure AD B2C options.|
 
 ### 3.1 Configuration options
 #### 3.1.1 JWT
 |Options|Description|
-|
+|-|-|
 |YZPortalApi__BaseAddress|Base address of the main API.|
 |YZPortalApi__Scope|The secret key used to create signing credentials.|
 
 #### 3.1.2 ConnectionStrings
 |Options|Description|
-|
+|-|-|
 |AzureAdB2C__Authority|Authority endpoint for portal sign-up/sign-in policy|
 |AzureAdB2C__ClientId|Application ID (clientId) of the application copied from the Azure portal.|
 |AzureAdB2C__ValidateAuthority|[MSAL.NET ValidateAuthority property](https://learn.microsoft.com/en-us/dotnet/api/microsoft.authentication.webassembly.msal.msalauthenticationoptions.validateauthority?view=aspnetcore-8.0)|
