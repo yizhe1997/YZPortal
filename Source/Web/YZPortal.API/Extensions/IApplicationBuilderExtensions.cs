@@ -31,7 +31,11 @@ namespace YZPortal.API.Extensions
                         .AddSupportedCultures(supportedCultures)
                         .AddSupportedUICultures(supportedCultures);
                 })
-                .UseHangfire(configuration);
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                })
+                .UseHangfireDashboard(configuration);
 
         internal static IApplicationBuilder UseSwagger(this IApplicationBuilder app, IApiVersionDescriptionProvider provider, IConfiguration configuration)
         {

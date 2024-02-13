@@ -69,7 +69,7 @@ namespace Infrastructure.Extensions
             services.AddCorsPolicy(configuration);
 
             // Antiforgery
-            services.AddAntiforgery();
+            //services.AddAntiforgery();
 
             // MVC
             services.AddControllersWithViews()
