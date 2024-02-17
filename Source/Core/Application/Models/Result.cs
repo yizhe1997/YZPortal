@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using Newtonsoft.Json;
 
 namespace Application.Models
 {
@@ -82,11 +81,6 @@ namespace Application.Models
         #endregion
 
         #endregion
-
-        public string ToJSONString()
-        {
-            return JsonConvert.SerializeObject(this);
-        }
     }
 
     public class Result<T> : Result, IResult<T>

@@ -7,7 +7,7 @@ namespace Application.Requests
     {
         public Guid RefId { get; set; }
         public IFormFile? File { get; set; }
-        public FileTypes FileType { get; set; }
+        public FileType FileType { get; set; }
         public string? FileName { get; set; }
     }
 }

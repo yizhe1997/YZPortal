@@ -1,8 +1,10 @@
 ﻿using Application.Exceptions;
+using Application.Interfaces.Services;
 using Application.Models;
 using Infrastructure.Configurations;
 using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Graph.Models.ODataErrors;
 using Serilog;
@@ -87,6 +89,8 @@ namespace YZPortal.API.Extensions
                           .BuildServiceProvider();
 
                         var logger = serviceProvider.GetService<ILogger<Exception>>();
+                        
+                        var serializer = serviceProvider.GetService<ISerializerService>();
 
                         var innerException = contextFeature.Error.InnerException;
 
@@ -98,10 +102,10 @@ namespace YZPortal.API.Extensions
                                 context.Response.StatusCode :
                                 (int)ex.Code;
 
-                            await context.Response.WriteAsync(new Result()
+                            await context.Response.WriteAsync(serializer?.Serialize(new Result()
                             {
                                 Messages = new List<string>() { ex.Error }
-                            }.ToJSONString());
+                            }) ?? "");
 
                             logger.LogError($"RestException thrown for method {methodPathString}.\r\nStatusCode:\r\n{(int)ex.Code}\r\nError message:\r\n{ex.Error}");
                         }
@@ -113,19 +117,19 @@ namespace YZPortal.API.Extensions
                             var statusCode = !Enum.TryParse(ex.Error?.Code, out HttpStatusCode httpStatusCode) ? (int)httpStatusCode : context.Response.StatusCode;
                             var errMsg = ex.Error?.Message ?? context.Response.StatusCode.ToString();
 
-                            await context.Response.WriteAsync(new Result()
+                            await context.Response.WriteAsync(serializer?.Serialize(new Result()
                             {
                                 Messages = new List<string>() { errMsg }
-                            }.ToJSONString());
+                            }) ?? "");
 
                             logger.LogError($"ODataError thrown for method {methodPathString}.\r\nStatusCode:\r\n{statusCode}\r\nError message:\r\n{errMsg}");
                         }
                         else
                         {
-                            await context.Response.WriteAsync(new Result()
+                            await context.Response.WriteAsync(serializer?.Serialize(new Result()
                             {
                                 Messages = new List<string>() { $"Error message - {contextFeature.Error.Message}, inner error message - {(innerException != null ? innerException.Message : "")}" }
-                            }.ToJSONString());
+                            }) ?? "");
 
                             logger.LogError($"Exception thrown for method {methodPathString}.\r\nStatusCode:\r\n{context.Response.StatusCode}\r\nError message:\r\n{contextFeature.Error.Message}\r\nInner error message:\r\n{(innerException != null ? innerException.Message : "")}");
                         }

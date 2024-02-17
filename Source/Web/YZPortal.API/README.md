@@ -14,6 +14,8 @@ on the local host. Presently, the backend API supports the following configurati
 |Graph|Configure Graph API options.|
 |AzureStorage|Configure Azure storage options.|
 |Mail|Configure Mail options.|
+|CORS|Configure CORS options.|
+|Cache|Configure Cache options.|
 
 ### 3.1 Configuration options
 #### 3.1.1 JWT
@@ -82,6 +84,18 @@ on the local host. Presently, the backend API supports the following configurati
 |Mail__GoogleSMTP__Port|The port number used for connecting to the mail server via Google SMTP.|
 |Mail__GoogleSMTP__EnableSSL|A boolean value indicating whether SSL (Secure Sockets Layer) should be enabled when connecting to the mail server via Google SMTP.|
 
+#### 3.1.10 CORS
+|Options|Description|
+|-|-|
+|CORS__Blazor|The client Urls for Blazor app.|
+
+#### 3.1.11 Cache
+|Options|Description|
+|-|-|
+|Cache__DistributedCacheType|Type of distributed cache e.g. Redis, SqlServer, InMemory. Will default to in-memory cache if set to null or empty.|
+|Cache__DefaultAbsoluteExpirationSeconds|Sets absolute time a cache entry can be inactive before it is removed from the cache.|
+|Cache__DefaultSlidingExpirationSeconds|Sets how long a cache entry can be inactive before it is removed from the cache.|
+|Cache__Redis__RedisURL|URL for redis cache server.|
 
 ## 4. References
 ### 4.1. Identity
@@ -120,3 +134,9 @@ on the local host. Presently, the backend API supports the following configurati
 ### 4.4. Security
 #### 4.4.1 CORS
 - [Middleware](https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-8.0) 
+
+### 4.5. Caching
+#### 4.5.1 CORS
+- [Distributed cache](https://code-maze.com/aspnetcore-distributed-caching/) 
+- [In-Memory cache](https://code-maze.com/aspnetcore-in-memory-caching/) 
+= [Redis cache](https://www.c-sharpcorner.com/article/easily-use-redis-cache-in-asp-net-6-0-web-api/)

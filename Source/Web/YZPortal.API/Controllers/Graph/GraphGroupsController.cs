@@ -12,12 +12,14 @@ namespace YZPortal.API.Controllers.Graph
 {
     public class GraphGroupsController : ApiControllerBase
     {
+        private readonly ICacheService _cache;
         private readonly IGraphService _graphService;
         private const string _ = "API.Access";
 
-        public GraphGroupsController(IGraphService graphService, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
+        public GraphGroupsController(IGraphService graphService, ICacheService cache, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {
             _graphService = graphService;
+            _cache = cache;
         }
 
         [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
@@ -26,7 +28,7 @@ namespace YZPortal.API.Controllers.Graph
         public async Task<ActionResult<SearchResult<GroupModel>>> GetGraphGroups([FromQuery] GetGraphGroupsRequest request)
         {
             var response = string.IsNullOrEmpty(request.UserSubId) ?
-                await _graphService.GroupsToSearchResultAsync(request) :
+                await _cache.GetOrSetAsync(nameof(GetGraphGroups), () => _graphService.GroupsToSearchResultAsync(request)) :
                 await _graphService.UserGroupsToSearchResultAsync(request.UserSubId, request);
 
             return Ok(response);

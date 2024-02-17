@@ -1,7 +1,7 @@
 ﻿namespace Domain.Enums
 {
     [Flags]
-    public enum FileTypes
+    public enum FileType
     {
         None = 0,
         UserProfileImage = 1

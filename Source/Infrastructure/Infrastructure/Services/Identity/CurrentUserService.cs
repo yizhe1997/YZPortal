@@ -1,17 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using Application.Interfaces.Services.Identity;
 using Application.Extensions;
+using Application.Interfaces.Services;
 
 namespace Infrastructure.Services.Identity
 {
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ISerializerService _serializer;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor, ISerializerService serializer)
         {
             _httpContextAccessor = httpContextAccessor;
+            _serializer = serializer;
         }
 
         public string? NameIdentifier => _httpContextAccessor.HttpContext?.User.GetNameIdentifier();
@@ -26,6 +28,6 @@ namespace Infrastructure.Services.Identity
         public string? IdentityProvider => _httpContextAccessor.HttpContext?.User.GetIdentityProvider();
         public string? IpAddress => _httpContextAccessor.HttpContext?.Request.Host.ToUriComponent();
         //public IEnumerable<Claim> Claims => _httpContextAccessor.HttpContext?.User.Claims ?? new List<Claim>();
-        public List<Domain.Entities.Users.Identity> Identities => _httpContextAccessor.HttpContext?.User.GetUserIdentities().Select(x => JsonConvert.DeserializeObject<Domain.Entities.Users.Identity>(x)).ToList() ?? new List<Domain.Entities.Users.Identity?>();
+        public List<Domain.Entities.Users.Identity> Identities => _httpContextAccessor.HttpContext?.User.GetUserIdentities().Select(x => _serializer.Deserialize<Domain.Entities.Users.Identity>(x)).ToList() ?? new List<Domain.Entities.Users.Identity>();
     }
 }

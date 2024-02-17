@@ -7,6 +7,7 @@ using Application.Interfaces.Services.Identity;
 using Application.Interfaces.Services.Mailing;
 using Azure.Storage.Blobs;
 using Domain.Entities.Users;
+using Domain.Enums;
 using Domain.Enums.Memberships;
 using Hangfire;
 using Infrastructure.Authentication;
@@ -15,6 +16,7 @@ using Infrastructure.Persistence.Contexts;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Services.Azure;
+using Infrastructure.Services.Caching;
 using Infrastructure.Services.Identity;
 using Infrastructure.Services.Mailing;
 using Microsoft.AspNetCore.Authentication;
@@ -43,6 +45,9 @@ namespace Infrastructure.Extensions
     {
         public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
         {
+            // Serializer
+            services.AddSerializer();
+
             // Persistence
             services.AddDbContext(configuration);
             services.AddRepositories();
@@ -75,6 +80,9 @@ namespace Infrastructure.Extensions
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
             services.AddRazorPages();
+
+            // Caching
+            services.AddCaching(configuration);
         }
 
         #region Persistence
@@ -338,6 +346,8 @@ namespace Infrastructure.Extensions
 
         #endregion
 
+        #region Misc
+
         private static void AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
         {
             // Add Hangfire services.
@@ -378,5 +388,68 @@ namespace Infrastructure.Extensions
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
         }
+
+        private static void AddSerializer(this IServiceCollection services)
+        {
+            services.AddTransient<ISerializerService, NewtonSoftService>();
+        }
+
+        private static void AddCaching(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<CacheConfig>(configuration.GetSection("Cache"));
+
+            var cacheConfig = configuration.GetSection("Cache").Get<CacheConfig>() ?? new();
+
+            switch (cacheConfig.DistributedCacheType)
+            {
+                case DistributedCacheType.Redis:
+                    {
+                        services.AddStackExchangeRedisCache(options =>
+                        {
+                            options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions()
+                            {
+                                AbortOnConnectFail = true,
+                                EndPoints = { cacheConfig.Redis.RedisURL }
+                            };
+                        });
+
+                        services.AddTransient<ICacheService, DistributedCacheService>();
+
+                        break;
+                    }
+                case DistributedCacheType.SqlServer:
+                    {
+                        services.AddDistributedSqlServerCache(options =>
+                        {
+                            options.ConnectionString = configuration.GetConnectionString("Primary");
+                            options.SchemaName = "dbo";
+                            options.TableName = "CacheItems";
+                        });
+
+                        services.AddTransient<ICacheService, DistributedCacheService>();
+
+                        break;
+                    }
+                case DistributedCacheType.InMemory:
+                    {
+                        services.AddDistributedMemoryCache();
+
+                        services.AddTransient<ICacheService, DistributedCacheService>();
+
+                        break;
+                    }
+                case DistributedCacheType.None:
+                default:
+                    {
+                        services.AddMemoryCache();
+
+                        services.AddTransient<ICacheService, LocalCacheService>();
+
+                        break;
+                    }
+            };
+        }
+
+        #endregion
     }
 }

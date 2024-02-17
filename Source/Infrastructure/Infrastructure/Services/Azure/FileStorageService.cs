@@ -88,7 +88,7 @@ namespace Infrastructure.Services.Azure
 
             switch (command.FileType)
             {
-                case FileTypes.UserProfileImage:
+                case FileType.UserProfileImage:
                     {
                         isValidRefId = (await _unitOfWork.Repository<User>().GetByIdAsync(command.RefId, cancellationToken)) != null;
                         containerName = _azureStorageConfig.UserProfileImageContainer;
