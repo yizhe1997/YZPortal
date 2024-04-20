@@ -4,7 +4,6 @@ using Application.Models;
 using Infrastructure.Configurations;
 using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Graph.Models.ODataErrors;
 using Serilog;

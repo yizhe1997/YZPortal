@@ -31,8 +31,9 @@ namespace YZPortal.Client.Shared
             var administrationSubMenus = new List<MenuItem>
             {
                 //new MenuItem() { Text = "Dealers", Icon = "fa-solid fa-fw fa-table", Url = "/fetchDealers" },
-                new MenuItem() { Text = "User Setup", Icon = "fa-solid fa-fw fa-users", Url = "/users" },
-                new MenuItem() { Text = "Background Jobs", Icon = "fa-solid fa-fw fa-users", Url = "/backgroundjobs" }
+                new() { Text = "User Setup", Icon = "fa-solid fa-fw fa-users", Url = "/users" },
+                new() { Text = "Background Jobs", Icon = "fa-solid fa-fw fa-users", Url = "/backgroundjobs" },
+                new() { Text = "Public Chat", Icon = "fa-solid fa-fw fa-users", Url = "/chatroom" }
             };
 
             Menus.Add(new MenuItem() { Text = "Administration", Icon = "fa-solid fa-fw fa-users", Items = administrationSubMenus });

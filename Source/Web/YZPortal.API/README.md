@@ -16,6 +16,7 @@ on the local host. Presently, the backend API supports the following configurati
 |Mail|Configure Mail options.|
 |CORS|Configure CORS options.|
 |Cache|Configure Cache options.|
+|SignalR|Configure SignalR options.|
 
 ### 3.1 Configuration options
 #### 3.1.1 JWT
@@ -97,6 +98,12 @@ on the local host. Presently, the backend API supports the following configurati
 |Cache__DefaultSlidingExpirationSeconds|Sets how long a cache entry can be inactive before it is removed from the cache.|
 |Cache__Redis__RedisURL|URL for redis cache server.|
 
+#### 3.1.12 SignalR
+|Options|Description|
+|-|-|
+|SignalR__SignalRType|Type of SignalR e.g. Azure. Will default to asp.net built in SignalR.|
+|SignalR__Azure__ConnectionString|The connection string for Azure SignalR.|
+
 ## 4. References
 ### 4.1. Identity
 #### 4.1.1. AZURE AD B2C
@@ -140,3 +147,16 @@ on the local host. Presently, the backend API supports the following configurati
 - [Distributed cache](https://code-maze.com/aspnetcore-distributed-caching/) 
 - [In-Memory cache](https://code-maze.com/aspnetcore-in-memory-caching/) 
 = [Redis cache](https://www.c-sharpcorner.com/article/easily-use-redis-cache-in-asp-net-6-0-web-api/)
+
+### 4.6. Real-time Web Functionality
+#### 4.6.1 SignalR
+- [Example](https://code-maze.com/creating-blazor-webassembly-signalr-charts/)
+- [Microsoft documentation](https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-8.0)
+- [Authentication](https://learn.microsoft.com/en-us/azure/azure-signalr/signalr-concept-authenticate-oauth)
+- [Advance Example](https://www.dotnetcurry.com/aspnet-core/realtime-app-using-blazor-webassembly-signalr-csharp9)
+- [Example](https://github.com/aspnet/AzureSignalR-samples/tree/main/samples/ChatRoomLocal)
+- [Example](https://learn.microsoft.com/en-us/azure/azure-signalr/signalr-quickstart-dotnet-core)
+- [Scaling](https://learn.microsoft.com/en-us/aspnet/core/signalr/scale?view=aspnetcore-8.0#azure-signalr-service)
+
+- #### 4.6.2 Websockets
+- [How to](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/websockets?view=aspnetcore-3.1)

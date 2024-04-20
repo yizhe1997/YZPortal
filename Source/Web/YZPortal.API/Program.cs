@@ -28,15 +28,15 @@ await app.Services.MigrateDatabaseAsync();
 
 app.UseInfrastructure();
 
+//// Make the default route redirect to Swagger documentation
+//var option = new RewriteOptions();
+//option.AddRedirect("^$", "chat");
+//app.UseRewriter(option);
+
 // Expose Swagger documentation
 app.UseSwagger(app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), configuration);
 
-app.MapControllers();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
+app.MapEndpoints();
 
 app.Run();
 

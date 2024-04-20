@@ -83,6 +83,9 @@ namespace Infrastructure.Extensions
 
             // Caching
             services.AddCaching(configuration);
+
+            // Real-Time Services
+            services.AddChatHub(configuration);
         }
 
         #region Persistence
@@ -444,6 +447,33 @@ namespace Infrastructure.Extensions
                         services.AddMemoryCache();
 
                         services.AddTransient<ICacheService, LocalCacheService>();
+
+                        break;
+                    }
+            };
+        }
+
+        private static void AddChatHub(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<SignalRConfig>(configuration.GetSection("SignalR"));
+
+            var signalRConfig = configuration.GetSection("SignalR").Get<SignalRConfig>() ?? new();
+
+            switch (signalRConfig.SignalRType)
+            {
+                case SignalRType.Azure:
+                    {
+                        services.AddSignalR().AddAzureSignalR(options =>
+                        {
+                            options.ConnectionString = signalRConfig.Azure.ConnectionString;
+                        });
+
+                        break;
+                    }
+                case SignalRType.None:
+                default:
+                    {
+                        services.AddSignalR();
 
                         break;
                     }

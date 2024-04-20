@@ -1,0 +1,204 @@
+﻿@page "/chatroom"
+@using Application.Constants
+@using System.Text.Json.Nodes
+@using System.Text.Json
+@using Application.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using YZPortal.Client.Clients.YZPortalApi;
+@using Microsoft.AspNetCore.SignalR.Client;
+@using Application.Extensions;
+@inject YZPortalApiConfig YZPortalApiConfig
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAccessTokenProvider TokenProvider
+@implements IDisposable
+@implements IAsyncDisposable
+@attribute [Authorize]
+
+<h3>ChatRoom</h3>
+
+@* banner to show current user *@
+<div class="alert alert-secondary mt-4" role="alert">
+    <span class="oi oi-person mr-2" aria-hidden="true"></span>
+    <span>You are connected as <b>@Username</b></span>
+</div>
+@* display messages *@
+<div id="scrollbox">
+    @foreach (var payload in ChatPaylods)
+    {
+        @if (payload.IsNotice)
+        {
+            <div class="alert alert-info">@payload.Message</div>
+        }
+        else
+        {
+            <div class="@payload.CSS">
+                <div class="user">@payload.Username: @payload.Message</div>
+            </div>
+        }
+    }
+    <hr />
+    <textarea class="input-lg" placeholder="enter your comment" @bind="@NewMessage"></textarea>
+    <button class="btn btn-default" @onclick="@(() => BroadcastToGroupAsync(NewMessage))">Send</button>
+</div>
+
+@code {
+    // name of the user who will be chatting
+    private string? Username;
+
+    // on-screen message
+    private string? Message;
+
+    // new message input
+    private string? NewMessage;
+
+    // list of messages in chat
+    private List<ChatPaylodModel> ChatPaylods = new List<ChatPaylodModel>();
+
+    private readonly CancellationTokenSource CancellationTokenSource = new();
+    private HubConnection? HubConnection;
+    private IDisposable? MessageSubscription;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            Username = authState.User.GetDisplayName() ?? "Anon";
+
+            // Setup chat hub connection
+            HubConnection = new HubConnectionBuilder()
+                .WithUrl(YZPortalApiConfig.BaseAddress + YZPortalApiConfig.ChatRoomUrl, options =>
+                    {
+                        options.AccessTokenProvider = () => GetAccessTokenAsync();
+                    })
+                .WithAutomaticReconnect(new ChatHubReconnectPolicy())
+                .Build();
+
+            // Register subscription
+            MessageSubscription = AddMessageSubscription(HubConnection);
+
+            await ConnectToChatHubWithRetryAsync(CancellationTokenSource.Token);
+
+            await BroadcastToGroupAsync(Username + " joined chat room.", true);
+        }
+        catch (Exception e)
+        {
+            Message = $"ERROR: Failed to start chat client: {e.Message}";
+        }
+    }
+
+    private async Task BroadcastToGroupAsync(string message, bool isNotice = false)
+    {
+        _ = HubConnection ?? throw new InvalidOperationException("HubConnection can't be null.");
+
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            await BroadcastMessageToGroupAsync(HubConnection, new ChatPaylodModel()
+            {
+                Username = Username,
+                Message = message,
+                IsMine = true,
+                IsNotice = isNotice
+            });
+
+            NewMessage = string.Empty;
+        }
+    }
+
+    private async Task<string?> GetAccessTokenAsync()
+    {
+        var accessTokenResult = await TokenProvider.RequestAccessToken();
+        var accessToken = "";
+
+        if (accessTokenResult.TryGetToken(out var token))
+        {
+            accessToken = token.Value;
+        }
+
+        return accessToken;
+    }
+
+    private async Task ConnectToChatHubWithRetryAsync(CancellationToken cancellationToken)
+    {
+        _ = HubConnection ?? throw new InvalidOperationException("HubConnection can't be null.");
+
+        // Keep trying to until we can start or the token is canceled.
+        while (true)
+        {
+            try
+            {
+                await HubConnection.StartAsync(cancellationToken);
+                return;
+            }
+            catch when (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            catch
+            {
+                // Try again in a few seconds. This could be an incremental interval
+                await Task.Delay(5000, cancellationToken);
+            }
+        }
+    }
+
+    internal class ChatHubReconnectPolicy : IRetryPolicy
+    {
+        public TimeSpan? NextRetryDelay(RetryContext retryContext) =>
+            retryContext.PreviousRetryCount switch
+            {
+                0 => TimeSpan.Zero,
+                1 => TimeSpan.FromSeconds(2),
+                2 => TimeSpan.FromSeconds(5),
+                _ => TimeSpan.FromSeconds(10)
+            };
+    }
+
+    #region Subscriptions
+
+    private IDisposable AddMessageSubscription(HubConnection hubConnection)
+    {
+        return hubConnection.On<ChatPaylodModel>(ChatHubConstants.TransferMessage, (model) =>
+        {
+            model.IsMine = model.Username?.Equals(Username, StringComparison.OrdinalIgnoreCase) ?? false;
+
+            ChatPaylods.Add(model);
+
+            // Inform blazor the UI needs updating
+            StateHasChanged();
+        });
+    }
+
+    #endregion
+
+    #region Publishers
+
+    public async Task BroadcastMessageToGroupAsync(HubConnection hubConnection, ChatPaylodModel model) =>
+        await hubConnection.SendAsync(ChatHubConstants.BroadcastToGroupAsync, model);
+
+    #endregion
+
+    #region Disposable
+
+    void IDisposable.Dispose()
+    {
+        CancellationTokenSource.Cancel();
+        CancellationTokenSource.Dispose();
+        MessageSubscription?.Dispose();
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (HubConnection is not null)
+        {
+            await BroadcastToGroupAsync(Username + " left chat room.", true);
+
+            await HubConnection.DisposeAsync();
+        }
+    }
+    
+    #endregion
+}

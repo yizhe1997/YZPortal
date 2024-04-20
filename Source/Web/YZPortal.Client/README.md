@@ -14,6 +14,8 @@ on the local host. Presently, the backend API supports the following configurati
 |-|-|
 |YZPortalApi__BaseAddress|Base address of the main API.|
 |YZPortalApi__Scope|The secret key used to create signing credentials.|
+|YZPortalApi__HangfireDashboardUrl|The url for Hangfire Dashboard.|
+|YZPortalApi__ChatRoomUrl|The url for SignalR Chat Hub.|
 
 #### 3.1.2 ConnectionStrings
 |Options|Description|
@@ -30,4 +32,10 @@ on the local host. Presently, the backend API supports the following configurati
 
 - [Policy based authorization](https://chrissainty.com/securing-your-blazor-apps-configuring-policy-based-authorization-with-blazor/)
 
+- [Disposable](https://www.meziantou.net/canceling-background-tasks-when-a-user-navigates-away-from-a-blazor-component.htm)
+
+- [Disposable](https://www.infoworld.com/article/3649352/how-to-work-with-iasyncdisposable-in-net-6.html)
+
 - [Razor component lifecycle](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-8.0)
+
+- [Blazor component lifecycle](https://blazor-university.com/components/component-lifecycles/)

@@ -6,15 +6,15 @@ using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.Mvc;
 using Application.Models;
 using Application.Requests;
+using Application.Constants;
 
 namespace YZPortal.API.Controllers
 {
     [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
-    [RequiredScope(_)]
+    [RequiredScope(ScopeConstants.APIAccess)]
     public class FileStorageController : ApiControllerBase
     {
         private readonly IFileStorageService _fileStorageService;
-        private const string _ = "API.Access";
 
         public FileStorageController(IFileStorageService fileStorageService, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {

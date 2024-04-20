@@ -1,4 +1,5 @@
-﻿using Application.Features.Users.Configs.Commands.UpdatePortalConfig;
+﻿using Application.Constants;
+using Application.Features.Users.Configs.Commands.UpdatePortalConfig;
 using Application.Features.Users.Configs.Queries.GetConfigs;
 using Application.Models;
 using MediatR;
@@ -10,11 +11,9 @@ using Microsoft.Identity.Web.Resource;
 namespace YZPortal.API.Controllers.Users.Configs
 {
     [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
-    [RequiredScope(_)]
+    [RequiredScope(ScopeConstants.APIAccess)]
     public class ConfigsController : ApiControllerBase
     {
-        private const string _ = "API.Access";
-
         public ConfigsController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {
         }
