@@ -4,9 +4,9 @@
 name: Build and deploy ASP.Net Core app to Azure Web App - YZPortalClient
 
 on:
-  push:
-    branches:
-      - master
+  # push:
+  #   branches:
+  #     - master
   workflow_dispatch:
 
 jobs:

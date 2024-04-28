@@ -15,6 +15,10 @@
 
   <RelyingParty>
     <DefaultUserJourney ReferenceId="ProfileEdit" />
+	<Endpoints>
+		<!-- Reference to the refresh token user journey-->
+		<Endpoint Id="Token" UserJourneyReferenceId="RedeemRefreshToken" />
+	</Endpoints>
     <TechnicalProfile Id="PolicyProfile">
       <DisplayName>PolicyProfile</DisplayName>
       <Protocol Name="OpenIdConnect" />
