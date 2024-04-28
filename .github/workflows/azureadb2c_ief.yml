@@ -4,7 +4,17 @@ on:
   #   branches:
   #     - master
   workflow_dispatch:
-
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'information'
+        type: choice
+        options:
+          - information
+          - debug
+          - warning
+          - critical
 env:
   clientId: 00250439-7907-492d-aa94-f040ba57171e
   tenant: yzorganization.onmicrosoft.com
