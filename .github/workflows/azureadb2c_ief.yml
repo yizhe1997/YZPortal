@@ -31,7 +31,7 @@ jobs:
         # The folder where the custom policies files are stored
         folder: "./Source/Web/YZPortal.API/Policies/AzureAdB2C"
         # Comma delimiter list of policy files
-        files: "PasswordReset.xml"
+        files: "TrustFrameworkBase.xml,TrustFrameworkLocalization.xml,TrustFrameworkExtensions.xml,AccountLinkExtensions.xml,SignUpOrSignin.xml,AccountLinkSignUpOrSignin.xml,ProfileEdit.xml,PasswordReset.xml"
         # The full Azure AD B2C tenant name (for example, contoso.onmicrosoft.com) or GUID
         tenant: ${{ env.tenant }}
         # The application Client ID for a service principal which will be used to authenticate to the Microsoft Graph
