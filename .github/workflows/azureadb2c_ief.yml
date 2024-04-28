@@ -29,7 +29,7 @@ jobs:
       uses: azure-ad-b2c/deploy-trustframework-policy@v3
       with:
           folder: ./Source/Web/YZPortal.API/Policies/AzureAdB2C
-          files: "TrustFrameworkBase.xml,TrustFrameworkLocalization.xml,TrustFrameworkExtensions.xml,AccountLinkExtensions.xml,SignUpOrSignin.xml,AccountLinkSignUpOrSignin.xml,ProfileEdit.xml,PasswordReset.xml"
-          clientId: ${{ secrets.AZUREADB2C_MANAGER_CLIENT_ID }}
+          files: "PasswordReset.xml"
+          clientId: ${{ env.AZUREADB2C_MANAGER_CLIENT_ID }}
           clientSecret: ${{ secrets.AZUREADB2C_MANAGER_CLIENT_SECRET }}
-          tenant: ${{ secrets.AZUREADB2C_TENANT }}
+          tenant: ${{ env.AZUREADB2C_TENANT }}
