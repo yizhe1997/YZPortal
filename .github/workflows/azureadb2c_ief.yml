@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: 'Upload TrustFrameworkBase Policy'
+    - name: 'Upload Policies'
       uses: azure-ad-b2c/deploy-trustframework-policy@v5
       with:
         # The folder where the custom policies files are stored
