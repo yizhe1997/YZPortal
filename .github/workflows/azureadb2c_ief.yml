@@ -26,10 +26,15 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: 'Upload TrustFrameworkBase Policy'
-      uses: azure-ad-b2c/deploy-trustframework-policy@v3
+      uses: azure-ad-b2c/deploy-trustframework-policy@v5
       with:
-          folder: ./Source/Web/YZPortal.API/Policies/AzureAdB2C
-          files: "PasswordReset.xml"
-          clientId: ${{ env.AZUREADB2C_MANAGER_CLIENT_ID }}
-          clientSecret: ${{ secrets.AZUREADB2C_MANAGER_CLIENT_SECRET }}
-          tenant: ${{ env.AZUREADB2C_TENANT }}
+        # The folder where the custom policies files are stored
+        folder: "./Source/Web/YZPortal.API/Policies/AzureAdB2C"
+        # Comma delimiter list of policy files
+        files: "PasswordReset.xml"
+        # The full Azure AD B2C tenant name (for example, contoso.onmicrosoft.com) or GUID
+        tenant: ${{ env.tenant }}
+        # The application Client ID for a service principal which will be used to authenticate to the Microsoft Graph
+        clientId: ${{ env.clientId }}
+        # The application Secret for a service principal which will be used to authenticate to the Microsoft Graph
+        clientSecret: ${{ secrets.AZUREADB2C_MANAGER_CLIENT_SECRET }}
