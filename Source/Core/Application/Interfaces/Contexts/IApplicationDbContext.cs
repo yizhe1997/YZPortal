@@ -12,6 +12,7 @@ namespace Application.Interfaces.Contexts
         #region Users
 
         public DbSet<Identity> Identities { get; set; }
+        public DbSet<UserProfileImage> UserProfileImages { get; set; }
 
         #region Configs
 

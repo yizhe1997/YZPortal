@@ -1,0 +1,125 @@
+﻿@using Application.Features.Users.Configs.Queries.GetConfigs;
+@using Domain.Enums.Memberships;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@using YZPortalV8.Client.Clients.YZPortalApi;
+@using YZPortalV8.Client.Pages.Authentication
+@using YZPortalV8.Client.Services.Authentication;
+@using YZPortalV8.Client.Services.LocalStorage;
+@inherits LayoutComponentBase
+@inject IAuthorizationService _authorizationService
+@inject ILocalStorageService LocalStorageService
+@inject YZPortalApiHttpClient YZPortalApiClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject SignOutSessionStateManager SignOutManager
+@inject NavigationManager Navigation
+
+<PageTitle>YZPortal</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <Layout SideWidth="0" IsPage="true" ShowGotoTop="true" ShowCollapseBar="true"
+            IsFullSide="@Configs.PortalConfig.IsFullSide" IsFixedHeader="@Configs.PortalConfig.IsFixedHeader" IsFixedFooter="@Configs.PortalConfig.IsFixedFooter" ShowFooter="@Configs.PortalConfig.ShowFooter"
+            TabDefaultUrl="/" UseTabSet="@Configs.PortalConfig.UseTabSet" AdditionalAssemblies="new[] { GetType().Assembly }" class="@Configs.PortalConfig.Theme">
+            <Header>
+                <span class="ms-3 flex-sm-fill d-none d-sm-block"></span>
+                <div class="flex-fill d-sm-none">
+                </div>
+                <CultureSelector />
+                <Logout ImageUrl="_content/Reference.Shared/images/Argo.png" DisplayName="超级管理员" UserName="@context.User.Identity?.Name">
+                    <LinkTemplate>
+                        <a @onclick="OnLogout"><i class="fa-solid fa-suitcase"></i>Logout</a>
+                    </LinkTemplate>
+                </Logout>
+                @*<Widget></Widget>*@
+                <div class="layout-drawer" @onclick="@(e => IsRightDrawerOpen = true)"><i class="fa fa-gears"></i></div>
+            </Header>
+            <Side>
+                <div class="layout-banner">
+                    <img class="layout-logo" src="_content/Reference.Shared/images/brand.png" />
+                    <div class="layout-title">
+                        <a href="#">
+                            <span>YZPortal</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="layout-menu">
+                    <div class="scroll">
+                        <Menu Items="@AdminMenu" IsVertical="true" class="menu is-vertical is-collapsed" />
+                        <Menu Items="@CatalogMenu" IsVertical="true" class="menu is-vertical is-collapsed" />
+                        <Menu Items="@PromotionsMenu" IsVertical="true" class="menu is-vertical is-collapsed" />
+                    </div>
+                </div>
+            </Side>
+            <Main>
+                <CascadingValue Value="this" IsFixed="true">
+                    @Body
+                </CascadingValue>
+            </Main>
+            <Footer>
+                <div class="text-center flex-fill">
+                    <a class="page-layout-demo-footer-link" href="https://gitee.com/LongbowEnterprise/BootstrapAdmin" target="_blank">Bootstrap Admin</a>
+                </div>
+            </Footer>
+        </Layout>
+
+        <RightDrawer PortalConfigChanged="@((PortalConfigDto newValue) => SetPortalConfig(newValue))" PortalConfig="@Configs.PortalConfig" @bind-IsRightDrawerOpen="IsRightDrawerOpen"></RightDrawer>
+    </Authorized>
+    <NotAuthorized>
+        <div class="container-fluid px-1 px-md-5 px-lg-1 px-xl-5 py-5 mx-auto">
+            <div class="card">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="h-100 d-flex justify-content-center align-items-center">
+                            <div class="py-4 px-3 w-50">
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        <a href="authentication/login">
+                                            <button class="btn btn-primary w-100 signup-button">Login</button>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        <a href="authentication/register">
+                                            <button class="btn btn-primary w-100 signup-button">Signup</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="right-side-content">
+                            <div class="content d-flex flex-column">
+                                <h6>Welcome to YZPortal!</h6>
+                                <span>manage your websites seamlessly</span>
+                            </div>
+                            <div class="right-side">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span><img src="https://i.imgur.com/kWmyZvb.jpg"></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span><img src="https://i.imgur.com/U0863iD.jpg"></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="parallelogram">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div hidden>
+            @Body
+        </div>
+    </NotAuthorized>
+</AuthorizeView>

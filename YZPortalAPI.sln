@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YZPortal.Client", "Source\W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTests", "Tests\Application.UnitTests\Application.UnitTests.csproj", "{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YZPortalV8.Client", "Source\Web\YZPortalV8.Client\YZPortalV8.Client.csproj", "{AA4134BC-5EE5-4D9E-B138-4090BC91C21B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA4134BC-5EE5-4D9E-B138-4090BC91C21B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA4134BC-5EE5-4D9E-B138-4090BC91C21B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA4134BC-5EE5-4D9E-B138-4090BC91C21B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA4134BC-5EE5-4D9E-B138-4090BC91C21B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +77,7 @@ Global
 		{2BD2560D-E9DC-431F-A138-3F1B44E6D24E} = {90C8F030-05C0-4029-B707-C724483E46D2}
 		{E1E5E36D-1FCE-4793-B43C-F837072DD9D2} = {90C8F030-05C0-4029-B707-C724483E46D2}
 		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC} = {306CF89F-FF42-4567-97FF-F98FE442221D}
+		{AA4134BC-5EE5-4D9E-B138-4090BC91C21B} = {90C8F030-05C0-4029-B707-C724483E46D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D507CA90-D13C-43DE-9C4C-D539972D8A4E}

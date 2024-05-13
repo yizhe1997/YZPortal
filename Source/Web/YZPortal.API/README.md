@@ -158,5 +158,17 @@ on the local host. Presently, the backend API supports the following configurati
 - [Example](https://learn.microsoft.com/en-us/azure/azure-signalr/signalr-quickstart-dotnet-core)
 - [Scaling](https://learn.microsoft.com/en-us/aspnet/core/signalr/scale?view=aspnetcore-8.0#azure-signalr-service)
 
-- #### 4.6.2 Websockets
+#### 4.6.2 Websockets
 - [How to](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/websockets?view=aspnetcore-3.1)
+
+### 4.7 CICD
+#### 4.7.1 Github Actions
+- [Manually Trigger a GitHub Action with “workflow_dispatch”](https://medium.com/@irfankaraman/manually-trigger-a-github-action-with-workflow-dispatch-124708e26afe)
+- [Azure AD B2C IEF deployment](https://learn.microsoft.com/en-us/azure/active-directory-b2c/deploy-custom-policies-github-action)
+
+### 4.8 Security
+#### 4.8.1 Refresh token
+- [OAuth 2.0 refresh tokens with Azure AD B2C](https://melmanm.github.io/misc/2023/01/29/article2-oauth-refresh-tokens-with-azure-b2c.html#refreshing-tokens-by-the-book)
+- [OAuth 2.0 authorization code flow in Azure Active Directory B2C](https://learn.microsoft.com/en-us/azure/active-directory-b2c/authorization-code-flow#1-get-an-authorization-code)
+
+

@@ -53,7 +53,8 @@ namespace Domain.Entities.Users
 
         #endregion
 
+        // TODO: change to owned type entity https://learn.microsoft.com/en-us/ef/core/modeling/owned-entities
         public PortalConfig PortalConfig { get; set; } = new();
-        public Domain.Entities.Misc.File? ProfileImage { get; set; }
+        public UserProfileImage? UserProfileImage { get; set; }
     }
 }

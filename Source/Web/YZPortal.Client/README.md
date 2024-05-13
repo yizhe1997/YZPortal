@@ -1,4 +1,7 @@
-﻿## 3. Configurations
+﻿## 1. Overview
+This project is a Blazor WebAssembly application powered by .NET 7.0. Blazor WebAssembly revolutionizes web development by enabling the creation of dynamic and interactive web user interfaces using C# instead of JavaScript. This approach simplifies the development process and enhances maintainability, empowering developers to build robust web applications with ease.
+
+## 3. Configurations
 To ensure a smooth startup and runtime experience, it's crucial to configure the settings before hosting. 
 You can set up the backend API by defining configurations through either environment variables on the hosting server or user secrets 
 on the local host. Presently, the backend API supports the following configurations:

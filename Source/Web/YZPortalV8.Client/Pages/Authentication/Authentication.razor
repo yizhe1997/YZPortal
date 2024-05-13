@@ -1,0 +1,56 @@
+﻿@page "/authentication/{action}"
+@using Application.Features.Users.Configs.Queries.GetConfigs;
+@using Application.Models;
+@using Application.Requests.Users;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using YZPortalV8.Client.Clients.YZPortalApi;
+@using YZPortalV8.Client.Services.Authentication;
+@using YZPortalV8.Client.Services.LocalStorage;
+@using Application.Extensions;
+@inject YZPortalApiHttpClient YZPortalApiClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILocalStorageService LocalStorageService
+
+@if (!string.IsNullOrEmpty(Action))
+{
+    <RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
+}
+
+@code{
+    [Parameter] 
+    public string? Action { get; set; }
+    [Parameter]
+    public ConfigsDto ConfigsModel { get; set; } = new ConfigsDto();
+    [Parameter]
+    public EventCallback<ConfigsDto> ConfigsModelChanged { get; set; }
+
+    private async Task HandleAuthenticationAsync()
+    {
+        // Create user in server if subject claim does not exist and update user if it does
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var identity = authState.User.Identities.FirstOrDefault(c => c.IsAuthenticated);
+        if (identity != null)
+        {
+            var userId = authState.User.GetSubClaim();
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var user = await YZPortalApiClient.GetUserAsync(userId);
+                if (user.Data.Id == Guid.Empty)
+                {
+                    var newUser = await YZPortalApiClient.CreateUserAsync();
+                }
+                else
+                {
+                    var newUser = await YZPortalApiClient.UpdateCurrentUserViaHttpContextAsync();
+                }
+
+                // Get user's configurations and store in local storage as well
+                var result = await YZPortalApiClient.GetConfigsAsync(authState.User.GetSubClaim() ?? string.Empty);
+                ConfigsModel = result.Data;
+                await LocalStorageService.SetUserConfigs(ConfigsModel);
+                await ConfigsModelChanged.InvokeAsync(ConfigsModel);
+            }
+        }
+    }
+}

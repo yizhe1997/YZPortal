@@ -1,0 +1,95 @@
+﻿using Application.Features.Users.Configs.Queries.GetConfigs;
+using BootstrapBlazor.Components;
+
+namespace YZPortalV8.Client.Layout
+{
+    public sealed partial class MainLayout
+    {
+        private ConfigsDto Configs { get; set; } = new ConfigsDto()
+        {
+            PortalConfig = new PortalConfigDto()
+            {
+                Theme = "color1"
+            }
+        };
+
+        private List<MenuItem> AdminMenu { get; set; } = [];
+        private List<MenuItem> CatalogMenu { get; set; } = [];
+        private List<MenuItem> PromotionsMenu { get; set; } = [];
+        public bool IsRightDrawerOpen { get; set; }
+
+        protected override async Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+
+            // On refresh try to fetch user configs
+            Configs = await LocalStorageService.GetUserConfigs();
+
+            InitMenu();
+        }
+
+        // TODO: will upgrade this to fetch the menuitems from the server since language is a thing
+        private void InitMenu()
+        {
+            // Clear menus
+
+            #region Administration Menu
+
+            AdminMenu.Clear();
+
+            var administrationSubMenus = new List<MenuItem>
+            {
+                //new MenuItem() { Text = "Dealers", Icon = "fa-solid fa-fw fa-table", Url = "/fetchDealers" },
+                new() { Text = "User Setup", Icon = "fa-solid fa-fw fa-users", Url = "/users" },
+                new() { Text = "Background Jobs", Icon = "fa-solid fa-fw fa-users", Url = "/backgroundjobs" },
+                new() { Text = "Public Chat", Icon = "fa-solid fa-fw fa-users", Url = "/chatroom" }
+            };
+
+            AdminMenu.Add(new MenuItem() { Text = "Administration", Icon = "fa-solid fa-fw fa-users", Items = administrationSubMenus });
+
+            #endregion
+
+            #region Catalog Menu
+
+            CatalogMenu.Clear();
+
+            var catalogSubMenus = new List<MenuItem>
+            {
+                new() { Text = "Products", Icon = "fas fa-folder-tree", Url = "/#" },
+                new() { Text = "Categories", Icon = "fas fa-folder-tree", Url = "/#" },
+            };
+
+            CatalogMenu.Add(new MenuItem() { Text = "Catalog", Icon = "fas fa-book", Items = catalogSubMenus });
+
+            #endregion
+
+            #region Promotions Menu
+
+            PromotionsMenu.Clear();
+
+            var promotionsSubMenus = new List<MenuItem>
+            {
+                new() { Text = "Discounts", Icon = "fas fa-hand-holding-dollar", Url = "/#" }
+            };
+
+            PromotionsMenu.Add(new MenuItem() { Text = "Promotions", Icon = "fas fa-tag", Items = promotionsSubMenus });
+
+            #endregion
+        }
+
+        private async Task OnLogout()
+        {
+            // TODO: Make sure all the infos on log out is removed
+            await LocalStorageService.ClearLocalStorage();
+
+            await SignOutManager.SetSignOutState();
+            Navigation.NavigateTo("authentication/logout");
+        }
+
+        private async Task SetPortalConfig(PortalConfigDto portalConfig)
+        {
+            Configs.PortalConfig = portalConfig;
+            await LocalStorageService.SetUserConfigs(Configs);
+        }
+    }
+}

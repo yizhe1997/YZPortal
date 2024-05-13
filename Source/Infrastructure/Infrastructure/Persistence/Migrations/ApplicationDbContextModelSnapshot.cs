@@ -22,7 +22,288 @@ namespace Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.Misc.File", b =>
+            modelBuilder.Entity("Domain.Entities.Discounts.Discount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CouponCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("DiscountLimitation")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DiscountLimitationId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DiscountTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EndDateUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCumulative")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LimitationTimes")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("MaxDiscountAmountForPercentage")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("RequiresCouponCode")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("StartDateUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("UsePercentage")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Discounts");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Discounts.DiscountMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DiscountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RefId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.ToTable("DiscountMappings");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("DiscountMapping");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Cost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Sku")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttribute", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductAttributes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttributeMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AttributeControlType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AttributeControlTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ProductAttributeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TextPrompt")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductAttributeId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductAttributeMappings");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttributeMappingValue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Cost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPreSelected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PriceAdjustment")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<bool>("PriceAdjustmentUsePercentage")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ProductAttributeMappingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("WeightAdjustment")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductAttributeMappingId")
+                        .IsUnique();
+
+                    b.ToTable("ProductAttributeMappingValues");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttributeMappingValuePicture", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -46,8 +327,128 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<Guid>("RefId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("RefType")
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RefId")
+                        .IsUnique();
+
+                    b.ToTable("ProductAttributeMappingValuePictures");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PageSize")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PageSizeOptions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ParentProductCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ProductCategoryPictureId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentProductCategoryId");
+
+                    b.ToTable("ProductCategories");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductCategoryMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProductCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductCategoryId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductCategoryMappings");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductCategoryPicture", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContainerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RefId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
@@ -60,9 +461,10 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RefId");
+                    b.HasIndex("RefId")
+                        .IsUnique();
 
-                    b.ToTable("Files");
+                    b.ToTable("ProductCategoryPicture");
                 });
 
             modelBuilder.Entity("Domain.Entities.Sync.SyncStatus", b =>
@@ -254,9 +656,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ProfileImageId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -277,6 +676,9 @@ namespace Infrastructure.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<Guid?>("UserProfileImageId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -287,9 +689,44 @@ namespace Infrastructure.Persistence.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("ProfileImageId");
+                    b.HasIndex("UserProfileImageId");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Users.UserProfileImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContainerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserProfileImages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -423,15 +860,104 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Misc.File", b =>
+            modelBuilder.Entity("Domain.Entities.Discounts.DiscountManufacturerMapping", b =>
                 {
-                    b.HasOne("Domain.Entities.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("RefId")
+                    b.HasBaseType("Domain.Entities.Discounts.DiscountMapping");
+
+                    b.HasDiscriminator().HasValue("DiscountManufacturerMapping");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Discounts.DiscountProductCategoryMapping", b =>
+                {
+                    b.HasBaseType("Domain.Entities.Discounts.DiscountMapping");
+
+                    b.HasIndex("RefId");
+
+                    b.HasDiscriminator().HasValue("DiscountProductCategoryMapping");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Discounts.DiscountProductMapping", b =>
+                {
+                    b.HasBaseType("Domain.Entities.Discounts.DiscountMapping");
+
+                    b.HasIndex("RefId");
+
+                    b.HasDiscriminator().HasValue("DiscountProductMapping");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Discounts.DiscountMapping", b =>
+                {
+                    b.HasOne("Domain.Entities.Discounts.Discount", null)
+                        .WithMany("DiscountMappings")
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttributeMapping", b =>
+                {
+                    b.HasOne("Domain.Entities.Products.ProductAttribute", null)
+                        .WithMany("ProductAttributeMappings")
+                        .HasForeignKey("ProductAttributeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Domain.Entities.Products.Product", null)
+                        .WithMany("ProductAttributeMappings")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttributeMappingValue", b =>
+                {
+                    b.HasOne("Domain.Entities.Products.ProductAttributeMapping", null)
+                        .WithOne("ProductAttributeMappingValue")
+                        .HasForeignKey("Domain.Entities.Products.ProductAttributeMappingValue", "ProductAttributeMappingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttributeMappingValuePicture", b =>
+                {
+                    b.HasOne("Domain.Entities.Products.ProductAttributeMappingValue", null)
+                        .WithOne("ProductAttributeMappingValuePicture")
+                        .HasForeignKey("Domain.Entities.Products.ProductAttributeMappingValuePicture", "RefId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductCategory", b =>
+                {
+                    b.HasOne("Domain.Entities.Products.ProductCategory", "ParentProductCategory")
+                        .WithMany()
+                        .HasForeignKey("ParentProductCategoryId");
+
+                    b.Navigation("ParentProductCategory");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductCategoryMapping", b =>
+                {
+                    b.HasOne("Domain.Entities.Products.ProductCategory", null)
+                        .WithMany("ProductCategoryMappings")
+                        .HasForeignKey("ProductCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Products.Product", null)
+                        .WithMany("ProductCategoryMappings")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductCategoryPicture", b =>
+                {
+                    b.HasOne("Domain.Entities.Products.ProductCategory", null)
+                        .WithOne("ProductCategoryPicture")
+                        .HasForeignKey("Domain.Entities.Products.ProductCategoryPicture", "RefId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.Users.Configs.PortalConfig", b =>
@@ -455,11 +981,11 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Users.User", b =>
                 {
-                    b.HasOne("Domain.Entities.Misc.File", "ProfileImage")
+                    b.HasOne("Domain.Entities.Users.UserProfileImage", "UserProfileImage")
                         .WithMany()
-                        .HasForeignKey("ProfileImageId");
+                        .HasForeignKey("UserProfileImageId");
 
-                    b.Navigation("ProfileImage");
+                    b.Navigation("UserProfileImage");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -511,6 +1037,67 @@ namespace Infrastructure.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Discounts.DiscountProductCategoryMapping", b =>
+                {
+                    b.HasOne("Domain.Entities.Products.ProductCategory", "ProductCategory")
+                        .WithMany("DiscountProductCategoryMappings")
+                        .HasForeignKey("RefId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductCategory");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Discounts.DiscountProductMapping", b =>
+                {
+                    b.HasOne("Domain.Entities.Products.Product", "Product")
+                        .WithMany("DiscountProductMappings")
+                        .HasForeignKey("RefId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Discounts.Discount", b =>
+                {
+                    b.Navigation("DiscountMappings");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.Product", b =>
+                {
+                    b.Navigation("DiscountProductMappings");
+
+                    b.Navigation("ProductAttributeMappings");
+
+                    b.Navigation("ProductCategoryMappings");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttribute", b =>
+                {
+                    b.Navigation("ProductAttributeMappings");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttributeMapping", b =>
+                {
+                    b.Navigation("ProductAttributeMappingValue")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductAttributeMappingValue", b =>
+                {
+                    b.Navigation("ProductAttributeMappingValuePicture");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Products.ProductCategory", b =>
+                {
+                    b.Navigation("DiscountProductCategoryMappings");
+
+                    b.Navigation("ProductCategoryMappings");
+
+                    b.Navigation("ProductCategoryPicture");
                 });
 
             modelBuilder.Entity("Domain.Entities.Users.User", b =>

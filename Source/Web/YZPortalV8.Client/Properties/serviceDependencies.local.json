@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "identityapp1": {
+      "connectionInfo": "App registration: YZPortalClient, Tenant: YZOrganization (yzorganization.onmicrosoft.com - AAD B2C)",
+      "secretStore": null,
+      "type": "identityapp.secretStore",
+      "connectionId": "AzureAD:ClientSecret"
+    }
+  }
+}

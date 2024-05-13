@@ -2,6 +2,7 @@
 using Application.Extensions;
 using Application.Interfaces.Contexts;
 using Application.Interfaces.Repositories;
+using Application.Interfaces.Repositories.Users;
 using Application.Interfaces.Services;
 using Application.Interfaces.Services.Identity;
 using Application.Interfaces.Services.Mailing;
@@ -14,11 +15,12 @@ using Infrastructure.Authentication;
 using Infrastructure.Configurations;
 using Infrastructure.Persistence.Contexts;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Persistence.Repositories.Users;
 using Infrastructure.Services;
-using Infrastructure.Services.Azure;
 using Infrastructure.Services.Caching;
 using Infrastructure.Services.Identity;
 using Infrastructure.Services.Mailing;
+using Infrastructure.Services.Storage;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -114,7 +116,7 @@ namespace Infrastructure.Extensions
                 .AddTransient(typeof(IGenericRepository<,>), typeof(GenericRepository<,>))
                 .AddTransient(typeof(IUnitOfWork<>), typeof(UnitOfWork<>))
                 .AddTransient<IPortalConfigRepository, PortalConfigRepository>()
-                .AddTransient<IFileRepository, FileRepository>()
+                .AddTransient<IUserProfileImageRepository, UserProfileImageRepository>()
                 .AddTransient<IUserRepository, UserRepository>();
         }
 
@@ -325,7 +327,7 @@ namespace Infrastructure.Extensions
                 }
             });
 
-            services.AddScoped<IFileStorageService, FileStorageService>();
+            services.AddScoped<IDataFileStorageService, DataFileStorageService>();
         }
 
         #endregion

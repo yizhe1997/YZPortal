@@ -1,6 +1,8 @@
 ﻿using Application.Interfaces.Contexts;
 using Application.Interfaces.Services.Identity;
 using Domain.Entities.Auditable;
+using Domain.Entities.Discounts;
+using Domain.Entities.Products;
 using Domain.Entities.Sync;
 using Domain.Entities.Users;
 using Domain.Entities.Users.Configs;
@@ -35,6 +37,7 @@ namespace Infrastructure.Persistence.Contexts
         #region Users
 
         public DbSet<Domain.Entities.Users.Identity> Identities { get; set; }
+        public DbSet<UserProfileImage> UserProfileImages { get; set; }
 
         #region Configs
 
@@ -50,9 +53,26 @@ namespace Infrastructure.Persistence.Contexts
 
         #endregion
 
-        #region Misc
+        #region Discounts
 
-        public DbSet<Domain.Entities.Misc.File> Files { get; set; }
+        public DbSet<Discount> Discounts { get; set; }
+        public DbSet<DiscountProductMapping> DiscountProductMappings { get; set; }
+        public DbSet<DiscountMapping> DiscountMappings { get; set; }
+        public DbSet<DiscountManufacturerMapping> DiscountManufacturerMappings { get; set; }
+        public DbSet<DiscountProductCategoryMapping> DiscountProductCategoryMappings { get; set; }
+
+        #endregion
+
+        #region Products
+
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ProductCategoryPicture> ProductCategoryPictures { get; set; }
+        public DbSet<ProductCategoryMapping> ProductCategoryMappings { get; set; }
+        public DbSet<ProductAttributeMappingValue> ProductAttributeMappingValues { get; set; }
+        public DbSet<ProductAttributeMappingValuePicture> ProductAttributeMappingValuePictures { get; set; }
+        public DbSet<ProductAttribute> ProductAttributes { get; set; }
+        public DbSet<ProductAttributeMapping> ProductAttributeMappings { get; set; }
 
         #endregion
 
