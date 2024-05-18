@@ -10,11 +10,10 @@
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ILocalStorageService LocalStorageService
+@inject NavigationManager Navigation
+@layout LoginLayout
 
-@if (!string.IsNullOrEmpty(Action))
-{
-    <RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
-}
+<RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
 
 @code{
     [Parameter] 

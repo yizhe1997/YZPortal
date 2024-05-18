@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YZPortal.Client", "Source\W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTests", "Tests\Application.UnitTests\Application.UnitTests.csproj", "{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YZPortalV8.Client", "Source\Web\YZPortalV8.Client\YZPortalV8.Client.csproj", "{AA4134BC-5EE5-4D9E-B138-4090BC91C21B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YZPortalV8.Client", "Source\Web\YZPortalV8.Client\YZPortalV8.Client.csproj", "{AA4134BC-5EE5-4D9E-B138-4090BC91C21B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

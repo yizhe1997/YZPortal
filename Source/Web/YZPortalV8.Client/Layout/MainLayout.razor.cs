@@ -1,10 +1,15 @@
 ﻿using Application.Features.Users.Configs.Queries.GetConfigs;
 using BootstrapBlazor.Components;
+using Application.Extensions;
 
 namespace YZPortalV8.Client.Layout
 {
     public sealed partial class MainLayout
     {
+        private string? Username { get; set; } = "";
+
+        public bool IsAuthenticated { get; set; }
+
         private ConfigsDto Configs { get; set; } = new ConfigsDto()
         {
             PortalConfig = new PortalConfigDto()
@@ -21,6 +26,10 @@ namespace YZPortalV8.Client.Layout
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            IsAuthenticated = authState.User.Identities?.FirstOrDefault(c => c.IsAuthenticated) is not null;
+            Username = authState.User.GetDisplayName() ?? "Anon";
 
             // On refresh try to fetch user configs
             Configs = await LocalStorageService.GetUserConfigs();

@@ -44,20 +44,20 @@
 
 @code {
     // name of the user who will be chatting
-    private string? Username;
+    private string? Username { get; set; }
 
     // on-screen message
-    private string? Message;
+    private string? Message { get; set; }
 
     // new message input
-    private string? NewMessage;
+    private string? NewMessage { get; set; }
 
     // list of messages in chat
-    private List<ChatPaylodModel> ChatPaylods = new List<ChatPaylodModel>();
+    private List<ChatPaylodModel> ChatPaylods { get; set; } = new List<ChatPaylodModel>();
 
     private readonly CancellationTokenSource CancellationTokenSource = new();
-    private HubConnection? HubConnection;
-    private IDisposable? MessageSubscription;
+    private HubConnection? HubConnection { get; set; }
+    private IDisposable? MessageSubscription { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
