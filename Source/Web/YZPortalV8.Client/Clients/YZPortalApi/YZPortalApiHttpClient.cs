@@ -269,11 +269,11 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return new SearchResult<IdentityModel.UserModel>();
         }
 
-        public async Task<Result> DeleteUserAsync(Guid userId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> DeleteUserAsync(string subId, CancellationToken cancellationToken = new CancellationToken())
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.DeleteAsync($"api/v1/Users/{userId}", cancellationToken);
+            using var response = await _http.DeleteAsync($"api/v1/Users/{subId}", cancellationToken);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken) ?? new();

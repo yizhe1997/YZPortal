@@ -4,5 +4,6 @@
     {
         public string? Issuer { get; set; }
         public string? IssuerUserId { get; set; }
+        public User User { get; set; }
     }
 }
