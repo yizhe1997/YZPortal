@@ -183,11 +183,11 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return new Result();
         }
 
-        public async Task<Result> UpdateUserAsync(string? subClaim, UpdateUserCommand? updateUserCommand = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> UpdateUserAsync(string? subId, UpdateUserCommand? updateUserCommand = null, CancellationToken cancellationToken = new CancellationToken())
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subClaim}", updateUserCommand, cancellationToken: cancellationToken);
+            using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subId}", updateUserCommand, cancellationToken: cancellationToken);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken) ?? new();
@@ -221,11 +221,11 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return new Result();
         }
 
-        public async Task<Result<IdentityModel.UserModel>> GetUserAsync(string subClaim, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result<IdentityModel.UserModel>> GetUserAsync(string subId, CancellationToken cancellationToken = new CancellationToken())
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.GetAsync($"api/v1/Users/{subClaim}", cancellationToken);
+            using var response = await _http.GetAsync($"api/v1/Users/{subId}", cancellationToken);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<Result<IdentityModel.UserModel>>(cancellationToken: cancellationToken) ?? new();
@@ -269,11 +269,11 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return new SearchResult<IdentityModel.UserModel>();
         }
 
-        public async Task<Result> DeleteUserAsync(Guid userId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> DeleteUserAsync(string subId, CancellationToken cancellationToken = new CancellationToken())
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.DeleteAsync($"api/v1/Users/{userId}", cancellationToken);
+            using var response = await _http.DeleteAsync($"api/v1/Users/{subId}", cancellationToken);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken) ?? new();
@@ -289,11 +289,11 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
 
         #region Configs
 
-        public async Task<Result<ConfigsDto>> GetConfigsAsync(string subClaim, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result<ConfigsDto>> GetConfigsAsync(string subId, CancellationToken cancellationToken = new CancellationToken())
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.GetAsync($"api/v1/Configs/{subClaim}", cancellationToken);
+            using var response = await _http.GetAsync($"api/v1/Configs/{subId}", cancellationToken);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<Result<ConfigsDto>>(cancellationToken: cancellationToken) ?? new();
@@ -312,11 +312,11 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return new Result<ConfigsDto>();
         }
 
-        public async Task<Result<PortalConfigDto>> UpdatePortalConfigAsync(string? subClaim, UpdateUserPortalConfigCommand? updateUserPortalConfigCommand = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result<PortalConfigDto>> UpdatePortalConfigAsync(string? subId, UpdateUserPortalConfigCommand? updateUserPortalConfigCommand = null, CancellationToken cancellationToken = new CancellationToken())
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.PutAsJsonAsync($"/api/v1/Configs/portalConfiguration/{subClaim}", updateUserPortalConfigCommand, cancellationToken: cancellationToken);
+            using var response = await _http.PutAsJsonAsync($"/api/v1/Configs/portalConfiguration/{subId}", updateUserPortalConfigCommand, cancellationToken: cancellationToken);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<Result<PortalConfigDto>>(cancellationToken: cancellationToken) ?? new();

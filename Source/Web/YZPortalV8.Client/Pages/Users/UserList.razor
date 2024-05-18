@@ -111,7 +111,7 @@
         var users = items.ToList();
         foreach (var user in users)
         {
-            var response = await YZPortalApiClient.DeleteUserAsync(user.Id);
+            var response = await YZPortalApiClient.DeleteUserAsync(user.SubjectIdentifier);
 
             if (response.Succeeded)
                 Users?.Remove(user);

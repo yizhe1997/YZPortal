@@ -36,7 +36,7 @@
             if (!string.IsNullOrEmpty(userId))
             {
                 var user = await YZPortalApiClient.GetUserAsync(userId);
-                if (user.Data.Id == Guid.Empty)
+                if (user.Data == null)
                 {
                     var newUser = await YZPortalApiClient.CreateUserAsync();
                 }
