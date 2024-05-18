@@ -6,7 +6,7 @@ namespace Application.Interfaces.Services.Identity
 {
     public interface IUserService
     {
-        Task<SearchResult<UserModel>> GetSearchResultAsync(SearchRequest searchParams, CancellationToken cancellationToken = new CancellationToken());
+        Task<SearchResult<UserModel>> GetSearchResultAsync(SearchRequest request, CancellationToken cancellationToken = new CancellationToken());
         
         Task<IResult<UserModel>> GetBySubIdAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken());
 

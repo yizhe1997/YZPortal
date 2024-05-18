@@ -11,36 +11,37 @@
 @attribute [Authorize(Policy = nameof(Role.Administrator))]
 
 <h1>Users</h1>
-
-<Table TItem="UserModel"
-       IsPagination="true"
-       PageItemsSource="@PageItemsSource"
-       IsBordered="true"
-       ShowToolbar="true"
-       ShowDefaultButtons="true"
-       ShowDeleteButton="true"
-       IsMultipleSelect="true"
-       ShowAddButton="false"
-       ShowEditButton="false"
-       ClickToSelect="true"
-       ShowSearch="true"
-       ShowCardView="true"
-       ShowFooter="true"
-       ShowExtendButtons="true"
-       ShowExtendEditButton="false"
-       ShowExtendDeleteButton="false"
-       TableSize="TableSize.Normal"
-       OnDeleteAsync="@OnDeleteAsync"
-       OnQueryAsync="@OnQueryAsync">
-    <TableColumns>
-        <TableColumn @bind-Field="@context.UserName" Sortable="true" Text="Email" />
-        <TableColumn @bind-Field="@context.DisplayName" Sortable="true" Text="Name" />
-        <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" Text="Last logged-in" />
-    </TableColumns>
-    <RowButtonTemplate>
-        <TableCellButton Color="Color.Primary" Icon="fa-solid fa-pen" Text="Edit" OnClick="() => OpenUserEditDialog(context)" />
-    </RowButtonTemplate>
-</Table>
+<div class="tabs-body-content">
+    <Table TItem="UserModel"
+           IsPagination="true"
+           PageItemsSource="@PageItemsSource"
+           IsBordered="true"
+           ShowToolbar="true"
+           ShowDefaultButtons="true"
+           ShowDeleteButton="true"
+           IsMultipleSelect="true"
+           ShowAddButton="false"
+           ShowEditButton="false"
+           ClickToSelect="true"
+           ShowSearch="true"
+           ShowCardView="true"
+           ShowFooter="true"
+           ShowExtendButtons="true"
+           ShowExtendEditButton="false"
+           ShowExtendDeleteButton="false"
+           TableSize="TableSize.Normal"
+           OnDeleteAsync="@OnDeleteAsync"
+           OnQueryAsync="@OnQueryAsync">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.UserName" Sortable="true" Text="Email" />
+            <TableColumn @bind-Field="@context.DisplayName" Sortable="true" Text="Name" />
+            <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" Text="Last logged-in" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton Color="Color.Primary" Icon="fa-solid fa-pen" Text="Edit" OnClick="() => OpenUserEditDialog(context)" />
+        </RowButtonTemplate>
+    </Table>
+</div>
 
 @code {
     private static IEnumerable<int> PageItemsSource => new int[] { 2, 4, 10 };
@@ -49,19 +50,19 @@
 
     private async Task OpenUserEditDialog(UserModel userModel)
     {
-        var diloagOpt = new DialogOption()
+        var dialogOpt = new DialogOption()
             {
                 ShowCloseButton = false,
-                Title = "Edit User",
+                Title = "Edit User Details",
                 Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(),
                 Size = Size.Large
             };
-        diloagOpt.Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(new Dictionary<string, object?>
+        dialogOpt.Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(new Dictionary<string, object?>
             {
                 [nameof(UserEditDialog.User)] = userModel,
-                [nameof(UserEditDialog.CloseDialog)] = EventCallback.Factory.Create<MouseEventArgs>(this, diloagOpt.CloseDialogAsync)
+                [nameof(UserEditDialog.CloseDialog)] = EventCallback.Factory.Create<MouseEventArgs>(this, dialogOpt.CloseDialogAsync)
             });
-        await DialogService.Show(diloagOpt);
+        await DialogService.Show(dialogOpt);
     }
 
     private async Task<bool> OnValidSubmit(string? userSubId, IEnumerable<string?> SelectedGraphGroups, IEnumerable<string?> ExistingGraphGroups)

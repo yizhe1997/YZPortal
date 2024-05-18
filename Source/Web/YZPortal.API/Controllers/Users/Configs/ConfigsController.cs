@@ -1,18 +1,12 @@
-﻿using Application.Constants;
-using Application.Features.Users.Configs.Commands.UpdatePortalConfig;
+﻿using Application.Features.Users.Configs.Commands.UpdatePortalConfig;
 using Application.Features.Users.Configs.Queries.GetConfigs;
 using Application.Models;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.Resource;
 
 namespace YZPortal.API.Controllers.Users.Configs
 {
-    [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
-    [RequiredScope(ScopeConstants.APIAccess)]
-    public class ConfigsController : ApiControllerBase
+    public class ConfigsController : AuthApiController
     {
         public ConfigsController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {

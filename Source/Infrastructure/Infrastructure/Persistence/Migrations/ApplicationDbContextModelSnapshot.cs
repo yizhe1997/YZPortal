@@ -151,6 +151,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -160,6 +163,9 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Sku")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StockQuantity")
+                        .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -362,6 +368,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -464,7 +473,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasIndex("RefId")
                         .IsUnique();
 
-                    b.ToTable("ProductCategoryPicture");
+                    b.ToTable("ProductCategoryPictures");
                 });
 
             modelBuilder.Entity("Domain.Entities.Sync.SyncStatus", b =>

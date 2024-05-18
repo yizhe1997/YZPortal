@@ -1,7 +1,7 @@
 ﻿@using Application.Features.Users.Configs.Queries.GetConfigs;
 @using Domain.Enums.Memberships;
 @using Microsoft.AspNetCore.Authorization;
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using YZPortalV8.Client.Clients.YZPortalApi;
 @using YZPortalV8.Client.Pages.Authentication
 @using YZPortalV8.Client.Services.Authentication;
@@ -14,35 +14,55 @@
 @inject SignOutSessionStateManager SignOutManager
 @inject NavigationManager Navigation
 
-<PageTitle>YZPortal</PageTitle>
-
 <AuthorizeView>
     <Authorized>
-        <Layout SideWidth="0" IsPage="true" ShowGotoTop="true" ShowCollapseBar="true"
-            IsFullSide="@Configs.PortalConfig.IsFullSide" IsFixedHeader="@Configs.PortalConfig.IsFixedHeader" IsFixedFooter="@Configs.PortalConfig.IsFixedFooter" ShowFooter="@Configs.PortalConfig.ShowFooter"
-            TabDefaultUrl="/" UseTabSet="@Configs.PortalConfig.UseTabSet" AdditionalAssemblies="new[] { GetType().Assembly }" class="@Configs.PortalConfig.Theme">
-            <Header>
+        <Layout 
+            SideWidth="0" 
+            IsPage="true" 
+            ShowGotoTop="false" 
+            ShowCollapseBar="true"
+            IsFullSide="@Configs.PortalConfig.IsFullSide" 
+            IsFixedHeader="@Configs.PortalConfig.IsFixedHeader" 
+            IsFixedFooter="@Configs.PortalConfig.IsFixedFooter" 
+            ShowFooter="@Configs.PortalConfig.ShowFooter"
+            TabDefaultUrl="/" UseTabSet="@Configs.PortalConfig.UseTabSet" 
+            AdditionalAssemblies="new[] { GetType().Assembly }" class="@Configs.PortalConfig.Theme">
+            <Header >
                 <span class="ms-3 flex-sm-fill d-none d-sm-block"></span>
                 <div class="flex-fill d-sm-none">
                 </div>
                 <CultureSelector />
-                <Logout ImageUrl="_content/Reference.Shared/images/Argo.png" DisplayName="超级管理员" UserName="@context.User.Identity?.Name">
+                <Logout
+                    ShowUserName=false
+                    DisplayName="@context.User.Identity?.Name"
+                    UserName="@context.User.Identity?.Name">
+                    <ChildContent>
+                        <i class="fa-fw fa-solid fa-user"></i>
+                    </ChildContent>
+                    <HeaderTemplate >
+                    </HeaderTemplate>
                     <LinkTemplate>
-                        <a @onclick="OnLogout"><i class="fa-solid fa-suitcase"></i>Logout</a>
+                        <a href="#">
+                            <i class="fa-solid fa-suitcase"></i><span>personal center</span>
+                        </a>
+                        <a href="#">
+                            <i class="fa-solid fa-gear"></i><span>set up</span>
+                        </a>
+                        <a @onclick="OnLogout"><i class="fa-solid fa-key"></i>Logout</a>
                     </LinkTemplate>
                 </Logout>
                 @*<Widget></Widget>*@
                 <div class="layout-drawer" @onclick="@(e => IsRightDrawerOpen = true)"><i class="fa fa-gears"></i></div>
             </Header>
             <Side>
-                <div class="layout-banner">
-                    <img class="layout-logo" src="_content/Reference.Shared/images/brand.png" />
-                    <div class="layout-title">
-                        <a href="#">
+                <a href="/home">
+                    <div class="layout-banner ">
+                        <img class="layout-logo" src="favicon.png" />
+                        <div class="layout-title">
                             <span>YZPortal</span>
-                        </a>
+                        </div>
                     </div>
-                </div>
+                </a>
                 <div class="layout-menu">
                     <div class="scroll">
                         <Menu Items="@AdminMenu" IsVertical="true" class="menu is-vertical is-collapsed" />
@@ -121,5 +141,11 @@
         <div hidden>
             @Body
         </div>
+
+        <Footer>
+            <div class="text-center flex-fill">
+                <a class="page-layout-demo-footer-link" href="https://gitee.com/LongbowEnterprise/BootstrapAdmin" target="_blank">Bootstrap Admin</a>
+            </div>
+        </Footer>
     </NotAuthorized>
 </AuthorizeView>

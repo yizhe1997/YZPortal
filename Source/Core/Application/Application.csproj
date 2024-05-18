@@ -38,4 +38,8 @@
 	  </EmbeddedResource>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Features\Discounts\Queries\" />
+	</ItemGroup>
+
 </Project>

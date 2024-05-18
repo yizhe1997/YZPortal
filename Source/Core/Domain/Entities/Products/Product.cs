@@ -20,6 +20,16 @@ public class Product : AuditableEntity<Guid>
     /// </summary>
     public string? Sku { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the entity is published
+    /// </summary>
+    public bool IsPublished { get; set; }
+
+    /// <summary>
+    /// Gets or sets the stock quantity
+    /// </summary>
+    public int StockQuantity { get; set; }
+
     #endregion
 
     #region Finance

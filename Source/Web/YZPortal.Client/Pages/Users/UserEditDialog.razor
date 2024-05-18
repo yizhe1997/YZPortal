@@ -10,7 +10,51 @@
 
 @inject YZPortalApiHttpClient YZPortalApiClient
 
-<EditForm id="@nameof(UserEditDialog)" Model="@User" OnValidSubmit="OnValidSubmit">
+<Card id="@nameof(UserEditDialog)" HeaderText="New customers" IsShadow="true" >
+@*     <HeaderTemplate>
+        <div class="card-tools float-right">
+            <button class="btn btn-xs btn-info btn-flat margin-r-5" disabled="disabled" data-chart-role="toggle-chart" data-chart-period="year">Year</button>
+            <button class="btn btn-xs btn-info btn-flat margin-r-5" disabled="disabled" data-chart-role="toggle-chart" data-chart-period="month">Month</button>
+            <button class="btn btn-xs btn-info btn-flat" disabled="disabled" data-chart-role="toggle-chart" data-chart-period="week">Week</button>
+            <button class="btn btn-tool margin-l-10" data-card-widget="collapse">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </HeaderTemplate> *@
+    <BodyTemplate>
+        <EditForm Model="@User">
+            <div class="col-12">
+                <BootstrapInput @bind-Value="@User.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
+            </div>
+            <div class="col-12">
+                <BootstrapInput @bind-Value="@User.DisplayName" DisplayText="Display Name" ShowLabel="true" />
+            </div>
+            <div class="col-12">
+                <BootstrapInput @bind-Value="@User.FirstName" DisplayText="First Name" ShowLabel="true" />
+            </div>
+            <div class="col-12">
+                <BootstrapInput @bind-Value="@User.LastName" DisplayText="Last Name" ShowLabel="true" />
+            </div>
+            <div class="col-12">
+                <BootstrapInput @bind-Value="@User.MobilePhone" DisplayText="MobilePhone" ShowLabel="true" />
+            </div>
+            
+        </EditForm>
+    </BodyTemplate>
+    <FooterTemplate>
+        <div class="row g-3">
+            <Divider Text="Groups" Alignment="Alignment.Left" style="margin: 2rem 0;" />
+            <div class="col-12 col-sm-6">
+                <MultiSelect Items="@GraphGroups" @bind-Value="SelectedGraphGroups" />
+            </div>
+            <div class="col-12 col-sm-6">
+                <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
+            </div>
+        </div>
+    </FooterTemplate>
+</Card>
+
+@* <EditForm id="@nameof(UserEditDialog)" Model="@User" OnValidSubmit="OnValidSubmit">
     <div class="col-12">
         <BootstrapInput @bind-Value="@User.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
     </div>
@@ -35,7 +79,7 @@
             <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
         </div>
     </div>
-</EditForm>
+</EditForm> *@
 
 <div class="modal-footer">
     <button type="submit" form="@nameof(UserEditDialog)" class="btn btn-primary">Save</button>

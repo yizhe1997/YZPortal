@@ -1,4 +1,4 @@
-﻿namespace Application.Interfaces.Repositories.Users
+﻿namespace Application.Interfaces.Repositories.Products
 {
     public interface IProductRepository
     {

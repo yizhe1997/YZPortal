@@ -6,8 +6,6 @@
 @inject YZPortalApiConfig YZPortalApiConfig
 @attribute [Authorize(Policy = nameof(Role.Administrator))]
 
-<PageTitle>Hangfire dashboard UI</PageTitle>
-
 <div class="text-center flex-fill">
     <a class="page-layout-demo-footer-link" href="@($"{YZPortalApiConfig.BaseAddress}{YZPortalApiConfig.HangfireDashboardUrl}")" target="_blank">TODO: use hyperlink or iframe (if i can get it to work without enabling 3rd party cookie...)</a>
 </div>

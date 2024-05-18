@@ -1,18 +1,12 @@
 ﻿using Application.Models;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
-using Microsoft.Identity.Web;
-using Application.Constants;
 using Application.Features.Users.Configs.Queries.GetConfigs;
 using Application.Features.Users.UserProfileImages.Commands;
 
 namespace YZPortal.API.Controllers.Users
 {
-    [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
-    [RequiredScope(ScopeConstants.APIAccess)]
-    public class UserProfileImagesController : ApiControllerBase
+    public class UserProfileImagesController : AuthApiController
     {
         public UserProfileImagesController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {

@@ -10,37 +10,47 @@
 
 @inject YZPortalApiHttpClient YZPortalApiClient
 
-<EditForm id="@nameof(UserEditDialog)" Model="@User" OnValidSubmit="OnValidSubmit">
-    <div class="col-12">
-        <BootstrapInput @bind-Value="@User.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
-    </div>
-    <div class="col-12">
-        <BootstrapInput @bind-Value="@User.DisplayName" DisplayText="Display Name" ShowLabel="true" />
-    </div>
-    <div class="col-12">
-        <BootstrapInput @bind-Value="@User.FirstName" DisplayText="First Name" ShowLabel="true" />
-    </div>
-    <div class="col-12">
-        <BootstrapInput @bind-Value="@User.LastName" DisplayText="Last Name" ShowLabel="true" />
-    </div>
-    <div class="col-12">
-        <BootstrapInput @bind-Value="@User.MobilePhone" DisplayText="MobilePhone" ShowLabel="true" />
-    </div>
-    <div class="row g-3">
-        <Divider Text="Groups" Alignment="Alignment.Left" style="margin: 2rem 0;" />
-        <div class="col-12 col-sm-6">
-            <MultiSelect Items="@GraphGroups" @bind-Value="SelectedGraphGroups" />
-        </div>
-        <div class="col-12 col-sm-6">
-            <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
-        </div>
-    </div>
-</EditForm>
-
-<div class="modal-footer">
-    <button type="submit" form="@nameof(UserEditDialog)" class="btn btn-primary">Save</button>
-    <button type="button" class="btn btn-light" @onclick="@CloseDialog">Cancel</button>
-</div>
+<Row ItemsPerRow="ItemsPerRow.One">
+    <Card CollapseIcon="fas fa-circle-info" HeaderText="Customer Info" IsShadow="true" IsCollapsible="true">
+        <BodyTemplate>
+            <EditForm Model="@User" OnValidSubmit="OnValidSubmit">
+                <div class="col-12">
+                    <BootstrapInput @bind-Value="@User.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
+                </div>
+                <div class="col-12">
+                    <BootstrapInput @bind-Value="@User.DisplayName" DisplayText="Display Name" ShowLabel="true" />
+                </div>
+                <div class="col-12">
+                    <BootstrapInput @bind-Value="@User.FirstName" DisplayText="First Name" ShowLabel="true" />
+                </div>
+                <div class="col-12">
+                    <BootstrapInput @bind-Value="@User.LastName" DisplayText="Last Name" ShowLabel="true" />
+                </div>
+                <div class="col-12">
+                    <BootstrapInput @bind-Value="@User.MobilePhone" DisplayText="MobilePhone" ShowLabel="true" />
+                </div>
+                <div class="col-12 row g-3">
+                    <div class="col-12 col-sm-8">
+                        <MultiSelect ShowLabel="true" DisplayText="Roles" Items="@GraphGroups" @bind-Value="SelectedGraphGroups" />
+                    </div>
+                    <div class="col-12 col-sm-4 align-self-end">
+                        <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="uni-translator-button-group">
+                        <button type="submit" form="@nameof(UserEditDialog)" class="btn btn-primary">Save</button>
+                        @* <Button Text="Cancel" Icon="fa-solid fa-braille" IsAsync="true" OnClick="@CloseDialog" class="me-2"></Button> *@
+                    </div>
+                </div>
+            </EditForm>
+        </BodyTemplate>
+    </Card>
+    <Card CollapseIcon="fas fa-shopping-cart" HeaderText="Orders" IsShadow="true" IsCollapsible="true">
+        <BodyTemplate>
+        </BodyTemplate>
+    </Card>
+</Row>
 
 @code {
     private List<SelectedItem> GraphGroups = new List<SelectedItem>();

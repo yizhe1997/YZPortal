@@ -58,6 +58,11 @@ public class ProductCategory : AuditableEntity<Guid>
     public int DisplayOrder { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the entity is published
+    /// </summary>
+    public bool IsPublished { get; set; }
+
+    /// <summary>
     /// Navigation property for ProductCategoryMapping entity
     /// </summary>
     public List<ProductCategoryMapping> ProductCategoryMappings { get; set; } = new List<ProductCategoryMapping>();

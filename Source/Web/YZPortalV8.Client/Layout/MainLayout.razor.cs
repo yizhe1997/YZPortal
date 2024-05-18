@@ -55,7 +55,7 @@ namespace YZPortalV8.Client.Layout
 
             var catalogSubMenus = new List<MenuItem>
             {
-                new() { Text = "Products", Icon = "fas fa-folder-tree", Url = "/#" },
+                new() { Text = "Products", Icon = "fas fa-folder-tree", Url = "/products" },
                 new() { Text = "Categories", Icon = "fas fa-folder-tree", Url = "/#" },
             };
 

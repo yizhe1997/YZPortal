@@ -9,6 +9,8 @@ using Application.Extensions;
 using Application.Features.Users.Configs.Commands.UpdatePortalConfig;
 using System.Net.Http.Headers;
 using YZPortalV8.Client.Services.LocalStorage;
+using Application.Features.Products.Queries.GetProducts;
+using Application.Features.Products.Queries.GetProductCategories;
 
 namespace YZPortalV8.Client.Clients.YZPortalApi
 {
@@ -328,6 +330,76 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
 
             return new Result<PortalConfigDto>();
         }
+
+        #endregion
+
+        #endregion
+
+        #region Catalog
+
+        #region Products
+
+        public async Task<SearchResult<ProductDto>> GetProductsAsync(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
+        {
+            await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Products", pageSize, pageNumber, searchString, orderBy);
+
+            using var response = await _http.SendAsync(requestMsg, cancellationToken);
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<SearchResult<ProductDto>>(cancellationToken: cancellationToken) ?? new();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+                {
+                }
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new SearchResult<ProductDto>();
+        }
+
+        #endregion
+
+        #region Catergories
+
+        public async Task<SearchResult<ProductCategoryDto>> GetProductCategoriesAsync(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
+        {
+            await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/ProductCategories", pageSize, pageNumber, searchString, orderBy);
+
+            using var response = await _http.SendAsync(requestMsg, cancellationToken);
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<SearchResult<ProductCategoryDto>>(cancellationToken: cancellationToken) ?? new();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+                {
+                }
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new SearchResult<ProductCategoryDto>();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Promotions
+
+        #region Discounts
 
         #endregion
 
