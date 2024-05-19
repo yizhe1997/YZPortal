@@ -10,40 +10,51 @@
 
 @inject YZPortalApiHttpClient YZPortalApiClient
 
-<Row ItemsPerRow="ItemsPerRow.One">
+<Row id="@nameof(UserEditDialog)" ItemsPerRow="ItemsPerRow.One">
     <Card CollapseIcon="fas fa-circle-info" HeaderText="Customer Info" IsShadow="true" IsCollapsible="true">
         <BodyTemplate>
-            <EditForm Model="@User" OnValidSubmit="OnValidSubmit">
-                <div class="col-12">
-                    <BootstrapInput @bind-Value="@User.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
-                </div>
-                <div class="col-12">
-                    <BootstrapInput @bind-Value="@User.DisplayName" DisplayText="Display Name" ShowLabel="true" />
-                </div>
-                <div class="col-12">
-                    <BootstrapInput @bind-Value="@User.FirstName" DisplayText="First Name" ShowLabel="true" />
-                </div>
-                <div class="col-12">
-                    <BootstrapInput @bind-Value="@User.LastName" DisplayText="Last Name" ShowLabel="true" />
-                </div>
-                <div class="col-12">
-                    <BootstrapInput @bind-Value="@User.MobilePhone" DisplayText="MobilePhone" ShowLabel="true" />
-                </div>
-                <div class="col-12 row g-3">
-                    <div class="col-12 col-sm-8">
-                        <MultiSelect ShowLabel="true" DisplayText="Roles" Items="@GraphGroups" @bind-Value="SelectedGraphGroups" />
-                    </div>
-                    <div class="col-12 col-sm-4 align-self-end">
-                        <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="uni-translator-button-group">
-                        <button type="submit" form="@nameof(UserEditDialog)" class="btn btn-primary">Save</button>
-                        @* <Button Text="Cancel" Icon="fa-solid fa-braille" IsAsync="true" OnClick="@CloseDialog" class="me-2"></Button> *@
-                    </div>
-                </div>
-            </EditForm>
+            <GroupBox style="margin-top: 1.5rem;">
+                <ValidateForm Model="@User">
+                    <EditorForm TModel="IdentityModel.UserModel" AutoGenerateAllItem=false>
+                        <FieldItems >
+                            <CardUpload IsSingle="true"
+                                TValue="string" 
+                                ShowDownloadButton="true"
+                                OnChange="@OnCardUpload" 
+                                OnDelete="@(fileName => Task.FromResult(true))">
+                            </CardUpload>
+                            <div class="col-12">
+                                <BootstrapInput @bind-Value="@User.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
+                            </div>
+                            <div class="col-12">
+                                <BootstrapInput @bind-Value="@User.DisplayName" DisplayText="Display Name" ShowLabel="true" />
+                            </div>
+                            <div class="col-12">
+                                <BootstrapInput @bind-Value="@User.FirstName" DisplayText="First Name" ShowLabel="true" />
+                            </div>
+                            <div class="col-12">
+                                <BootstrapInput @bind-Value="@User.LastName" DisplayText="Last Name" ShowLabel="true" />
+                            </div>
+                            <div class="col-12">
+                                <BootstrapInput @bind-Value="@User.MobilePhone" DisplayText="MobilePhone" ShowLabel="true" />
+                            </div>
+                            <div class="col-12 row g-3">
+                                <div class="col-12 col-sm-8">
+                                    <MultiSelect ShowLabel="true" DisplayText="Roles" Items="@GraphGroups" @bind-Value="SelectedGraphGroups" />
+                                </div>
+                                <div class="col-12 col-sm-4 align-self-end">
+                                    <Button Icon="fa-regular fa-trash-can" Text="Clear" OnClick="@ClearListItems" />
+                                </div>
+                            </div>
+                        </FieldItems>
+                        <Buttons>
+                            <div class="text-end">
+                                <Button disabled="@IsSubmitDisabled" OnClick="@Submit" ButtonType="ButtonType.Submit" Icon="fa-solid fa-floppy-disk" Text="Submit" />
+                            </div>
+                        </Buttons>
+                    </EditorForm>
+                </ValidateForm>
+            </GroupBox>
         </BodyTemplate>
     </Card>
     <Card CollapseIcon="fas fa-shopping-cart" HeaderText="Orders" IsShadow="true" IsCollapsible="true">
@@ -53,10 +64,11 @@
 </Row>
 
 @code {
-    private List<SelectedItem> GraphGroups = new List<SelectedItem>();
+    public bool IsSubmitDisabled { get; set; } = true;
+    private List<SelectedItem> GraphGroups { get; set; } = new List<SelectedItem>();
     private IEnumerable<string?> SelectedGraphGroups { get; set; } = Enumerable.Empty<string?>();
     private IEnumerable<string?> ExistingGraphGroups { get; set; } = Enumerable.Empty<string?>();
-
+    private static long MaxFileLength  => 200 * 1024 * 1024;
     [Parameter]
     public EventCallback<MouseEventArgs> CloseDialog { get; set; }
 
@@ -67,7 +79,30 @@
 
     private static List<SelectedItem> GenerateDataSource(List<GraphModel.GroupModel> source) => source.Select(i => new SelectedItem(i.Id, i.DisplayName ?? string.Empty)).ToList();
 
-    private async Task OnValidSubmit()
+    private async Task OnCardUpload(UploadFile file)
+    {
+        if (file != null && file.File != null)
+        {
+            // 服务器端验证当文件大于 2MB 时提示文件太大信息
+            if (file.Size > MaxFileLength)
+            {
+                // await ToastService.Information("Upload the file", "The file size is greater than 200MB");
+                file.Code = 1;
+                file.Error = "The file size is greater than 200MB";
+            }
+            else
+            {
+                // await SaveToFile(file);
+            }
+        }
+    }
+
+    private async Task OnFieldValueChanged()
+    {
+        IsSubmitDisabled = false;
+    }
+
+    private async Task Submit()
     {
         var userSubIds = new string[] { User.SubjectIdentifier ?? string.Empty };
 
@@ -91,7 +126,7 @@
             MobilePhone = User.MobilePhone
         });
 
-        await CloseDialog.InvokeAsync();
+        // await CloseDialog.InvokeAsync();
     }
 
     protected override async Task OnInitializedAsync()

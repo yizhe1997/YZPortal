@@ -13,7 +13,9 @@
 @inject NavigationManager Navigation
 @layout LoginLayout
 
-<RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
+<div hidden>
+    <RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
+</div>
 
 @code{
     [Parameter] 

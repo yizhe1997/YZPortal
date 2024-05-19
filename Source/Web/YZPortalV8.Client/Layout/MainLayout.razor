@@ -11,8 +11,6 @@
 @inject ILocalStorageService LocalStorageService
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject SignOutSessionStateManager SignOutManager
-@inject NavigationManager Navigation
 
 <PageTitle>YZPortal</PageTitle>
 
@@ -31,25 +29,7 @@
         <div class="flex-fill d-sm-none">
         </div>
         <CultureSelector />
-        <Logout ShowUserName=false
-                DisplayName="@Username"
-                UserName="@Username">
-            <ChildContent>
-                <i class="fa-fw fa-solid fa-user"></i>
-            </ChildContent>
-            <HeaderTemplate>
-            </HeaderTemplate>
-            <LinkTemplate>
-                <a href="#">
-                    <i class="fa-solid fa-suitcase"></i><span>personal center</span>
-                </a>
-                <a href="#">
-                    <i class="fa-solid fa-gear"></i><span>set up</span>
-                </a>
-                <a @onclick="OnLogout"><i class="fa-solid fa-key"></i>Logout</a>
-            </LinkTemplate>
-        </Logout>
-        @*<Widget></Widget>*@
+        <Widget></Widget>
         <div class="layout-drawer" @onclick="@(e => IsRightDrawerOpen = true)"><i class="fa fa-gears"></i></div>
     </Header>
     <Side>

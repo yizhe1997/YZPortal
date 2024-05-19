@@ -1,0 +1,64 @@
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using YZPortalV8.Client.Services.LocalStorage
+@inject ILocalStorageService LocalStorageService
+@inject SignOutSessionStateManager SignOutManager
+@inject NavigationManager Navigation
+
+<DropdownWidget class="px-3">
+    @* <DropdownWidgetItem Icon="fa-regular fa-envelope" BadgeNumber="4">
+        <HeaderTemplate>
+            <span>您有 4 个未读消息</span>
+        </HeaderTemplate>
+        <BodyTemplate>
+            @for (var index = 0; index < 4; index++)
+            {
+                <a class="dropdown-item d-flex align-items-center" href="#" @onclick:preventDefault>
+                    <div style="width: 40px; height: 40px;">
+                        <Avatar Url="_content/BootstrapBlazorAppRef.Shared/images/Argo-C.png" IsCircle="true" Size="Size.Small" />
+                    </div>
+                    <div class="ms-2">
+                        <div class="d-flex position-relative">
+                            <h4>Argo Zhang</h4>
+                            <small><i class="fa fa-clock-o"></i> @(4 + index) mins</small>
+                        </div>
+                        <div class="text-truncate">Why not buy a new awesome theme?</div>
+                    </div>
+                </a>
+            }
+        </BodyTemplate>
+        <FooterTemplate>
+            <a href="#" @onclick:preventDefault>查看所有消息</a>
+        </FooterTemplate>
+    </DropdownWidgetItem> *@
+    <DropdownWidgetItem 
+        Icon="fa-fw fa-solid fa-user"
+        HeaderColor="Color.None">
+        <HeaderTemplate>
+        </HeaderTemplate>
+        <BodyTemplate>
+            <a href="#" class="dropdown-item" @onclick:preventDefault>
+                <i class="fa-solid fa-suitcase"></i>
+                <span>personal center</span>
+            </a>
+            <a href="#" class="dropdown-item" @onclick:preventDefault>
+                <i class="fa-solid fa-gear"></i>
+                <span>set up</span>
+            </a>
+            <a @onclick="OnLogout" class="dropdown-item" @onclick:preventDefault>
+                <i class="fa-solid fa-key"></i>
+                <span>Logout</span>
+            </a>
+        </BodyTemplate>
+    </DropdownWidgetItem>
+</DropdownWidget>
+
+@code{
+    private async Task OnLogout()
+    {
+        // TODO: Make sure all the infos on log out is removed
+        await LocalStorageService.ClearLocalStorage();
+
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

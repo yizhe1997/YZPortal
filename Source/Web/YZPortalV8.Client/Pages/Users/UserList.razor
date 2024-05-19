@@ -33,6 +33,15 @@
            OnDeleteAsync="@OnDeleteAsync"
            OnQueryAsync="@OnQueryAsync">
         <TableColumns>
+            <TableColumn @bind-Field="@context.UserName" Width="260">
+                <Template Context="value">
+                    <div class="d-flex">
+                        <div>
+                            <img src="favicon.png" />
+                        </div>
+                    </div>
+                </Template>
+            </TableColumn>
             <TableColumn @bind-Field="@context.UserName" Sortable="true" Text="Email" />
             <TableColumn @bind-Field="@context.DisplayName" Sortable="true" Text="Name" />
             <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" Text="Last logged-in" />

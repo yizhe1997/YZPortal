@@ -86,15 +86,6 @@ namespace YZPortalV8.Client.Layout
             #endregion
         }
 
-        private async Task OnLogout()
-        {
-            // TODO: Make sure all the infos on log out is removed
-            await LocalStorageService.ClearLocalStorage();
-
-            await SignOutManager.SetSignOutState();
-            Navigation.NavigateTo("authentication/logout");
-        }
-
         private async Task SetPortalConfig(PortalConfigDto portalConfig)
         {
             Configs.PortalConfig = portalConfig;

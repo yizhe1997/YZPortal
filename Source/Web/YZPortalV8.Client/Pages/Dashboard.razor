@@ -5,23 +5,17 @@
 @page "/dashboard"
 @using Microsoft.AspNetCore.Authorization
 
-<div class="alert alert-warning alert-dismissable">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-    The store has some error(s) or warning(s). Please find more information on the <a href="/Admin/Common/Warnings">Warnings</a> page
-</div>
-
-<div class="content-header">
-    <h1>
-        <h1>@localizer["helloworld"]</h1>
-        Dashboard
-    </h1>
-</div>
-
 <section class="content">
     <div class="container-fluid">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
+                    <div class="content-header">
+                        <h1>
+                            @* <h1>@localizer["helloworld"]</h1> *@
+                            Dashboard
+                        </h1>
+                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <Card CollapseIcon="far fa-star" HeaderText="Start accepting orders" IsShadow="true" IsCollapsible="true">
