@@ -364,6 +364,31 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return new SearchResult<ProductDto>();
         }
 
+        public async Task<byte[]> GetProductsExcelAsync(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
+        {
+            await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Products/ExportExcel", pageSize, pageNumber, searchString, orderBy);
+
+            using var response = await _http.SendAsync(requestMsg, cancellationToken);
+            try
+            {
+                var output = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+                {
+                }
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return [];
+        }
+
         #endregion
 
         #region Catergories

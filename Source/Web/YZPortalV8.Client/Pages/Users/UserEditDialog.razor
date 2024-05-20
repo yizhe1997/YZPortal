@@ -64,6 +64,7 @@
 </Row>
 
 @code {
+    // TODO: disable while graph details still loading
     public bool IsSubmitDisabled { get; set; } = true;
     private List<SelectedItem> GraphGroups { get; set; } = new List<SelectedItem>();
     private IEnumerable<string?> SelectedGraphGroups { get; set; } = Enumerable.Empty<string?>();

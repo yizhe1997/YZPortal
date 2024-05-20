@@ -1,4 +1,4 @@
-﻿namespace Application.Features.Products.Queries.GetProductsExport
+﻿namespace Application.Features.Products.Queries.GetProductCategoriesExport
 {
     public class ProductCategoryExportDto
     {

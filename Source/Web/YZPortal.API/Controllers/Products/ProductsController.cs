@@ -1,11 +1,13 @@
 ﻿using Application.Models;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Application.Features.Products.Queries.GetProducts;
 using Application.Features.Products.Queries.GetProductsExport;
 using Application.Interfaces.Services.ExportImport;
 using System.Text;
 using Domain.Entities.Products;
+using Microsoft.AspNetCore.Mvc;
+using Application.Features.Products.Queries.GetProduct;
+using Application.Features.Products.Commands.AddProduct;
 
 namespace YZPortal.API.Controllers.Products.ProductCategories
 {
@@ -29,6 +31,30 @@ namespace YZPortal.API.Controllers.Products.ProductCategories
         #endregion
 
         /// <summary>
+        /// Create a product.
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<Result<Guid>>> CreateProduct([FromBody] AddProductCommand command)
+        {
+            var response = await _mediator.Send(command);
+
+            return CreatedAtAction(nameof(GetProducts), new { id = response.Data }, response);
+        }
+
+        /// <summary>
+        /// Gets a product.
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<ActionResult<SearchResult<ProductDto>>> GetProduct([FromRoute] Guid id, [FromQuery] GetProductByIdQuery query)
+        {
+            query.Id = id;
+
+            var response = await _mediator.Send(query);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Gets a list of products.
         /// </summary>
         [HttpGet]
@@ -43,29 +69,29 @@ namespace YZPortal.API.Controllers.Products.ProductCategories
         /// Exports a list of products in xlsx format.
         /// </summary>
         [HttpGet(("ExportExcel"))]
-        public async Task<ActionResult<FileStreamResult>> ExportExcelProducts([FromQuery] GetProductsExportQuery query)
+        public async Task<IActionResult> ExportExcelProducts([FromQuery] GetProductsExportQuery query)
         {
             var response = await _mediator.Send(query);
 
             var stream = await _exportManager.ExportProductsToXlsxAsync(response.Data);
 
-            return Ok(new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
-                FileDownloadName = $"{nameof(ProductCategory)}.xlsx"
-            });
+                FileDownloadName = $"{nameof(Product)}.xlsx"
+            };
         }
 
         /// <summary>
         /// Exports a list of products in XML format.
         /// </summary>
         [HttpGet(("ExportXML"))]
-        public async Task<ActionResult<FileStreamResult>> ExportXMLProducts([FromQuery] GetProductsExportQuery query)
+        public async Task<IActionResult> ExportXMLProducts([FromQuery] GetProductsExportQuery query)
         {
             var response = await _mediator.Send(query);
 
             var xml = await _exportManager.ExportProductsToXmlAsync(response.Data);
 
-            return Ok(File(Encoding.UTF8.GetBytes(xml), "application/xml", $"{nameof(ProductCategory)}.xml"));
+            return File(Encoding.UTF8.GetBytes(xml), "application/xml", $"{nameof(Product)}.xml");
         }
     }
 }

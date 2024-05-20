@@ -43,29 +43,29 @@ namespace YZPortal.API.Controllers.Products.ProductCategories
         /// Exports a list of product categories in xlsx format.
         /// </summary>
         [HttpGet(("ExportExcel"))]
-        public async Task<ActionResult<FileStreamResult>> ExportExcelProductCategories([FromQuery] GetProductCategoriesExportQuery query)
+        public async Task<IActionResult> ExportExcelProductCategories([FromQuery] GetProductCategoriesExportQuery query)
         {
             var response = await _mediator.Send(query);
 
             var stream = await _exportManager.ExportProductCategoriesToXlsxAsync(response.Data);
 
-            return Ok(new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
                 FileDownloadName = $"{nameof(ProductCategory)}.xlsx"
-            });
+            };
         }
 
         /// <summary>
         /// Exports a list of product categories in XML format.
         /// </summary>
         [HttpGet(("ExportXML"))]
-        public async Task<ActionResult<FileStreamResult>> ExportXMLProductCategories([FromQuery] GetProductCategoriesExportQuery query)
+        public async Task<IActionResult> ExportXMLProductCategories([FromQuery] GetProductCategoriesExportQuery query)
         {
             var response = await _mediator.Send(query);
 
             var xml = await _exportManager.ExportProductCategoriesToXmlAsync(response.Data);
 
-            return Ok(File(Encoding.UTF8.GetBytes(xml), "application/xml", $"{nameof(ProductCategory)}.xml"));
+            return File(Encoding.UTF8.GetBytes(xml), "application/xml", $"{nameof(ProductCategory)}.xml");
         }
     }
 }

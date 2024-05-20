@@ -4,6 +4,7 @@ using Application.Interfaces.Contexts;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Repositories.Users;
 using Application.Interfaces.Services;
+using Application.Interfaces.Services.ExportImport;
 using Application.Interfaces.Services.Identity;
 using Application.Interfaces.Services.Mailing;
 using Azure.Storage.Blobs;
@@ -18,6 +19,7 @@ using Infrastructure.Persistence.Repositories;
 using Infrastructure.Persistence.Repositories.Users;
 using Infrastructure.Services;
 using Infrastructure.Services.Caching;
+using Infrastructure.Services.ExportImport;
 using Infrastructure.Services.Identity;
 using Infrastructure.Services.Mailing;
 using Infrastructure.Services.Storage;
@@ -88,6 +90,9 @@ namespace Infrastructure.Extensions
 
             // Real-Time Services
             services.AddChatHub(configuration);
+
+            // ExportImport
+            services.AddExportImport();
         }
 
         #region Persistence
@@ -480,6 +485,12 @@ namespace Infrastructure.Extensions
                         break;
                     }
             };
+        }
+
+        private static void AddExportImport(this IServiceCollection services)
+        {
+            services.AddTransient<IExportManager, ExportManager>();
+            services.AddTransient<IImportManager, ImportManager>();
         }
 
         #endregion

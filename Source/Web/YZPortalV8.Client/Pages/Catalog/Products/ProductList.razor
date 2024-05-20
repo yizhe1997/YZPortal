@@ -2,6 +2,7 @@
 @using Application.Features.Products.Queries.GetProducts
 @using Application.Models.Identity;
 @using Application.Models;
+@using Domain.Entities.Products
 @using Domain.Enums.Memberships;
 @using Microsoft.AspNetCore.Authorization;
 @using System.Diagnostics.CodeAnalysis;
@@ -10,6 +11,8 @@
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject DialogService DialogService
 @attribute [Authorize]
+@inject YZPortalApiConfig YZPortalApiConfig
+@inject IJSRuntime JS
 
 <h1>Users</h1>
 <div class="tabs-body-content">
@@ -35,18 +38,20 @@
            OnDeleteAsync="@OnDeleteAsync"
            OnQueryAsync="@OnQueryAsync">
         <TableToolbarTemplate>
-            <TableToolbarButton Color="Color.Primary"
-                                Icon="fa-fw fa-solid fa-floppy-disk"
-                                Text="Download PDF"
-                                IsAsync />
-            <TableToolbarButton Color="Color.Primary"
-                                Icon="fa-fw fa-solid fa-floppy-disk"
-                                Text="Export"
-                                IsAsync />
-            <TableToolbarButton Color="Color.Primary"
-                                Icon="fa-fw fa-solid fa-floppy-disk"
-                                Text="Import"
-                                IsAsync />
+            @* <TableToolbarButton Color="Color.Primary"
+                Icon="fa-fw fa-solid fa-floppy-disk"
+                Text="Download PDF"
+                IsAsync /> *@
+            <TableToolbarButton OnClick="DownloadFileFromURL"
+                Color="Color.Primary"
+                Icon="fa-fw fa-solid fa-floppy-disk"
+                Text="Download Excel"
+                IsAsync />
+            <TableToolbarButton 
+                Color="Color.Primary"
+                Icon="fa-fw fa-solid fa-floppy-disk"
+                Text="Import"
+                IsAsync />
         </TableToolbarTemplate>
         <TableColumns>
             <TableColumn @bind-Field="@context.Name" Text="Picture" />
@@ -70,6 +75,10 @@
 @code {
     private List<SelectedItem> GraphGroups = new List<SelectedItem>();
 
+    public QueryPageOptions queryPageOptions { get; set; } = new();
+
+    public List<string> orderby { get; set; } = new List<string>();
+
     private static IEnumerable<int> PageItemsSource => new int[] { 2, 4, 10 };
 
     private List<ProductDto>? Products;
@@ -89,6 +98,18 @@
                 [nameof(UserEditDialog.CloseDialog)] = EventCallback.Factory.Create<MouseEventArgs>(this, dialogOpt.CloseDialogAsync)
             });
         await DialogService.Show(dialogOpt);
+    }
+
+    private async Task DownloadFileFromURL()
+    {
+        var result = await YZPortalApiClient.GetProductsExcelAsync(pageSize: queryPageOptions.PageItems, pageNumber: queryPageOptions.PageIndex, searchString: queryPageOptions.SearchText, orderBy: orderby.ToArray());
+
+        await JS.InvokeVoidAsync("BlazorDownloadFile", new
+        {
+            Content = result,
+            FileName = $"{nameof(ProductCategory)}.xlsx",
+            ContentType = "application/octet-stream"
+        });
     }
 
     private async Task<bool> OnValidSubmit(string? userSubId, IEnumerable<string?> SelectedGraphGroups, IEnumerable<string?> ExistingGraphGroups)
@@ -112,7 +133,8 @@
 
     private async Task<QueryData<ProductDto>> OnQueryAsync(QueryPageOptions options)
     {
-        var orderby = new List<string>();
+        queryPageOptions = options;
+        orderby.Clear();
 
         if (options.SortOrder != SortOrder.Unset)
         {

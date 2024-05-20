@@ -1,5 +1,4 @@
-﻿using Application.Features.Products.Queries.GetProductsExport;
-using Application.Interfaces.Repositories;
+﻿using Application.Interfaces.Repositories;
 using Application.Models;
 using Application.Requests.Indexes;
 using AutoMapper;

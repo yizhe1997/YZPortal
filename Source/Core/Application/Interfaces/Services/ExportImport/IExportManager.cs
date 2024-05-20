@@ -1,4 +1,5 @@
-﻿using Application.Features.Products.Queries.GetProductsExport;
+﻿using Application.Features.Products.Queries.GetProductCategoriesExport;
+using Application.Features.Products.Queries.GetProductsExport;
 
 namespace Application.Interfaces.Services.ExportImport;
 

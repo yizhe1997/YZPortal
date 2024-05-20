@@ -1,4 +1,5 @@
-﻿using Application.Features.Products.Queries.GetProductsExport;
+﻿using Application.Features.Products.Queries.GetProductCategoriesExport;
+using Application.Features.Products.Queries.GetProductsExport;
 using Application.Interfaces.Services.ExportImport;
 using Infrastructure.Extensions.OfficeOpenXmlExtensions;
 using OfficeOpenXml;
@@ -6,7 +7,7 @@ using OfficeOpenXml;
 namespace Infrastructure.Services.ExportImport;
 
 /// <summary>
-/// Export manager interface
+/// Export manager service
 /// </summary>
 public class ExportManager : IExportManager
 {
@@ -24,7 +25,7 @@ public class ExportManager : IExportManager
 
     public async Task<MemoryStream> ExportProductCategoriesToXlsxAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = new CancellationToken())
     {
-        await using var stream = new MemoryStream();
+        var stream = new MemoryStream();
 
         using (ExcelPackage package = new(stream))
         {
@@ -47,7 +48,7 @@ public class ExportManager : IExportManager
 
     public async Task<MemoryStream> ExportProductsToXlsxAsync(List<ProductExportDto> products, CancellationToken cancellationToken = new CancellationToken())
     {
-        await using var stream = new MemoryStream();
+        var stream = new MemoryStream();
 
         using (ExcelPackage package = new(stream))
         {

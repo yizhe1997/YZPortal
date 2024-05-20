@@ -38,12 +38,12 @@ namespace Application.Features.Users.Configs.Commands.UpdatePortalConfig
             _portalConfigRepository = portalConfigRepository;
         }
 
-        public async Task<Result> Handle(UpdateUserPortalConfigCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(UpdateUserPortalConfigCommand command, CancellationToken cancellationToken)
         {
-            var portalConfig = await _portalConfigRepository.GetByUserSubIdFirstOrDefaultAsync(request.UserSubId);
+            var portalConfig = await _portalConfigRepository.GetByUserSubIdFirstOrDefaultAsync(command.UserSubId);
             if (portalConfig != null)
             {
-                _mapper.Map(request, portalConfig);
+                _mapper.Map(command, portalConfig);
 
                 await _unitOfWork.Commit(cancellationToken);
 
