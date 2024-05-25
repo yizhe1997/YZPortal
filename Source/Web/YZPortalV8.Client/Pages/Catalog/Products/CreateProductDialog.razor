@@ -1,0 +1,87 @@
+﻿@using Application.Features.Products.Commands.AddProduct
+@using Application.Models;
+@using Application.Requests.Users;
+﻿@using BootstrapBlazor.Components
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Diagnostics.CodeAnalysis;
+@using YZPortalV8.Client.Clients.YZPortalApi
+
+@inject YZPortalApiHttpClient YZPortalApiClient
+
+<Row id="@nameof(CreateProductDialog)" ItemsPerRow="ItemsPerRow.One">
+    <Card CollapseIcon="fas fa-circle-info" HeaderText="Product Info" IsShadow="true" IsCollapsible="true">
+        <BodyTemplate>
+            <GroupBox style="margin-top: 1.5rem;">
+                <ValidateForm Model="@Product">
+                    <EditorForm TModel="AddProductCommand" AutoGenerateAllItem=false>
+                        <FieldItems >
+                            
+                            <div class="col-12">
+                                <BootstrapInput @bind-Value="@Product.Name" DisplayText="Product Name" ShowLabel="true" />
+                            </div>
+                            <div class="col-12">
+                                <BootstrapInput @bind-Value="@Product.Sku" DisplayText="SKU" ShowLabel="true" />
+                            </div>
+                        </FieldItems>
+                        <Buttons>
+                            <div class="text-end">
+                                <Button OnClick="@Submit" ButtonType="ButtonType.Submit" Icon="fa-solid fa-floppy-disk" Text="Submit" />
+                            </div>
+                        </Buttons>
+                    </EditorForm>
+                </ValidateForm>
+            </GroupBox>
+        </BodyTemplate>
+    </Card>
+    <Card CollapseIcon="fas fa-shopping-cart" HeaderText="Multimedia" IsShadow="true" IsCollapsible="true">
+        <BodyTemplate>
+            <CardUpload IsSingle="true"
+                        TValue="string"
+                        ShowDownloadButton="true"
+                        OnChange="@OnCardUpload"
+                        OnDelete="@(fileName => Task.FromResult(true))">
+            </CardUpload>
+        </BodyTemplate>
+    </Card>
+</Row>
+
+@code {
+    private static long MaxFileLength  => 200 * 1024 * 1024;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> CloseDialog { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> RefreshParentComponentCallback { get; set; }
+
+    public AddProductCommand Product { get; set; } = new AddProductCommand();
+
+    private async Task OnCardUpload(UploadFile file)
+    {
+        if (file != null && file.File != null)
+        {
+            // 服务器端验证当文件大于 2MB 时提示文件太大信息
+            if (file.Size > MaxFileLength)
+            {
+                // await ToastService.Information("Upload the file", "The file size is greater than 200MB");
+                file.Code = 1;
+                file.Error = "The file size is greater than 200MB";
+            }
+            else
+            {
+                // await SaveToFile(file);
+            }
+        }
+    }
+
+    private async Task Submit()
+    {
+        await YZPortalApiClient.CreateProductAsync(Product);
+
+        // TODO: only invoke if successfully created, check guid
+        await RefreshParentComponentCallback.InvokeAsync(true);
+
+        await CloseDialog.InvokeAsync();
+    }
+}

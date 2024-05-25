@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using YZPortalV8.Client.Services.LocalStorage;
 using Application.Features.Products.Queries.GetProducts;
 using Application.Features.Products.Queries.GetProductCategories;
+using Application.Features.Products.Commands.AddProduct;
 
 namespace YZPortalV8.Client.Clients.YZPortalApi
 {
@@ -63,7 +64,7 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return requestMsg;
         }
 
-        public async Task SetHttpRequestMessageHeadersAsync(CancellationToken cancellationToken = new CancellationToken())
+        public async Task SetHttpRequestMessageHeadersAsync(CancellationToken cancellationToken = default)
         {
             var preferredLanguage = await _localStorageService.GetUserCulture(cancellationToken);
 
@@ -388,6 +389,47 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
 
             return [];
         }
+
+        public async Task<Result<Guid>> CreateProductAsync(AddProductCommand command)
+        {
+            await SetHttpRequestMessageHeadersAsync();
+
+            using var response = await _http.PostAsJsonAsync("/api/v1/Products", command);
+
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<Result<Guid>>() ?? new();
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new Result<Guid>();
+        }
+
+        public async Task<Result<Guid>> DeleteProductAsync(Guid id)
+        {
+            await SetHttpRequestMessageHeadersAsync();
+
+            using var response = await _http.DeleteAsync($"/api/v1/Products/{id}");
+
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<Result<Guid>>() ?? new();
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+
+            return new Result<Guid>();
+        }
+
 
         #endregion
 

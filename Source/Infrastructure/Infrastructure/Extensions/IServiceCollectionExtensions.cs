@@ -122,7 +122,8 @@ namespace Infrastructure.Extensions
                 .AddTransient(typeof(IUnitOfWork<>), typeof(UnitOfWork<>))
                 .AddTransient<IPortalConfigRepository, PortalConfigRepository>()
                 .AddTransient<IUserProfileImageRepository, UserProfileImageRepository>()
-                .AddTransient<IUserRepository, UserRepository>();
+                .AddTransient<IUserRepository, UserRepository>()
+                .AddTransient<IIdentityRepository, IdentityRepository>();
         }
 
         #endregion

@@ -20,6 +20,8 @@
            ShowDefaultButtons="true"
            ShowDeleteButton="true"
            IsMultipleSelect="true"
+           IsAutoRefresh="@IsTableAutoRefreshEnabled"
+           AutoRefreshInterval=501
            ShowAddButton="false"
            ShowEditButton="false"
            ClickToSelect="true"
@@ -49,6 +51,8 @@
         <RowButtonTemplate>
             <TableCellButton Color="Color.Primary" Icon="fa-solid fa-pen" Text="Edit" OnClick="() => OpenUserEditDialog(context)" />
         </RowButtonTemplate>
+        <EditTemplate>
+        </EditTemplate>
     </Table>
 </div>
 
@@ -56,6 +60,10 @@
     private static IEnumerable<int> PageItemsSource => new int[] { 2, 4, 10 };
 
     private List<UserModel>? Users;
+
+    public QueryPageOptions queryPageOptions { get; set; } = new();
+
+    public bool IsTableAutoRefreshEnabled { get; set; }
 
     private async Task OpenUserEditDialog(UserModel userModel)
     {
@@ -69,7 +77,9 @@
         dialogOpt.Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(new Dictionary<string, object?>
             {
                 [nameof(UserEditDialog.User)] = userModel,
-                [nameof(UserEditDialog.CloseDialog)] = EventCallback.Factory.Create<MouseEventArgs>(this, dialogOpt.CloseDialogAsync)
+                [nameof(UserEditDialog.CloseDialog)] = EventCallback.Factory.Create<MouseEventArgs>(this, dialogOpt.CloseDialogAsync),
+                // TODO: using autorefresh is not ideal, look for alternatives e,
+                [nameof(UserEditDialog.RefreshParentComponentCallback)] = EventCallback.Factory.Create<bool>(this, () => IsTableAutoRefreshEnabled = true),
             });
         await DialogService.Show(dialogOpt);
     }
@@ -95,6 +105,9 @@
 
     private async Task<QueryData<UserModel>> OnQueryAsync(QueryPageOptions options)
     {
+        IsTableAutoRefreshEnabled = false;
+        queryPageOptions = options;
+
         var orderby = new List<string>();
 
         if (options.SortOrder != SortOrder.Unset)

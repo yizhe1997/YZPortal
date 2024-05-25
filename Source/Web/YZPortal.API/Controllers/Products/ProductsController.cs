@@ -42,14 +42,29 @@ namespace YZPortal.API.Controllers.Products.ProductCategories
         }
 
         /// <summary>
+        /// Delete a product
+        /// </summary>
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Result<Guid>>> Delete([FromRoute] Guid id)
+        {
+            var response = await _mediator.Send(new DeleteProductCommand()
+            {
+                Id = id
+            });
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Gets a product.
         /// </summary>
         [HttpGet("{id}")]
-        public async Task<ActionResult<SearchResult<ProductDto>>> GetProduct([FromRoute] Guid id, [FromQuery] GetProductByIdQuery query)
+        public async Task<ActionResult<SearchResult<ProductDto>>> GetProduct([FromRoute] Guid id)
         {
-            query.Id = id;
-
-            var response = await _mediator.Send(query);
+            var response = await _mediator.Send(new GetProductByIdQuery()
+            {
+                Id = id
+            });
 
             return Ok(response);
         }

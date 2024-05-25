@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Services;
+﻿using Application.Features.Users.UserProfileImages.Commands;
+using Application.Interfaces.Services;
 using Application.Interfaces.Services.Identity;
 using Application.Models;
 using Application.Models.Identity;
@@ -68,17 +69,16 @@ namespace YZPortal.API.Controllers.Users
             return CreatedAtAction(nameof(GetUser), new { subjectId = _currentUserService.NameIdentifier }, response);
         }
 
+        // TODO: properly handle transaction scope... https://stackoverflow.com/questions/36636272/transactions-with-asp-net-identity-usermanager
         /// <summary>
         /// Updates the details of the application user.
         /// </summary>
         [HttpPut("{userSubId}")]
         public async Task<ActionResult<Result>> UpdateUser([FromRoute] string userSubId, [FromBody] UpdateUserCommand request)
         {
-            var response = await _graphService.UserUpdateAsync(userSubId, request);
-
-            // TODO: Move to scheduler
-            // TODO: also use transaction scope if this is not last step since https://stackoverflow.com/questions/36636272/transactions-with-asp-net-identity-usermanager
             await _userService.UpdateAsync(userSubId, request);
+
+            var response = await _graphService.UserUpdateAsync(userSubId, request);
 
             return Ok(response);
         }
@@ -86,6 +86,8 @@ namespace YZPortal.API.Controllers.Users
         [HttpPut(nameof(UpdateCurrentUserViaHttpContext))]
         public async Task<ActionResult<Result>> UpdateCurrentUserViaHttpContext()
         {
+            await _mediator.Send(new DeleteIdentityCommand() { UserSubId = _currentUserService.NameIdentifier });
+
             var response = await _userService.UpdateAsync(_currentUserService.NameIdentifier, _currentUserService);
 
             return Ok(response);

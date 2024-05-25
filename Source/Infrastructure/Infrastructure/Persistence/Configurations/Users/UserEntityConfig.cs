@@ -18,7 +18,9 @@ namespace Infrastructure.Persistence.Configurations.Users
 
             builder.HasMany(x => x.Identities)
                 .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
                 .IsRequired()
+                .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

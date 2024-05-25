@@ -3,7 +3,6 @@ using Application.Models;
 using AutoMapper;
 using Domain.Entities.Products;
 using MediatR;
-using System.Text.Json.Serialization;
 
 namespace Application.Features.Products.Queries.GetProduct
 {

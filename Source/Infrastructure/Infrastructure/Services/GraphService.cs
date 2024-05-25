@@ -13,6 +13,8 @@ using Microsoft.Kiota.Abstractions;
 
 namespace Infrastructure.Services
 {
+    // REF: https://developer.microsoft.com/en-us/graph/graph-explorer
+    // REF: https://learn.microsoft.com/en-us/graph/query-parameters
     public class GraphService : IGraphService
     {
         // Variables

@@ -76,7 +76,8 @@
     [Parameter]
     public IdentityModel.UserModel User { get; set; } = new IdentityModel.UserModel();
 
-    public UpdateUserCommand UpdateUserRequest { get; set; } = new UpdateUserCommand();
+    [Parameter]
+    public EventCallback<bool> RefreshParentComponentCallback { get; set; }
 
     private static List<SelectedItem> GenerateDataSource(List<GraphModel.GroupModel> source) => source.Select(i => new SelectedItem(i.Id, i.DisplayName ?? string.Empty)).ToList();
 
@@ -126,6 +127,9 @@
             LastName = User.LastName,
             MobilePhone = User.MobilePhone
         });
+
+        // TODO: only invoke if successfully edit
+        await RefreshParentComponentCallback.InvokeAsync(true);
 
         // await CloseDialog.InvokeAsync();
     }

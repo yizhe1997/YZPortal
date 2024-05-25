@@ -1,4 +1,5 @@
 ﻿@page "/products"
+@using Application.Features.Products.Commands.AddProduct
 @using Application.Features.Products.Queries.GetProducts
 @using Application.Models.Identity;
 @using Application.Models;
@@ -7,178 +8,179 @@
 @using Microsoft.AspNetCore.Authorization;
 @using System.Diagnostics.CodeAnalysis;
 @using YZPortalV8.Client.Clients.YZPortalApi;
-@using YZPortalV8.Client.Pages.Users;
+@using YZPortalV8.Client.Pages.Catalog.Products;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject DialogService DialogService
 @attribute [Authorize]
 @inject YZPortalApiConfig YZPortalApiConfig
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 
 <h1>Users</h1>
 <div class="tabs-body-content">
-    <Table TItem="ProductDto"
-           IsPagination="true"
-           PageItemsSource="@PageItemsSource"
-           IsBordered="true"
-           ShowToolbar="true"
-           ShowDefaultButtons="true"
-           ShowDeleteButton="true"
-           IsMultipleSelect="true"
-           ShowAddButton="true"
-           ShowEditButton="false"
-           ClickToSelect="true"
-           ShowSearch="true"
-           ShowCardView="true"
-           ShowFooter="true"
-           ShowExtendButtons="true"
-           ShowExtendEditButton="false"
-           ShowExtendDeleteButton="false"
-           TableSize="TableSize.Normal"
-           OnAddAsync="@OnAddAsync"
-           OnDeleteAsync="@OnDeleteAsync"
-           OnQueryAsync="@OnQueryAsync">
-        <TableToolbarTemplate>
-            @* <TableToolbarButton Color="Color.Primary"
-                Icon="fa-fw fa-solid fa-floppy-disk"
-                Text="Download PDF"
-                IsAsync /> *@
-            <TableToolbarButton OnClick="DownloadFileFromURL"
-                Color="Color.Primary"
-                Icon="fa-fw fa-solid fa-floppy-disk"
-                Text="Download Excel"
-                IsAsync />
-            <TableToolbarButton 
-                Color="Color.Primary"
-                Icon="fa-fw fa-solid fa-floppy-disk"
-                Text="Import"
-                IsAsync />
-        </TableToolbarTemplate>
-        <TableColumns>
-            <TableColumn @bind-Field="@context.Name" Text="Picture" />
-            <TableColumn @bind-Field="@context.Name" Sortable="true" Text="Product Name" Searchable="true">
-                <SearchTemplate Context="model">
-                    <div class="col-12 col-sm-6">
-                        <Select Items="GraphGroups" @bind-Value="@model!.Name" ShowLabel="true" DisplayText="Product Name"></Select>
-                    </div>
-                </SearchTemplate>
-            </TableColumn>
-            <TableColumn @bind-Field="@context.Sku" Sortable="true" Text="SKU" Searchable="true" />
-            <TableColumn @bind-Field="@context.Price" Text="Price" />
-            <TableColumn @bind-Field="@context.StockQuantity" Sortable="true" Text="Stock Qty" />
-        </TableColumns>
-        @* <RowButtonTemplate>
-            <TableCellButton Color="Color.Primary" Icon="fa-solid fa-pen" Text="Edit" OnClick="() => OpenUserEditDialog(context)" />
-        </RowButtonTemplate> *@
-    </Table>
+	@* AutoRefreshInterval set to 501. Look for "AutoRefreshInterval > 500" in BootstrapBlazor.Components.Table<TItem> class *@
+	<Table TItem="ProductDto"
+		   IsPagination="true"
+		   PageItemsSource="@PageItemsSource"
+		   IsBordered="true"
+		   ShowToolbar="true"
+		   ShowDefaultButtons="true"
+		   ShowDeleteButton="true"
+		   IsMultipleSelect="true"
+		   IsAutoRefresh="@IsTableAutoRefreshEnabled"
+		   AutoRefreshInterval=501
+		   ShowLoading="true"
+		   ShowAddButton="false"
+		   ShowEditButton="false"
+		   ClickToSelect="true"
+		   ShowSearch="true"
+		   ShowCardView="true"
+		   ShowFooter="true"
+		   ShowExtendButtons="true"
+		   ShowExtendEditButton="false"
+		   ShowExtendDeleteButton="false"
+		   TableSize="TableSize.Normal"
+		   OnDeleteAsync="@OnDeleteAsync"
+		   OnQueryAsync="@OnQueryAsync">
+		<TableExtensionToolbarTemplate>
+			<ButtonUpload TValue="string" ShowUploadFileList="false" BrowserButtonClass="btn-secondary" />
+		</TableExtensionToolbarTemplate>
+		<TableToolbarTemplate>
+			<TableToolbarButton OnClick="OpenCreateProductDialog"
+								Color="Color.Success"
+								Icon="fa-solid fa-plus"
+								Text="Add"
+								IsAsync />
+			@* <TableToolbarButton Color="Color.Primary"
+			Icon="fa-fw fa-solid fa-floppy-disk"
+			Text="Download PDF"
+			IsAsync /> *@
+			<TableToolbarButton OnClick="DownloadFileFromURL"
+								Color="Color.Primary"
+								Icon="fa-fw fa-solid fa-floppy-disk"
+								Text="Download Excel"
+								IsAsync />
+			<TableToolbarButton Color="Color.Primary"
+								Icon="fa-fw fa-solid fa-floppy-disk"
+								Text="Import"
+								IsAsync />
+		</TableToolbarTemplate>
+		<TableColumns>
+			<TableColumn @bind-Field="@context.Name" Text="Picture" />
+			<TableColumn @bind-Field="@context.Name" Sortable="true" Text="Product Name" Searchable="true">
+				<SearchTemplate Context="model">
+					<div class="col-12 col-sm-6">
+						<Select Items="GraphGroups" @bind-Value="@model!.Name" ShowLabel="true" DisplayText="Product Name"></Select>
+					</div>
+				</SearchTemplate>
+			</TableColumn>
+			<TableColumn @bind-Field="@context.Sku" Sortable="true" Text="SKU" Searchable="true" />
+			<TableColumn @bind-Field="@context.Price" Text="Price" />
+			<TableColumn @bind-Field="@context.StockQuantity" Sortable="true" Text="Stock Qty" />
+		</TableColumns>
+		@* <RowButtonTemplate>
+		<TableCellButton Color="Color.Primary" Icon="fa-solid fa-pen" Text="Edit" OnClick="() => OpenUserEditDialog(context)" />
+		</RowButtonTemplate> *@
+	</Table>
 </div>
 
 @code {
-    private List<SelectedItem> GraphGroups = new List<SelectedItem>();
+	private List<SelectedItem> GraphGroups { get; set; } = new List<SelectedItem>();
 
-    public QueryPageOptions queryPageOptions { get; set; } = new();
+	public QueryPageOptions queryPageOptions { get; set; } = new();
 
-    public List<string> orderby { get; set; } = new List<string>();
+	public List<string> orderby { get; set; } = new List<string>();
 
-    private static IEnumerable<int> PageItemsSource => new int[] { 2, 4, 10 };
+	private static IEnumerable<int> PageItemsSource => new int[] { 10, 20, 50 };
 
-    private List<ProductDto>? Products;
+	private List<ProductDto>? Products { get; set; }
 
-    private async Task OpenUserEditDialog(UserModel userModel)
-    {
-        var dialogOpt = new DialogOption()
-            {
-                ShowCloseButton = false,
-                Title = "Edit User",
-                Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(),
-                Size = Size.Large
-            };
-        dialogOpt.Component = BootstrapDynamicComponent.CreateComponent<UserEditDialog>(new Dictionary<string, object?>
-            {
-                [nameof(UserEditDialog.User)] = userModel,
-                [nameof(UserEditDialog.CloseDialog)] = EventCallback.Factory.Create<MouseEventArgs>(this, dialogOpt.CloseDialogAsync)
-            });
-        await DialogService.Show(dialogOpt);
-    }
+	public bool IsTableAutoRefreshEnabled { get; set; }
 
-    private async Task DownloadFileFromURL()
-    {
-        var result = await YZPortalApiClient.GetProductsExcelAsync(pageSize: queryPageOptions.PageItems, pageNumber: queryPageOptions.PageIndex, searchString: queryPageOptions.SearchText, orderBy: orderby.ToArray());
+	private async Task OpenCreateProductDialog()
+	{
+		var dialogOpt = new DialogOption()
+			{
+				ShowCloseButton = false,
+				Title = "Product Creation",
+				Component = BootstrapDynamicComponent.CreateComponent<CreateProductDialog>(),
+				Size = Size.Large
+			};
+		dialogOpt.Component = BootstrapDynamicComponent.CreateComponent<CreateProductDialog>(new Dictionary<string, object?>
+			{
+				[nameof(CreateProductDialog.CloseDialog)] = EventCallback.Factory.Create<MouseEventArgs>(this, dialogOpt.CloseDialogAsync),
+				// TODO: using autorefresh is not ideal, look for alternatives e,
+				[nameof(CreateProductDialog.RefreshParentComponentCallback)] = EventCallback.Factory.Create<bool>(this, () => IsTableAutoRefreshEnabled = true),
+			});
+		await DialogService.Show(dialogOpt);
+	}
 
-        await JS.InvokeVoidAsync("BlazorDownloadFile", new
-        {
-            Content = result,
-            FileName = $"{nameof(ProductCategory)}.xlsx",
-            ContentType = "application/octet-stream"
-        });
-    }
+	private async Task DownloadFileFromURL()
+	{
+		var result = await YZPortalApiClient.GetProductsExcelAsync(pageSize: queryPageOptions.PageItems, pageNumber: queryPageOptions.PageIndex, searchString: queryPageOptions.SearchText, orderBy: orderby.ToArray());
 
-    private async Task<bool> OnValidSubmit(string? userSubId, IEnumerable<string?> SelectedGraphGroups, IEnumerable<string?> ExistingGraphGroups)
-    {
-        var userSubIds = new string[] { userSubId ?? string.Empty };
+		await JS.InvokeVoidAsync("BlazorDownloadFile", new
+		{
+			Content = result,
+			FileName = $"{nameof(ProductCategory)}.xlsx",
+			ContentType = "application/octet-stream"
+		});
+	}
 
-        // Add groups
-        foreach (var selectdGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
-        {
-            await YZPortalApiClient.GraphGroupAddUsers(selectdGraphGroup, userSubIds);
-        }
+	private async Task<bool> OnValidSubmit(string? userSubId, IEnumerable<string?> SelectedGraphGroups, IEnumerable<string?> ExistingGraphGroups)
+	{
+		var userSubIds = new string[] { userSubId ?? string.Empty };
 
-        // Remove groups
-        foreach (var selectdGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
-        {
-            await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, userSubId);
-        }
+		// Add groups
+		foreach (var selectdGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
+		{
+			await YZPortalApiClient.GraphGroupAddUsers(selectdGraphGroup, userSubIds);
+		}
 
-        return await Task.FromResult(true);
-    }
+		// Remove groups
+		foreach (var selectdGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
+		{
+			await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, userSubId);
+		}
 
-    private async Task<QueryData<ProductDto>> OnQueryAsync(QueryPageOptions options)
-    {
-        queryPageOptions = options;
-        orderby.Clear();
+		return await Task.FromResult(true);
+	}
 
-        if (options.SortOrder != SortOrder.Unset)
-        {
-            orderby.Add(options.SortName + " " + options.SortOrder.ToString());
-        }
+	private async Task<QueryData<ProductDto>> OnQueryAsync(QueryPageOptions options)
+	{
+		// TODO: include try catch or risk looping auto refresh
+		// Reset flag
+		IsTableAutoRefreshEnabled = false;
+		queryPageOptions = options;
+		orderby.Clear();
 
-        var result = await YZPortalApiClient.GetProductsAsync(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby.ToArray());
+		if (options.SortOrder != SortOrder.Unset)
+		{
+			orderby.Add(options.SortName + " " + options.SortOrder.ToString());
+		}
 
-        Products = result.Data;
+		var result = await YZPortalApiClient.GetProductsAsync(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby.ToArray());
 
-        return await Task.FromResult(new QueryData<ProductDto>()
-            {
-                Items = Products,
-                TotalCount = result.TotalItems,
-                IsSorted = orderby.Any(),
-                IsSearch = !string.IsNullOrEmpty(options.SearchText)
-            });
-    }
+		return await Task.FromResult(new QueryData<ProductDto>()
+			{
+				Items = result.Data,
+				TotalCount = result.TotalItems,
+				IsSorted = orderby.Any(),
+				IsSearch = !string.IsNullOrEmpty(options.SearchText)
+			});
+	}
 
-    private async Task<ProductDto> OnAddAsync()
-    {
-        // var users = items.ToList();
-        // foreach (var user in users)
-        // {
-        //     var response = await YZPortalApiClient.DeleteUserAsync(user.Id);
+	private async Task<bool> OnDeleteAsync(IEnumerable<ProductDto> items)
+	{
+		var products = items.ToList();
+		foreach (var product in products)
+		{
+			var response = await YZPortalApiClient.DeleteProductAsync(product.Id);
 
-        //     if (response.Succeeded)
-        //         Products?.Remove(user);
-        // }
+			if (response.Succeeded)
+				Products?.Remove(product);
+		}
 
-        return new ProductDto();
-    }
-
-    private async Task<bool> OnDeleteAsync(IEnumerable<ProductDto> items)
-    {
-        // var users = items.ToList();
-        // foreach (var user in users)
-        // {
-        //     var response = await YZPortalApiClient.DeleteUserAsync(user.Id);
-
-        //     if (response.Succeeded)
-        //         Products?.Remove(user);
-        // }
-
-        return await Task.FromResult(true);
-    }
+		return await Task.FromResult(true);
+	}
 }
