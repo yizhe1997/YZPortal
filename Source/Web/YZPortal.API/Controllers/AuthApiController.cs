@@ -1,6 +1,8 @@
 ﻿using Application.Constants;
+using Application.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
 
@@ -12,6 +14,14 @@ namespace YZPortal.API.Controllers
     {
         public AuthApiController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
         {
+        }
+
+        [HttpPost("TriggerApiControllerException")]
+        public async Task<ActionResult<Result>> TriggerApiControllerExceptionAsync()
+        {
+            throw new Exception();
+
+            return Ok();
         }
     }
 }

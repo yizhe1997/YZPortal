@@ -15,9 +15,6 @@ using Application.Features.Products.Commands.AddProduct;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Forms;
 using Application.Features.Users.UserProfileImages.Commands;
-using System.Net.Http;
-using System.Net.Mime;
-using System.Text;
 
 namespace YZPortalV8.Client.Clients.YZPortalApi
 {

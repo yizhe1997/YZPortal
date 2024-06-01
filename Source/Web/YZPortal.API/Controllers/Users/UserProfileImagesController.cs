@@ -24,19 +24,6 @@ namespace YZPortal.API.Controllers.Users
             return Ok(response);
         }
 
-        ///// <summary>
-        ///// Upload user profile image
-        ///// </summary>
-        //[HttpPost("{userId}")]
-        //public async Task<ActionResult<Result>> UploadUserProfileImageAsync([FromRoute] Guid userId, [FromForm] IFormFile file)
-        //{
-        //    // Check if thefile is there
-        //    if (file == null)
-        //        return BadRequest("File is required");
-
-        //    return Ok();
-        //}
-
         /// <summary>
         /// Delete user profile image
         /// </summary>
