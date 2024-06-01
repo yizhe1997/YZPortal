@@ -318,17 +318,14 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             await SetHttpRequestMessageHeadersAsync();
 
             using var ms = image.OpenReadStream();
+            var streamContent = new StreamContent(ms, Convert.ToInt32(image.Size));
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue(image.ContentType);
+
             using var content = new MultipartFormDataContent
             {
-                { new StreamContent(ms, Convert.ToInt32(image.Size)), "command." + nameof(UploadUserProfileImageCommand.File), image.Name }
+                { streamContent, "command." + nameof(UploadUserProfileImageCommand.File), image.Name }
             };
             content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
-
-            //using MultipartFormDataContent multipartContent = new()
-            //{
-            //    { new StringContent("John", Encoding.UTF8, MediaTypeNames.Text.Plain), "first_name" },
-            //    { new StringContent("Doe", Encoding.UTF8, MediaTypeNames.Text.Plain), "last_name" }
-            //};
 
             using var response = await _http.PostAsync($"api/v1/UserProfileImages/{userId}", content);
             try
