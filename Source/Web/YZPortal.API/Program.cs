@@ -6,6 +6,7 @@ using Application.Extensions;
 using YZPortal.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddAzureWebAppDiagnostics();
 var configuration = builder.Configuration;
 
 builder.Host.UseSerilog(configuration);
