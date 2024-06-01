@@ -12,6 +12,12 @@ using YZPortalV8.Client.Services.LocalStorage;
 using Application.Features.Products.Queries.GetProducts;
 using Application.Features.Products.Queries.GetProductCategories;
 using Application.Features.Products.Commands.AddProduct;
+using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Components.Forms;
+using Application.Features.Users.UserProfileImages.Commands;
+using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
 
 namespace YZPortalV8.Client.Clients.YZPortalApi
 {
@@ -22,12 +28,14 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
         private readonly ILogger<YZPortalApiHttpClient> _logger;
         private readonly HttpClient _http;
         private readonly ILocalStorageService _localStorageService;
+        private readonly IJSRuntime _jSRuntime;
 
-        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService localStorageService)
+        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService localStorageService, IJSRuntime jSRuntime)
         {
             _logger = logger;
             _http = http;
             _localStorageService = localStorageService;
+            _jSRuntime = jSRuntime;
         }
 
         #region Helpers
@@ -288,13 +296,97 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return new Result();
         }
 
-        #region Configs
+        #region User Profile Image
 
-        public async Task<Result<ConfigsDto>> GetConfigsAsync(string subId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> DeleteUserProfileImageAsync(Guid userId)
+        {
+            await SetHttpRequestMessageHeadersAsync();
+
+            using var response = await _http.DeleteAsync($"api/v1/UserProfileImages/{userId}");
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<Result>() ?? new();
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            return new Result();
+        }
+
+        public async Task<Result> UploadUserProfileImageAsync(Guid userId, IBrowserFile image)
+        {
+            await SetHttpRequestMessageHeadersAsync();
+
+            using var ms = image.OpenReadStream();
+            using var content = new MultipartFormDataContent
+            {
+                { new StreamContent(ms, Convert.ToInt32(image.Size)), "command." + nameof(UploadUserProfileImageCommand.File), image.Name }
+            };
+            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
+
+            //using MultipartFormDataContent multipartContent = new()
+            //{
+            //    { new StringContent("John", Encoding.UTF8, MediaTypeNames.Text.Plain), "first_name" },
+            //    { new StringContent("Doe", Encoding.UTF8, MediaTypeNames.Text.Plain), "last_name" }
+            //};
+
+            using var response = await _http.PostAsync($"api/v1/UserProfileImages/{userId}", content);
+            try
+            {
+                var output = await response.Content.ReadFromJsonAsync<Result>() ?? new();
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            return new Result();
+        }
+
+        public async Task GetUserProfileImageAsync(Guid userId, CancellationToken cancellationToken = new CancellationToken())
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.GetAsync($"api/v1/Configs/{subId}", cancellationToken);
+            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/UserProfileImages/{userId}");
+
+            using var response = await _http.SendAsync(requestMsg, cancellationToken);
+            try
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
+                {
+                }
+
+                var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+                var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                var fileName = contentDisposition?.FileNameStar ?? contentDisposition?.FileName ?? "downloadedFile";
+
+                await _jSRuntime.InvokeVoidAsync("BlazorDownloadFile", new
+                {
+                    Content = bytes,
+                    FileName = fileName,
+                    ContentType = contentType
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region Configs
+
+        public async Task<Result<ConfigsDto>> GetConfigsAsync(string userSubId, CancellationToken cancellationToken = new CancellationToken())
+        {
+            await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+            using var response = await _http.GetAsync($"api/v1/Configs/{userSubId}", cancellationToken);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<Result<ConfigsDto>>(cancellationToken: cancellationToken) ?? new();
@@ -313,11 +405,11 @@ namespace YZPortalV8.Client.Clients.YZPortalApi
             return new Result<ConfigsDto>();
         }
 
-        public async Task<Result<PortalConfigDto>> UpdatePortalConfigAsync(string? subId, UpdateUserPortalConfigCommand? updateUserPortalConfigCommand = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result<PortalConfigDto>> UpdatePortalConfigAsync(string? userSubId, UpdateUserPortalConfigCommand? updateUserPortalConfigCommand = null, CancellationToken cancellationToken = new CancellationToken())
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.PutAsJsonAsync($"/api/v1/Configs/portalConfiguration/{subId}", updateUserPortalConfigCommand, cancellationToken: cancellationToken);
+            using var response = await _http.PutAsJsonAsync($"/api/v1/Configs/portalConfiguration/{userSubId}", updateUserPortalConfigCommand, cancellationToken: cancellationToken);
             try
             {
                 var output = await response.Content.ReadFromJsonAsync<Result<PortalConfigDto>>(cancellationToken: cancellationToken) ?? new();

@@ -22,6 +22,12 @@ namespace Infrastructure.Persistence.Configurations.Users
                 .IsRequired()
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.UserProfileImage)
+               .WithOne()
+               .HasForeignKey<UserProfileImage>(x => x.RefId)
+               .HasPrincipalKey<User>(x => x.Id)
+               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

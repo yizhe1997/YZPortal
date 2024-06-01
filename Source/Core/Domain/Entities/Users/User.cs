@@ -1,6 +1,7 @@
 ﻿using Domain.Entities.Auditable;
 using Domain.Entities.Users.Configs;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities.Users
 {
@@ -56,5 +57,7 @@ namespace Domain.Entities.Users
         // TODO: change to owned type entity https://learn.microsoft.com/en-us/ef/core/modeling/owned-entities
         public PortalConfig PortalConfig { get; set; } = new();
         public UserProfileImage? UserProfileImage { get; set; }
+        [NotMapped]
+        public string? UserProfileImageUrl { get; set; }
     }
 }

@@ -32,6 +32,19 @@
     </div>
 
     <script>
+        // REF: https://learn.microsoft.com/en-us/aspnet/core/blazor/images?view=aspnetcore-8.0#stream-image-data
+        window.setImage = async (imageElementId, imageStream) => {
+            const arrayBuffer = await imageStream.arrayBuffer();
+            const blob = new Blob([arrayBuffer]);
+            const url = URL.createObjectURL(blob);
+            const image = document.getElementById(imageElementId);
+            image.onload = () => {
+                URL.revokeObjectURL(url);
+            }
+            image.src = url;
+        }
+    </script>
+    <script>
         window.BlazorDownloadFile = (options) => {
             // REF: https://www.meziantou.net/generating-and-downloading-a-file-in-a-blazor-webassembly-application.htm
             // Create the URL

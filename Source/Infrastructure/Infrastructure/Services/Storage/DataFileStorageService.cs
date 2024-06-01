@@ -9,6 +9,7 @@ using Application.Requests;
 using Domain.Entities.Misc;
 using Application.Features.Users.UserProfileImages.Commands;
 using Application.Interfaces.Repositories.Users;
+using Azure.Storage.Blobs.Models;
 
 namespace Infrastructure.Services.Storage
 {
@@ -27,25 +28,27 @@ namespace Infrastructure.Services.Storage
 
         public async Task<Result> DeleteDataFileAsync(DataFile dataFile, CancellationToken cancellationToken)
         {
-            var blob = await ReferenceBlob(dataFile.ContainerName ?? "", dataFile.Name ?? "");
-            if (blob != null)
+            var blobClient = new BlobClient(new Uri(dataFile.Url ?? ""));
+
+            if (await blobClient.ExistsAsync())
             {
-                await blob.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+                await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
 
                 return await Result.SuccessAsync();
             }
 
-            return await Result.FailAsync("File not found");
+            return await Result.FailAsync("Data file not found");
         }
 
         public async Task<Result<DownloadFileModel>> DownloadDataFileAsync(DataFile dataFile, CancellationToken cancellationToken)
         {
-            var blob = await ReferenceBlob(dataFile.ContainerName ?? "", dataFile.Name ?? "");
-            if (blob != null)
+            var blobClient = new BlobClient(new Uri(dataFile.Url ?? ""));
+
+            if (await blobClient.ExistsAsync())
             {
                 var stream = new MemoryStream();
 
-                await blob.DownloadToAsync(stream, cancellationToken);
+                await blobClient.DownloadToAsync(stream, cancellationToken);
 
                 stream.Seek(0, SeekOrigin.Begin);
 
@@ -59,12 +62,18 @@ namespace Infrastructure.Services.Storage
                 return await Result<DownloadFileModel>.SuccessAsync(result);
             }
 
-            return await Result<DownloadFileModel>.FailAsync("Fail to download");
+            return await Result<DownloadFileModel>.FailAsync("Data file not found");
         }
 
-        public async Task<Tuple<Result, string>> UploadDataFileAsync<T>(UploadDataFileCommand command, CancellationToken cancellationToken) where T : UploadDataFileCommand
+        /// <returns>
+        /// Item1: generic result
+        /// Item2: container name used for uploading data file
+        /// Item3: data file url
+        /// </returns>
+        public async Task<Tuple<Result, string>> UploadDataFileAsync<T>(UploadDataFileCommand command, CancellationToken cancellationToken = default) where T : UploadDataFileCommand
         {
             var containerName = "";
+            var fileName = command.RefId.ToString() + "_" + command.File?.FileName;
 
             #region Validation
 
@@ -84,7 +93,7 @@ namespace Infrastructure.Services.Storage
                     await Result.FailAsync("Container name is null or empty"),
                     "");
 
-            if (string.IsNullOrEmpty(command.FileName))
+            if (string.IsNullOrEmpty(command.File?.FileName))
                 return new Tuple<Result, string>(
                     await Result.FailAsync("File name is null or empty"),
                     "");
@@ -98,52 +107,33 @@ namespace Infrastructure.Services.Storage
 
             #region Execution
 
-            using var ms = new MemoryStream();
-            command.File.CopyTo(ms);
+            var containerClient = _blobClient.GetBlobContainerClient(containerName);
 
-            var blob = await ReferenceBlob(containerName, command.FileName, true);
-            if (blob == null)
+            if (await containerClient.ExistsAsync())
             {
-                return new Tuple<Result, string>(await Result.FailAsync("Failed to reference blob"), containerName);
+                var blobClient = containerClient.GetBlobClient(fileName);
+
+                if (await blobClient.ExistsAsync())
+                {
+                    await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+                }
+
+                // For now the ACL via SASUrl is sufficient
+                var uri = blobClient.GenerateSasUri(BlobSasPermissions.Create | BlobSasPermissions.Read | BlobSasPermissions.Delete, DateTime.MaxValue);
+                blobClient = new BlobClient(uri);
+
+                using var ms = new MemoryStream();
+                command.File.CopyTo(ms);
+
+                ms.Seek(0, SeekOrigin.Begin);
+                await blobClient.UploadAsync(ms, new BlobHttpHeaders { ContentType = command.File.ContentType }, cancellationToken: cancellationToken);
+
+                return new Tuple<Result, string>(await Result.SuccessAsync(blobClient.Uri.ToString()), containerName);
             }
 
-            ms.Seek(0, SeekOrigin.Begin);
-            await blob.UploadAsync(ms, cancellationToken);
-
-            return new Tuple<Result, string>(await Result.SuccessAsync(), containerName);
+            return new Tuple<Result, string>(await Result.FailAsync("Failed to reference blob"), containerName);
 
             #endregion
         }
-
-        #region Helpers
-
-        /// <summary>
-		/// Access the blob given the container and object name. Returns null if exception caught
-		/// </summary>
-		private async Task<BlobClient?> ReferenceBlob(string containerName, string fileName, bool toUpload = false)
-        {
-            // Container reference
-            var containerClient = _blobClient.GetBlobContainerClient(containerName);
-
-            if (!await containerClient.ExistsAsync())
-                return null;
-
-            var blobClient = containerClient.GetBlobClient(fileName);
-            var blobExists = await blobClient.ExistsAsync();
-
-            if (toUpload)
-            {
-                if (!blobExists)
-                {
-                    var uri = blobClient.GenerateSasUri(BlobSasPermissions.Write | BlobSasPermissions.Create, DateTime.MaxValue);
-                    return new BlobClient(uri);
-                }
-                // UploadAsync will throw exception if blob exist already so no need to handle
-            }
-
-            return blobExists ? blobClient : null;
-        }
-
-        #endregion
     }
 }

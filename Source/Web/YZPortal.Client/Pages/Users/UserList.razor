@@ -33,7 +33,7 @@
        OnDeleteAsync="@OnDeleteAsync"
        OnQueryAsync="@OnQueryAsync">
     <TableColumns>
-        <TableColumn @bind-Field="@context.UserName" Sortable="true" Text="Email" />
+        <TableColumn @bind-Field="@context.Email" Sortable="true" Text="Email" />
         <TableColumn @bind-Field="@context.DisplayName" Sortable="true" Text="Name" />
         <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" Text="Last logged-in" />
     </TableColumns>

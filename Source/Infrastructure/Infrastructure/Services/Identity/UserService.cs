@@ -29,10 +29,31 @@ namespace Infrastructure.Services.Identity
 
         public async Task<SearchResult<UserModel>> GetSearchResultAsync(SearchRequest request, CancellationToken cancellationToken = new CancellationToken())
         {
-            var query = _userManager.Users;
+            var query = _userManager.Users.Include(x => x.UserProfileImage).Select(x => new User
+            {
+                Email = x.Email,
+                DisplayName = x.DisplayName,
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                SubjectIdentifier = x.SubjectIdentifier,
+                IpAddress = x.IpAddress,
+                AuthTime = x.AuthTime,
+                AuthExpireTime = x.AuthExpireTime,
+                AuthClassRef = x.AuthClassRef,
+                MobilePhone = x.MobilePhone,
+                IdentityProvider = x.IdentityProvider,
+                LastidpAccessToken = x.LastidpAccessToken,
+                UserProfileImageUrl = x.UserProfileImage.Url,
+                CreatedBy = x.CreatedBy,
+                CreatedDate = x.CreatedDate,
+                UpdatedBy = x.UpdatedBy,
+                UpdatedDate = x.UpdatedDate,
+                Id = x.Id
+            });
+
             var result = await SearchResult<User>.SuccessAsync<UserModel>(request, query, _mapper, 
                 x => x.DisplayName.Contains(request.SearchString) ||
-                x.UserName.Contains(request.SearchString),
+                x.Email.Contains(request.SearchString),
                 cancellationToken: cancellationToken);
             return result;
         }

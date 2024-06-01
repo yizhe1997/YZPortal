@@ -9,6 +9,8 @@
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject DialogService DialogService
 @attribute [Authorize(Policy = nameof(Role.Administrator))]
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
 
 <h1>Users</h1>
 <div class="tabs-body-content">
@@ -26,7 +28,6 @@
            ShowEditButton="false"
            ClickToSelect="true"
            ShowSearch="true"
-           ShowCardView="true"
            ShowFooter="true"
            ShowExtendButtons="true"
            ShowExtendEditButton="false"
@@ -35,16 +36,25 @@
            OnDeleteAsync="@OnDeleteAsync"
            OnQueryAsync="@OnQueryAsync">
         <TableColumns>
-            <TableColumn @bind-Field="@context.UserName" Width="260">
+            <TableColumn @bind-Field="@context.UserProfileImageUrl" Text="Profile Image" Width="120">
                 <Template Context="value">
-                    <div class="d-flex">
-                        <div>
-                            <img src="favicon.png" />
-                        </div>
-                    </div>
+                    <ImageViewer Url="@value.Value" ShowPlaceHolder="true" HandleError="true" FitMode="ObjectFitMode.Contain">
+                        <PlaceHolderTemplate>
+                            <div class="d-flex">
+                                <div>
+                                    <img src="favicon.png" />
+                                </div>
+                            </div>
+                        </PlaceHolderTemplate>
+                        <ErrorTemplate>
+                            <div class="d-flex">
+                                Load failed
+                            </div>
+                        </ErrorTemplate>
+                    </ImageViewer>
                 </Template>
             </TableColumn>
-            <TableColumn @bind-Field="@context.UserName" Sortable="true" Text="Email" />
+            <TableColumn @bind-Field="@context.Email" Sortable="true" Text="Email" />
             <TableColumn @bind-Field="@context.DisplayName" Sortable="true" Text="Name" />
             <TableColumn @bind-Field="@context.AuthTime" Sortable="true" FormatString="yyyy-MM-dd" Text="Last logged-in" />
         </TableColumns>
@@ -64,6 +74,37 @@
     public QueryPageOptions queryPageOptions { get; set; } = new();
 
     public bool IsTableAutoRefreshEnabled { get; set; }
+
+    private async Task<Stream> GetImageStreamAsync()
+    {
+        return await Http.GetStreamAsync(
+            "https://avatars.githubusercontent.com/u/9141961");
+    }
+
+    private async Task SetImageAsync2()
+    {
+        try
+        {
+            var imageStream = await GetImageStreamAsync();
+            var dotnetImageStream = new DotNetStreamReference(imageStream);
+            await JSRuntime.InvokeVoidAsync("setImage", "image", dotnetImageStream);
+        }
+        catch (JSException ex)
+        {
+            var m = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+    private async Task SetImageAsync(string imageUrl, Guid id)
+    {
+        var imageStream = await Http.GetStreamAsync(imageUrl);
+        var dotnetImageStream = new DotNetStreamReference(imageStream);
+        await JSRuntime.InvokeVoidAsync("setImage", id.ToString(), dotnetImageStream);
+    }
 
     private async Task OpenUserEditDialog(UserModel userModel)
     {
@@ -105,7 +146,12 @@
 
     private async Task<QueryData<UserModel>> OnQueryAsync(QueryPageOptions options)
     {
-        IsTableAutoRefreshEnabled = false;
+        // Reset flag
+        if (IsTableAutoRefreshEnabled)
+        {
+            IsTableAutoRefreshEnabled = false;
+            StateHasChanged();
+        }
         queryPageOptions = options;
 
         var orderby = new List<string>();

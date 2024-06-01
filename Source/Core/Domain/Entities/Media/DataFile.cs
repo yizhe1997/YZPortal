@@ -9,5 +9,6 @@ namespace Domain.Entities.Misc
         public long Size { get; set; }
         public string? ContainerName { get; set; }
         public abstract Guid RefId { get; set; }
+        public string? Url { get; set; }
     }
 }

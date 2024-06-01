@@ -45,6 +45,8 @@ namespace YZPortal.API.Filters
                 filterContext.HttpContext.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
                 filterContext.HttpContext.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
                 filterContext.HttpContext.Response.Headers.Add("Referrer-Policy", "no-referrer");
+                // REF: https://stackoverflow.com/questions/72490802/content-disposition-is-always-null
+                filterContext.HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "*");
             }
         }
 

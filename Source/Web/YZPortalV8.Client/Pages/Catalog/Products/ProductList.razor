@@ -148,9 +148,13 @@
 
 	private async Task<QueryData<ProductDto>> OnQueryAsync(QueryPageOptions options)
 	{
-		// TODO: include try catch or risk looping auto refresh
 		// Reset flag
-		IsTableAutoRefreshEnabled = false;
+		if (IsTableAutoRefreshEnabled)
+		{
+			IsTableAutoRefreshEnabled = false;
+			StateHasChanged();
+		}
+		
 		queryPageOptions = options;
 		orderby.Clear();
 

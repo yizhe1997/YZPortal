@@ -4,10 +4,7 @@ namespace Application.Models.Identity
 {
     public class UserModel : AuditableModel<Guid>
     {
-        public string? UserName { get; set; }
-
-        #region B2C Claims
-
+        public string? UserName { get; set; } // Use get set operator to concat
         public string? DisplayName { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
@@ -17,14 +14,14 @@ namespace Application.Models.Identity
         public DateTime? AuthExpireTime { get; set; }
         public string? AuthClassRef { get; set; }
         public string? MobilePhone { get; set; }
+        public string? UserProfileImageUrl { get; set; }
+        public string? Email { get; set; }
 
         #region Identity Provider
 
         public string? IdentityProvider { get; set; } // TODO
         public string? LastidpAccessToken { get; set; } // TODO
         public List<IdentityModel> Identities { get; set; } = new List<IdentityModel>();
-
-        #endregion
 
         #endregion
     }

@@ -1,19 +1,20 @@
 ﻿using Application.Interfaces.Repositories.Users;
 using Application.Interfaces.Services;
 using Application.Models;
+using Application.Models.File;
 using MediatR;
 using Microsoft.Extensions.Localization;
 using System.Text.Json.Serialization;
 
 namespace Application.Features.Users.UserProfileImages.Commands
 {
-    public class DownloadUserProfileImageCommand : IRequest<Result>
+    public class DownloadUserProfileImageCommand : IRequest<Result<DownloadFileModel>>
     {
         [JsonIgnore]
         public Guid UserId { get; set; }
     }
 
-    public class DownloadUserProfileImageCommandHandler : IRequestHandler<DownloadUserProfileImageCommand, Result>
+    public class DownloadUserProfileImageCommandHandler : IRequestHandler<DownloadUserProfileImageCommand, Result<DownloadFileModel>>
     {
         private readonly IDataFileStorageService _dataFileStorageService;
         private readonly IUserProfileImageRepository _userProfileImageRepository;
@@ -29,7 +30,7 @@ namespace Application.Features.Users.UserProfileImages.Commands
             _dataFileStorageService = dataFileStorageService;
         }
 
-        public async Task<Result> Handle(DownloadUserProfileImageCommand command, CancellationToken cancellationToken)
+        public async Task<Result<DownloadFileModel>> Handle(DownloadUserProfileImageCommand command, CancellationToken cancellationToken)
         {
             var userProfileImage = await _userProfileImageRepository.GetByUserIdFirstOrDefaultAsync(command.UserId);
             if (userProfileImage != null)
@@ -38,7 +39,7 @@ namespace Application.Features.Users.UserProfileImages.Commands
             }
             else
             {
-                return await Result.FailAsync(_localizer["Not Found"]);
+                return await Result<DownloadFileModel>.FailAsync(_localizer["Not Found"]);
             }
         }
     }

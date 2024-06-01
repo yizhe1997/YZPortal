@@ -142,11 +142,14 @@ on the local host. Presently, the backend API supports the following configurati
 #### 4.4.1 CORS
 - [Middleware](https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-8.0) 
 
+- #### 4.4.2 Storage Protection
+- [SAS URLs in Microsoft Azure Blob Storage](https://tejaksha-k.medium.com/understanding-sas-urls-in-microsoft-azure-blob-storage-aa358d7ca8bf#:~:text=SAS%20URLs%20provide%20a%20secure,to%20a%20third%2Dparty%20user.)
+
 ### 4.5. Caching
-#### 4.5.1 CORS
+#### 4.5.1 General
 - [Distributed cache](https://code-maze.com/aspnetcore-distributed-caching/) 
 - [In-Memory cache](https://code-maze.com/aspnetcore-in-memory-caching/) 
-= [Redis cache](https://www.c-sharpcorner.com/article/easily-use-redis-cache-in-asp-net-6-0-web-api/)
+- [Redis cache](https://www.c-sharpcorner.com/article/easily-use-redis-cache-in-asp-net-6-0-web-api/)
 
 ### 4.6. Real-time Web Functionality
 #### 4.6.1 SignalR

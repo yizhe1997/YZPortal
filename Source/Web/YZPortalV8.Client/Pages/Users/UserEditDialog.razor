@@ -7,22 +7,44 @@
 @using YZPortalV8.Client.Clients.YZPortalApi
 @using GraphModel = Application.Models.Graph;
 @using IdentityModel = Application.Models.Identity;
-
 @inject YZPortalApiHttpClient YZPortalApiClient
+@inject DownloadService DownloadService
+@implements IDisposable
+@implements IAsyncDisposable
 
 <Row id="@nameof(UserEditDialog)" ItemsPerRow="ItemsPerRow.One">
     <Card CollapseIcon="fas fa-circle-info" HeaderText="Customer Info" IsShadow="true" IsCollapsible="true">
         <BodyTemplate>
             <GroupBox style="margin-top: 1.5rem;">
+                <CardUpload TValue="string" 
+                    ShowProgress="true" 
+                    IsSingle="true" 
+                    ShowDownloadButton="true" 
+                    DefaultFileList="@DefaultFileList"
+                    OnDownload="@DownloadFileAsync"
+                    OnChange="@OnCardUpload"
+                    OnDelete="@OnFileDelete">
+                    <IconTemplate Context="value">
+                        <ImageViewer Url="@value.PrevUrl"
+                                     ShowPlaceHolder="true" HandleError="true" FitMode="ObjectFitMode.Contain">
+                            <PlaceHolderTemplate>
+                                <div class="d-flex">
+                                    <div>
+                                        <img src="favicon.png" />
+                                    </div>
+                                </div>
+                            </PlaceHolderTemplate>
+                            <ErrorTemplate>
+                                <div class="d-flex">
+                                    Load failed
+                                </div>
+                            </ErrorTemplate>
+                        </ImageViewer>
+                    </IconTemplate>
+                </CardUpload>
                 <ValidateForm Model="@User">
                     <EditorForm TModel="IdentityModel.UserModel" AutoGenerateAllItem=false>
                         <FieldItems >
-                            <CardUpload IsSingle="true"
-                                TValue="string" 
-                                ShowDownloadButton="true"
-                                OnChange="@OnCardUpload" 
-                                OnDelete="@(fileName => Task.FromResult(true))">
-                            </CardUpload>
                             <div class="col-12">
                                 <BootstrapInput @bind-Value="@User.UserName" IsDisabled="true" DisplayText="Email" ShowLabel="true" />
                             </div>
@@ -69,7 +91,10 @@
     private List<SelectedItem> GraphGroups { get; set; } = new List<SelectedItem>();
     private IEnumerable<string?> SelectedGraphGroups { get; set; } = Enumerable.Empty<string?>();
     private IEnumerable<string?> ExistingGraphGroups { get; set; } = Enumerable.Empty<string?>();
+    private List<UploadFile>? DefaultFileList { get; set; }
     private static long MaxFileLength  => 200 * 1024 * 1024;
+    public bool IsRefreshParentComponentRequired { get; set; }
+    private CancellationTokenSource? ReadAvatarToken { get; set; }
     [Parameter]
     public EventCallback<MouseEventArgs> CloseDialog { get; set; }
 
@@ -81,22 +106,56 @@
 
     private static List<SelectedItem> GenerateDataSource(List<GraphModel.GroupModel> source) => source.Select(i => new SelectedItem(i.Id, i.DisplayName ?? string.Empty)).ToList();
 
+    private async Task DownloadFileAsync(UploadFile item)
+    {
+        await YZPortalApiClient.GetUserProfileImageAsync(User.Id);
+    }
+
+    private async Task<bool> OnFileDelete(UploadFile item)
+    {
+        await YZPortalApiClient.DeleteUserProfileImageAsync(User.Id);
+
+        DefaultFileList = null;
+
+        IsRefreshParentComponentRequired = true;
+        // TODO: return true if api success
+        return true;
+    }
+
     private async Task OnCardUpload(UploadFile file)
     {
         if (file != null && file.File != null)
         {
-            // 服务器端验证当文件大于 2MB 时提示文件太大信息
+            var format = file.File.ContentType;
+
             if (file.Size > MaxFileLength)
             {
                 // await ToastService.Information("Upload the file", "The file size is greater than 200MB");
                 file.Code = 1;
                 file.Error = "The file size is greater than 200MB";
             }
+            else if (CheckValidAvatarFormat(format))
+            {
+                var result = await YZPortalApiClient.UploadUserProfileImageAsync(User.Id, file.File);
+
+                // service
+                DefaultFileList = new(new[] { new UploadFile { PrevUrl = result.Messages[0] ?? "" } });
+                // await SaveToFile(file);
+
+                IsRefreshParentComponentRequired = true;
+                StateHasChanged();
+            }
             else
             {
-                // await SaveToFile(file);
+                file.Code = 1;
+                file.Error = "The file format is incorrect";
             }
         }
+    }
+
+    private static bool CheckValidAvatarFormat(string format)
+    {
+        return "jpg;png;bmp;gif;jpeg".Split(';').Any(f => format.Contains(f, StringComparison.OrdinalIgnoreCase));
     }
 
     private async Task OnFieldValueChanged()
@@ -129,24 +188,41 @@
         });
 
         // TODO: only invoke if successfully edit
-        await RefreshParentComponentCallback.InvokeAsync(true);
+        IsRefreshParentComponentRequired = true;
 
         // await CloseDialog.InvokeAsync();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
+        if (!string.IsNullOrEmpty(User.UserProfileImageUrl))
+            DefaultFileList = new(new[] { new UploadFile { PrevUrl = User.UserProfileImageUrl } });
 
         var graphGroups = await YZPortalApiClient.GetGraphGroups();
         this.GraphGroups = GenerateDataSource(graphGroups.Data);
 
         var selectedGraphGroups = await YZPortalApiClient.GetGraphGroups(User.SubjectIdentifier);
         this.SelectedGraphGroups = ExistingGraphGroups = selectedGraphGroups.Data.Select(x => x.Id).ToList();
+
+        await base.OnInitializedAsync();
     }
 
     private void ClearListItems()
     {
         SelectedGraphGroups = Enumerable.Empty<string?>();
     }
+
+    #region Disposable
+
+    void IDisposable.Dispose()
+    {
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (IsRefreshParentComponentRequired)
+            await RefreshParentComponentCallback.InvokeAsync(true);
+    }
+
+    #endregion
 }

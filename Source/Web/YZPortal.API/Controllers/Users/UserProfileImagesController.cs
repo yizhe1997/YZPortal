@@ -1,7 +1,6 @@
 ﻿using Application.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Application.Features.Users.Configs.Queries.GetConfigs;
 using Application.Features.Users.UserProfileImages.Commands;
 
 namespace YZPortal.API.Controllers.Users
@@ -15,8 +14,8 @@ namespace YZPortal.API.Controllers.Users
         /// <summary>
         /// Upload user profile image
         /// </summary>
-        [HttpPut("{userId}")]
-        public async Task<ActionResult<Result>> UploadUserProfileImageAsync([FromRoute] Guid userId, [FromBody] UploadUserProfileImageCommand command)
+        [HttpPost("{userId}")]
+        public async Task<ActionResult<Result>> UploadUserProfileImageAsync([FromRoute] Guid userId, [FromForm] UploadUserProfileImageCommand command)
         {
             command.RefId = userId;
 
@@ -25,11 +24,24 @@ namespace YZPortal.API.Controllers.Users
             return Ok(response);
         }
 
+        ///// <summary>
+        ///// Upload user profile image
+        ///// </summary>
+        //[HttpPost("{userId}")]
+        //public async Task<ActionResult<Result>> UploadUserProfileImageAsync([FromRoute] Guid userId, [FromForm] IFormFile file)
+        //{
+        //    // Check if thefile is there
+        //    if (file == null)
+        //        return BadRequest("File is required");
+
+        //    return Ok();
+        //}
+
         /// <summary>
         /// Delete user profile image
         /// </summary>
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<Result<ConfigsDto>>> DeleteUserProfileImageAsync([FromRoute] Guid userId)
+        [HttpDelete("{userId}")]
+        public async Task<ActionResult<Result>> DeleteUserProfileImageAsync([FromRoute] Guid userId)
         {
             var response = await _mediator.Send(new DeleteUserProfileImageCommand()
             {
@@ -43,14 +55,14 @@ namespace YZPortal.API.Controllers.Users
         /// Download user profile image
         /// </summary>
         [HttpGet("{userId}")]
-        public async Task<ActionResult<Result<ConfigsDto>>> DownloadUserProfileImageAsync([FromRoute] Guid userId)
+        public async Task<IActionResult> DownloadUserProfileImageAsync([FromRoute] Guid userId)
         {
             var response = await _mediator.Send(new DownloadUserProfileImageCommand()
             {
                 UserId = userId
             });
 
-            return Ok(response);
+            return File(response.Data.Stream, response.Data.ContentType, response.Data.FileName);
         }
     }
 }
