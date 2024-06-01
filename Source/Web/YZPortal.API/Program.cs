@@ -6,10 +6,14 @@ using Application.Extensions;
 using YZPortal.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Logging.AddAzureWebAppDiagnostics();
+
 var configuration = builder.Configuration;
 
 builder.Host.UseSerilog(configuration);
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.AddAzureWebAppDiagnostics();
+
 
 // Ref: https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/PII
 // https://stackoverflow.com/questions/54435551/invalidoperationexception-idx20803-unable-to-obtain-configuration-from-pii

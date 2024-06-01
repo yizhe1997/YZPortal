@@ -83,7 +83,11 @@ namespace YZPortal.API.Extensions
                     if (contextFeature != null)
                     {
                         var serviceProvider = new ServiceCollection()
-                          .AddLogging(cfg => cfg.AddConsole())
+                          .AddLogging(cfg => 
+                            cfg.AddConsole()
+                            .AddDebug()
+                            .AddAzureWebAppDiagnostics()
+                          )
                           .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Information)
                           .BuildServiceProvider();
 
