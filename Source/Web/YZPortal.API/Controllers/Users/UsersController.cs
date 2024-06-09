@@ -23,6 +23,12 @@ namespace YZPortal.API.Controllers.Users
             _graphService = graphService;
         }
 
+        [HttpPost("TriggerApiControllerException")]
+        public async Task<ActionResult<Result>> TriggerApiControllerExceptionAsync()
+        {
+            throw new Exception();
+        }
+
         /// <summary>
         /// Returns a list of application user.
         /// </summary>

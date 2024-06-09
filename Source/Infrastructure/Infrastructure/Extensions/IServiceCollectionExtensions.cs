@@ -28,15 +28,20 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using SendGrid.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -47,7 +52,7 @@ namespace Infrastructure.Extensions
 {
     public static class IServiceCollectionExtensions
     {
-        public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
+        public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
         {
             // Serializer
             services.AddSerializer();
@@ -93,6 +98,10 @@ namespace Infrastructure.Extensions
 
             // ExportImport
             services.AddExportImport();
+
+            // Instrumentation
+            services.AddInstrumentation(environment);
+            services.AddInstrumentationExporters(configuration);
         }
 
         #region Persistence
@@ -353,6 +362,60 @@ namespace Infrastructure.Extensions
             services.Configure<GraphConfig>(configuration.GetSection("Graph"));
 
             services.AddTransient<IGraphService, GraphService>();
+        }
+
+        #endregion
+
+        #region Instrumentation
+
+        private static void AddInstrumentation(this IServiceCollection services, IWebHostEnvironment environment)
+        {
+            services.AddOpenTelemetry()
+                .WithTracing(x =>
+                {
+                    if (environment.IsDevelopment())
+                    {
+                        x.SetSampler<AlwaysOnSampler>();
+                    }
+
+                    x.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+                    //.AddGrpcClientInstrumentation()
+                    //.AddSqlClientInstrumentation();
+
+                    //x.AddConsoleExporter();
+                })
+                .WithMetrics(x =>
+                {
+                    x.AddRuntimeInstrumentation()
+                        .AddMeter(
+                            "Microsoft.AspNetCore.Hosting",
+                            "Microsoft.AspNetCore.Server.Kestrel",
+                            "System.Net.Http");
+                });
+        }
+
+        private static void AddInstrumentationExporters(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<InstrumentationConfig>(configuration.GetSection("Instrumentation"));
+
+            var instrumentationConfig = configuration.GetSection("Instrumentation").Get<InstrumentationConfig>() ?? new();
+
+            if (!string.IsNullOrEmpty(instrumentationConfig.OtlpExporterEndpoint))
+            {
+                services.Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter(options =>
+                {
+                    options.Endpoint = new Uri(instrumentationConfig.OtlpExporterEndpoint);
+                }));
+                services.ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddOtlpExporter(options =>
+                {
+                    options.Endpoint = new Uri(instrumentationConfig.OtlpExporterEndpoint);
+                }));
+                services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter(options =>
+                {
+                    options.Endpoint = new Uri(instrumentationConfig.OtlpExporterEndpoint);
+                }));
+            }
         }
 
         #endregion

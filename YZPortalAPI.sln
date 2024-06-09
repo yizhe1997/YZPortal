@@ -4,6 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D0390E45-2678-4726-B098-8C7BBA7C5194}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.filenesting.json = .filenesting.json
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{F8DA2397-E1D2-4F88-9002-FE1AA8FF62C4}"
 EndProject

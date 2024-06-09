@@ -1,28 +1,22 @@
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.IdentityModel.Logging;
-using Serilog;
 using Infrastructure.Extensions;
 using Application.Extensions;
 using YZPortal.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
 var configuration = builder.Configuration;
 
+#region Logging
+
+builder.Logging.ConfigureLogging();
 builder.Host.UseSerilog(configuration);
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-builder.Logging.AddAzureWebAppDiagnostics();
 
+#endregion
 
-// Ref: https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/PII
-// https://stackoverflow.com/questions/54435551/invalidoperationexception-idx20803-unable-to-obtain-configuration-from-pii
-IdentityModelEventSource.ShowPII = true;
-
-#region Add services to the container.
+#region Add services
 
 builder.Services.AddApplicationLayer();
-builder.Services.AddInfrastructureLayer(configuration);
+builder.Services.AddInfrastructureLayer(configuration, builder.Environment);
 builder.Services.AddWebLayer(configuration);
 
 #endregion
@@ -31,14 +25,8 @@ var app = builder.Build();
 
 await app.Services.MigrateDatabaseAsync();
 
-app.UseInfrastructure();
+app.UseInfrastructure(builder.Services);
 
-//// Make the default route redirect to Swagger documentation
-//var option = new RewriteOptions();
-//option.AddRedirect("^$", "chat");
-//app.UseRewriter(option);
-
-// Expose Swagger documentation
 app.UseSwagger(app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), configuration);
 
 app.MapEndpoints();
