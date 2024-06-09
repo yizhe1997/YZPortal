@@ -174,4 +174,10 @@ on the local host. Presently, the backend API supports the following configurati
 - [OAuth 2.0 refresh tokens with Azure AD B2C](https://melmanm.github.io/misc/2023/01/29/article2-oauth-refresh-tokens-with-azure-b2c.html#refreshing-tokens-by-the-book)
 - [OAuth 2.0 authorization code flow in Azure Active Directory B2C](https://learn.microsoft.com/en-us/azure/active-directory-b2c/authorization-code-flow#1-get-an-authorization-code)
 
+### 4.9 Instrumentation
+#### 4.9.1 Logging
+- [Logging in Azure with Application Insights and Serilog](https://hackernoon.com/logging-in-azure-with-application-insights-and-serilog)
+- [Logging in .NET Core and ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-6.0)
+- [Azure App Service Logs](https://stackify.com/azure-app-service-log-files/)
+- [Azure App Service Logging](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/azure-app-service-logging-how-to-monitor-your-web-apps-in-real/ba-p/3800390)
 

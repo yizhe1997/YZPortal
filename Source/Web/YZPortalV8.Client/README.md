@@ -46,3 +46,5 @@ on the local host. Presently, the backend API supports the following configurati
 - [File upload](https://learn.microsoft.com/en-us/aspnet/core/blazor/file-uploads?view=aspnetcore-8.0)
 
 - [File download](https://learn.microsoft.com/en-us/aspnet/core/blazor/file-downloads?view=aspnetcore-8.0)
+
+- [Logging](https://learn.microsoft.com/en-us/aspnet/core/blazor/fundamentals/logging?view=aspnetcore-8.0)

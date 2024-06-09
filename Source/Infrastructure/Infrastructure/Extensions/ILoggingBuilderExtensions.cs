@@ -10,6 +10,7 @@ namespace Infrastructure.Extensions
         {
             builder.ClearProviders();
             builder.AddConsole();
+            builder.AddDebug();
             builder.AddAzureWebAppDiagnostics();
 
             builder.ConfigureOpenTelemetry();
