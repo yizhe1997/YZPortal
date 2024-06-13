@@ -1,6 +1,6 @@
 ﻿using Application.Features.Users.Configs.Queries.GetConfigs;
 
-namespace YZPortalV8.Client.Services.LocalStorage
+namespace YZPortal.Client.Services.LocalStorage
 {
     public interface ILocalStorageService
     {

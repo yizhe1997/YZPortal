@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using YZPortalV8.Client;
-using YZPortalV8.Client.Extensions;
-using YZPortalV8.Client.Services.Authorization;
-using YZPortalV8.Client.Services.LocalStorage;
-using YZPortalV8.Client.Clients.YZPortalApi;
-using YZPortalV8.Client.Services.Authentication;
+using YZPortal.Client;
+using YZPortal.Client.Extensions;
+using YZPortal.Client.Services.Authorization;
+using YZPortal.Client.Services.LocalStorage;
+using YZPortal.Client.Clients.YZPortalApi;
+using YZPortal.Client.Services.Authentication;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var configuration = builder.Configuration;

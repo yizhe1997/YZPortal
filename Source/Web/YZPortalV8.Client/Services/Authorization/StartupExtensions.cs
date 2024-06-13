@@ -1,6 +1,6 @@
 ﻿using Application.Extensions;
 
-namespace YZPortalV8.Client.Services.Authorization
+namespace YZPortal.Client.Services.Authorization
 {
     public static class StartupExtensions
     {

@@ -2,7 +2,7 @@
 using Microsoft.JSInterop;
 using System.Globalization;
 
-namespace YZPortalV8.Client.Extensions
+namespace YZPortal.Client.Extensions
 {
     public static class WebAssemblyHostExtensions
     {

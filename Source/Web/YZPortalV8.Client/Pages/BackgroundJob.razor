@@ -1,7 +1,7 @@
 ﻿@page "/backgroundjobs"
 @using Domain.Enums.Memberships;
 @using Microsoft.AspNetCore.Authorization;
-@using YZPortalV8.Client.Clients.YZPortalApi;
+@using YZPortal.Client.Clients.YZPortalApi;
 @inject Microsoft.Extensions.Configuration.IConfiguration config
 @inject YZPortalApiConfig YZPortalApiConfig
 @attribute [Authorize(Policy = nameof(Role.Administrator))]

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace YZPortalV8.Client.Shared.ResourceFiles {
+namespace YZPortal.Client.Shared.ResourceFiles {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace YZPortalV8.Client.Shared.ResourceFiles {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("YZPortalV8.Client.Shared.ResourceFiles.Resource", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("YZPortal.Client.Shared.ResourceFiles.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

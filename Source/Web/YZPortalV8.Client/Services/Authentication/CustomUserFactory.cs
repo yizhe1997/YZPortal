@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text.Json.Serialization;
 
 // REF: https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/azure-active-directory-groups-and-roles?view=aspnetcore-7.0
-namespace YZPortalV8.Client.Services.Authentication
+namespace YZPortal.Client.Services.Authentication
 {
     public class CustomUserFactory : AccountClaimsPrincipalFactory<CustomUserAccount>
     {

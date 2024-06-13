@@ -2,7 +2,7 @@
 using BootstrapBlazor.Components;
 using Application.Extensions;
 
-namespace YZPortalV8.Client.Layout
+namespace YZPortal.Client.Layout
 {
     public sealed partial class MainLayout
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
-namespace YZPortalV8.Client.Clients.YZPortalApi
+namespace YZPortal.Client.Clients.YZPortalApi
 {
     public static class StartupExtensions
     {

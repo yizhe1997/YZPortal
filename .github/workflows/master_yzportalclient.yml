@@ -23,10 +23,10 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build Source/Web/YZPortalV8.Client --configuration Release
+        run: dotnet build Source/Web/YZPortal.Client --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish Source/Web/YZPortalV8.Client -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish Source/Web/YZPortal.Client -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2

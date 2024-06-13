@@ -4,8 +4,8 @@
 @using Domain.Enums.Memberships;
 @using Microsoft.AspNetCore.Authorization;
 @using System.Diagnostics.CodeAnalysis;
-@using YZPortalV8.Client.Clients.YZPortalApi;
-@using YZPortalV8.Client.Pages.Users;
+@using YZPortal.Client.Clients.YZPortalApi;
+@using YZPortal.Client.Pages.Users;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject DialogService DialogService
 @attribute [Authorize(Policy = nameof(Role.Administrator))]

@@ -1,7 +1,7 @@
 ﻿using Application.Features.Users.Configs.Queries.GetConfigs;
 using Application.Extensions;
 
-namespace YZPortalV8.Client.Services.LocalStorage
+namespace YZPortal.Client.Services.LocalStorage
 {
     public class LocalStorageProperties
 	{

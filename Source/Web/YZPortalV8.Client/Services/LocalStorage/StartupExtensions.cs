@@ -1,6 +1,6 @@
 ﻿using Blazored.LocalStorage;
 
-namespace YZPortalV8.Client.Services.LocalStorage
+namespace YZPortal.Client.Services.LocalStorage
 {
     public static class StartupExtensions
     {

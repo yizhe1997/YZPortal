@@ -8,7 +8,7 @@ using Application.Requests.Indexes;
 using Application.Extensions;
 using Application.Features.Users.Configs.Commands.UpdatePortalConfig;
 using System.Net.Http.Headers;
-using YZPortalV8.Client.Services.LocalStorage;
+using YZPortal.Client.Services.LocalStorage;
 using Application.Features.Products.Queries.GetProducts;
 using Application.Features.Products.Queries.GetProductCategories;
 using Application.Features.Products.Commands.AddProduct;
@@ -16,7 +16,7 @@ using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Forms;
 using Application.Features.Users.UserProfileImages.Commands;
 
-namespace YZPortalV8.Client.Clients.YZPortalApi
+namespace YZPortal.Client.Clients.YZPortalApi
 {
     // TODO: the ? statements can be removed for some?
     // TODO: Advanced query

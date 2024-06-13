@@ -1,4 +1,4 @@
-﻿namespace YZPortalV8.Client.Clients.YZPortalApi
+﻿namespace YZPortal.Client.Clients.YZPortalApi
 {
     public class YZPortalApiConfig
     {
