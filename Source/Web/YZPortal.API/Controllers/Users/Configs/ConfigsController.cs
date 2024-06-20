@@ -6,12 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace YZPortal.API.Controllers.Users.Configs
 {
-    public class ConfigsController : AuthApiController
+    public class ConfigsController(IMediator mediator, LinkGenerator linkGenerator) : AuthApiController(mediator, linkGenerator)
     {
-        public ConfigsController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
-        {
-        }
-
         /// <summary>
         /// Updates the portal configuration of the current user.
         /// </summary>

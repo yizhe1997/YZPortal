@@ -5,16 +5,11 @@ using System.Collections;
 
 namespace Infrastructure.Persistence.Repositories
 {
-    public class UnitOfWork<TId> : IUnitOfWork<TId>
+    public class UnitOfWork<TId>(ApplicationDbContext dbContext) : IUnitOfWork<TId>
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ApplicationDbContext _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         private bool disposed;
-        private Hashtable _repositories = new();
-
-        public UnitOfWork(ApplicationDbContext dbContext)
-        {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        }
+        private readonly Hashtable _repositories = [];
 
         public IGenericRepository<TEntity, TId> Repository<TEntity>() where TEntity : class, IEntity<TId>
         {
@@ -32,12 +27,12 @@ namespace Infrastructure.Persistence.Repositories
             return (IGenericRepository<TEntity, TId>)_repositories[type];
         }
 
-        public async Task<int> Commit(CancellationToken cancellationToken)
+        public async Task<int> Commit(CancellationToken cancellationToken = default)
         {
             return await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public Task<int> CommitAndRemoveCache(CancellationToken cancellationToken, params string[] cacheKeys)
+        public Task<int> CommitAndRemoveCache(CancellationToken cancellationToken = default, params string[] cacheKeys)
         {
             throw new NotImplementedException();
         }

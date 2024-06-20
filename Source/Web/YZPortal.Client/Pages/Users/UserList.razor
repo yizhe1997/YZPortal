@@ -1,16 +1,16 @@
 ﻿@page "/users"
 @using Application.Models.Identity;
 @using Application.Models;
+@using Application.Requests.Indexes
 @using Domain.Enums.Memberships;
 @using Microsoft.AspNetCore.Authorization;
 @using System.Diagnostics.CodeAnalysis;
 @using YZPortal.Client.Clients.YZPortalApi;
 @using YZPortal.Client.Pages.Users;
-@inject YZPortalApiHttpClient YZPortalApiClient
 @inject DialogService DialogService
+@inject ToastService ToastService
+@inject YZPortalApiHttpClient YZPortalApiClient
 @attribute [Authorize(Policy = nameof(Role.Administrator))]
-@inject HttpClient Http
-@inject IJSRuntime JSRuntime
 
 <h1>Users</h1>
 <div class="tabs-body-content">
@@ -75,37 +75,6 @@
 
     public bool IsTableAutoRefreshEnabled { get; set; }
 
-    private async Task<Stream> GetImageStreamAsync()
-    {
-        return await Http.GetStreamAsync(
-            "https://avatars.githubusercontent.com/u/9141961");
-    }
-
-    private async Task SetImageAsync2()
-    {
-        try
-        {
-            var imageStream = await GetImageStreamAsync();
-            var dotnetImageStream = new DotNetStreamReference(imageStream);
-            await JSRuntime.InvokeVoidAsync("setImage", "image", dotnetImageStream);
-        }
-        catch (JSException ex)
-        {
-            var m = ex.Message;
-        }
-        catch (Exception ex)
-        {
-            throw;
-        }
-    }
-
-    private async Task SetImageAsync(string imageUrl, Guid id)
-    {
-        var imageStream = await Http.GetStreamAsync(imageUrl);
-        var dotnetImageStream = new DotNetStreamReference(imageStream);
-        await JSRuntime.InvokeVoidAsync("setImage", id.ToString(), dotnetImageStream);
-    }
-
     private async Task OpenUserEditDialog(UserModel userModel)
     {
         var dialogOpt = new DialogOption()
@@ -125,25 +94,6 @@
         await DialogService.Show(dialogOpt);
     }
 
-    private async Task<bool> OnValidSubmit(string? userSubId, IEnumerable<string?> SelectedGraphGroups, IEnumerable<string?> ExistingGraphGroups)
-    {
-        var userSubIds = new string[] { userSubId ?? string.Empty };
-
-        // Add groups
-        foreach (var selectdGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
-        {
-            await YZPortalApiClient.GraphGroupAddUsers(selectdGraphGroup, userSubIds);
-        }
-
-        // Remove groups
-        foreach (var selectdGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
-        {
-            await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, userSubId);
-        }
-
-        return await Task.FromResult(true);
-    }
-
     private async Task<QueryData<UserModel>> OnQueryAsync(QueryPageOptions options)
     {
         // Reset flag
@@ -161,14 +111,25 @@
             orderby.Add(options.SortName + " " + options.SortOrder.ToString());
         }
 
-        var result = await YZPortalApiClient.GetUsersAsync(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby.ToArray());
+        var getUsersAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+            async () => await YZPortalApiClient.GetUsersAsync(new SearchRequest()
+                {
+                    PageSize = options.PageItems,
+                    PageNumber = options.PageIndex,
+                    SearchString = options.SearchText ?? "",
+                    OrderBy = orderby.ToArray()
+                }),
+            ToastService,
+            title: "Load Data",
+            hideSuccessToast: true
+        );
 
-        Users = result.Data;
+        Users = getUsersAsyncResult.Data;
 
         return await Task.FromResult(new QueryData<UserModel>()
             {
                 Items = Users,
-                TotalCount = result.TotalItems,
+                TotalCount = getUsersAsyncResult.TotalItems,
                 IsSorted = orderby.Any(),
                 IsSearch = !string.IsNullOrEmpty(options.SearchText)
             });
@@ -177,14 +138,23 @@
     private async Task<bool> OnDeleteAsync(IEnumerable<UserModel> items)
     {
         var users = items.ToList();
+        var isAnyDeleted = false;
+
         foreach (var user in users)
         {
-            var response = await YZPortalApiClient.DeleteUserAsync(user.SubjectIdentifier);
+            var deleteUserAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+                async () => await YZPortalApiClient.DeleteUserAsync(user.SubjectIdentifier),
+                ToastService,
+                title: "Delete Data"
+            );
 
-            if (response.Succeeded)
+            if (deleteUserAsyncResult.Succeeded)
+            {
+                isAnyDeleted = true;
                 Users?.Remove(user);
+            }
         }
 
-        return await Task.FromResult(true);
+        return await Task.FromResult(isAnyDeleted);
     }
 }

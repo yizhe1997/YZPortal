@@ -11,6 +11,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ILocalStorageService LocalStorageService
 @inject NavigationManager Navigation
+@inject ToastService ToastService
 @layout LoginLayout
 
 <div hidden>
@@ -36,19 +37,40 @@
 
             if (!string.IsNullOrEmpty(userId))
             {
-                var user = await YZPortalApiClient.GetUserAsync(userId);
-                if (user.Data == null)
+                var getUserAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+                    async () => await YZPortalApiClient.GetUserAsync(userId),
+                    ToastService,
+                    title: "Load Data",
+                    hideSuccessToast: true
+                );
+
+                if (getUserAsyncResult.Data == null)
                 {
-                    var newUser = await YZPortalApiClient.CreateUserAsync();
+                    var createUserAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+                        async () => await YZPortalApiClient.CreateUserAsync(),
+                        ToastService,
+                        title: "Create Data",
+                        hideSuccessToast: true
+                    );
                 }
                 else
                 {
-                    var newUser = await YZPortalApiClient.UpdateCurrentUserViaHttpContextAsync();
+                    var updateCurrentUserViaHttpContextAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+                        async () => await YZPortalApiClient.UpdateCurrentUserViaHttpContextAsync(),
+                        ToastService,
+                        title: "Save Data",
+                        hideSuccessToast: true
+                    );
                 }
 
                 // Get user's configurations and store in local storage as well
-                var result = await YZPortalApiClient.GetConfigsAsync(authState.User.GetSubClaim() ?? string.Empty);
-                ConfigsModel = result.Data;
+                var getUserConfigsAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+                    async () => await YZPortalApiClient.GetUserConfigsAsync(authState.User.GetSubClaim() ?? string.Empty),
+                    ToastService,
+                    title: "Load Data",
+                    hideSuccessToast: true
+                );
+                ConfigsModel = getUserConfigsAsyncResult.Data;
                 await LocalStorageService.SetUserConfigs(ConfigsModel);
                 await ConfigsModelChanged.InvokeAsync(ConfigsModel);
             }

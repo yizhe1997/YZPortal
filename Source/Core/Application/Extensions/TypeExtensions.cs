@@ -11,7 +11,7 @@ namespace Application.Extensions
         /// </summary>
         public static string[] GetConstants(this Type type)
         {
-            ArrayList constants = new ArrayList();
+            ArrayList constants = [];
 
             FieldInfo[] fieldInfos = type.GetFields(
                 // Gets all public and static fields and non public e.g internal
@@ -50,7 +50,7 @@ namespace Application.Extensions
         // Ref: https://stackoverflow.com/questions/14971631/convert-an-enum-to-liststring
         public static List<string> GetEnumDataTypes<T>()
         {
-            return Enum.GetNames(typeof(T)).ToList();
+            return [.. Enum.GetNames(typeof(T))];
         }
 
         // Ref: https://stackoverflow.com/questions/40639126/list-of-enum-values-from-long-bit-mask

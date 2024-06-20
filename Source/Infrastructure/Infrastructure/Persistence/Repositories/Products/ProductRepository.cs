@@ -4,13 +4,7 @@ using Domain.Entities.Products;
 
 namespace Infrastructure.Persistence.Repositories.Products
 {
-    public class ProductRepository : IProductRepository
+    public class ProductRepository(IGenericRepository<Product, Guid> repository) : IProductRepository
     {
-        private readonly IGenericRepository<Product, Guid> _repository;
-
-        public ProductRepository(IGenericRepository<Product, Guid> repository)
-        {
-            _repository = repository;
-        }
     }
 }

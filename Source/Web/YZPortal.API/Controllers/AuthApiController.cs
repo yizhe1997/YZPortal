@@ -8,10 +8,7 @@ namespace YZPortal.API.Controllers
 {
     [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
     [RequiredScope(ScopeConstants.APIAccess)]
-    public class AuthApiController : ApiControllerBase
+    public class AuthApiController(IMediator mediator, LinkGenerator linkGenerator) : ApiControllerBase(mediator, linkGenerator)
     {
-        public AuthApiController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
-        {
-        }
     }
 }

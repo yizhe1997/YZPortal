@@ -5,12 +5,8 @@ using Application.Features.Users.UserProfileImages.Commands;
 
 namespace YZPortal.API.Controllers.Users
 {
-    public class UserProfileImagesController : AuthApiController
+    public class UserProfileImagesController(IMediator mediator, LinkGenerator linkGenerator) : AuthApiController(mediator, linkGenerator)
     {
-        public UserProfileImagesController(IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
-        {
-        }
-
         /// <summary>
         /// Upload user profile image
         /// </summary>

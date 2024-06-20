@@ -4,13 +4,7 @@ using Domain.Entities.Products;
 
 namespace Infrastructure.Persistence.Repositories.Products
 {
-    public class ProductAttributeValuePictureRepository : IProductAttributeValuePicture
+    public class ProductAttributeValuePictureRepository(IGenericRepository<ProductAttributeMappingValuePicture, Guid> repository) : IProductAttributeValuePicture
     {
-        private readonly IGenericRepository<ProductAttributeMappingValuePicture, Guid> _repository;
-
-        public ProductAttributeValuePictureRepository(IGenericRepository<ProductAttributeMappingValuePicture, Guid> repository)
-        {
-            _repository = repository;
-        }
     }
 }

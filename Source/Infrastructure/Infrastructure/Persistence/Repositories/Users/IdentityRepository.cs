@@ -6,18 +6,11 @@ using System.Linq.Dynamic.Core;
 
 namespace Infrastructure.Persistence.Repositories.Users
 {
-    public class IdentityRepository : IIdentityRepository
+    public class IdentityRepository(IGenericRepository<Identity, Guid> repository) : IIdentityRepository
     {
-        private readonly IGenericRepository<Identity, Guid> _repository;
-
-        public IdentityRepository(IGenericRepository<Identity, Guid> repository)
+        public async Task<List<Identity>> GetByUserSubIdAsync(string userSubId, CancellationToken cancellationToken = default)
         {
-            _repository = repository;
-        }
-
-        public async Task<List<Identity>> GetByUserSubIdAsync(string userSubId)
-        {
-            return await _repository.Entities.Where(p => p.User.SubjectIdentifier == userSubId).ToListAsync();
+            return await repository.Entities.Where(p => p.User.SubjectIdentifier == userSubId).ToListAsync(cancellationToken);
         }
     }
 }

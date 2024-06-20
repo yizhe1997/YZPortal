@@ -181,3 +181,5 @@ on the local host. Presently, the backend API supports the following configurati
 - [Azure App Service Logs](https://stackify.com/azure-app-service-log-files/)
 - [Azure App Service Logging](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/azure-app-service-logging-how-to-monitor-your-web-apps-in-real/ba-p/3800390)
 
+### 4.10.0 Exception
+- [Exption Handler](https://www.roundthecode.com/dotnet-tutorials/exception-handling-own-middleware-dotnet-8)

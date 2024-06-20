@@ -11,25 +11,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.Identity
 {
-    internal class UserService : IUserService
+    internal class UserService(
+        ICurrentUserService currentUserService,
+        UserManager<User> userManager,
+        IMapper mapper) : IUserService
     {
-        private readonly ICurrentUserService _currentUserService;
-        private readonly UserManager<User> _userManager;
-        private readonly IMapper _mapper;
-
-        public UserService(
-            ICurrentUserService currentUserService,
-            UserManager<User> userManager,
-            IMapper mapper)
+        public async Task<SearchResult<UserModel>> GetSearchResultAsync(SearchRequest request, CancellationToken cancellationToken = default)
         {
-            _currentUserService = currentUserService;
-            _userManager = userManager;
-            _mapper = mapper;
-        }
-
-        public async Task<SearchResult<UserModel>> GetSearchResultAsync(SearchRequest request, CancellationToken cancellationToken = new CancellationToken())
-        {
-            var query = _userManager.Users.Include(x => x.UserProfileImage).Select(x => new User
+            var query = userManager.Users.Include(x => x.UserProfileImage).Select(x => new User
             {
                 Email = x.Email,
                 DisplayName = x.DisplayName,
@@ -51,32 +40,32 @@ namespace Infrastructure.Services.Identity
                 Id = x.Id
             });
 
-            var result = await SearchResult<User>.SuccessAsync<UserModel>(request, query, _mapper, 
+            var result = await SearchResult<User>.SuccessAsync<UserModel>(request, query, mapper, 
                 x => x.DisplayName.Contains(request.SearchString) ||
                 x.Email.Contains(request.SearchString),
                 cancellationToken: cancellationToken);
             return result;
         }
 
-        public async Task<IResult<UserModel>> GetBySubIdAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<IResult<UserModel>> GetBySubIdAsync(string? userSubId, CancellationToken cancellationToken = default)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == userSubId, cancellationToken);
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == userSubId, cancellationToken);
 
             if (user == null)
                 return await Result<UserModel>.FailAsync("User not found");
 
-            var result = _mapper.Map<UserModel>(user);
+            var result = mapper.Map<UserModel>(user);
             return await Result<UserModel>.SuccessAsync(result);
         }
 
-        public async Task<IResult<UserModel>> GetAsync(Guid id, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<IResult<UserModel>> GetAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
 
             if (user == null)
                 return await Result<UserModel>.FailAsync("User not found");
 
-            var result = _mapper.Map<UserModel>(user);
+            var result = mapper.Map<UserModel>(user);
 
             return await Result<UserModel>.SuccessAsync(result);
         }
@@ -84,16 +73,16 @@ namespace Infrastructure.Services.Identity
         /// <summary>
         /// Generate an application user based on the current context.
         /// </summary>
-        public async Task<IResult> CreateAsync<T>(T body, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<IResult> CreateAsync<T>(T body, CancellationToken cancellationToken = default)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == _currentUserService.NameIdentifier, cancellationToken);
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == currentUserService.NameIdentifier, cancellationToken);
 
             if (user != null)
                 return await Result<User>.FailAsync("User already exist");
 
-            var newUser = _mapper.Map<User>(body);
+            var newUser = mapper.Map<User>(body);
 
-            var result = await _userManager.CreateAsync(newUser);
+            var result = await userManager.CreateAsync(newUser);
 
             return await result.ToApplicationResultAsync();
         }
@@ -101,41 +90,41 @@ namespace Infrastructure.Services.Identity
         /// <summary>
         /// Modifies the details of the application user.
         /// </summary>
-        public async Task<IResult> UpdateAsync<T>(string? userSubId, T body, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<IResult> UpdateAsync<T>(string? userSubId, T body, CancellationToken cancellationToken = default)
         {
             // Validate if user exist
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == userSubId, cancellationToken);
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == userSubId, cancellationToken);
             if (user == null)
                 return await Result<User>.FailAsync("User not found");
 
             // Map fields to existing user and save
-            _mapper.Map(body, user);
+            mapper.Map(body, user);
 
-            var result = await _userManager.UpdateAsync(user);
-
-            return await result.ToApplicationResultAsync();
-        }
-
-        public async Task<IResult> DeleteAsync(Guid id, CancellationToken cancellationToken = new CancellationToken())
-        {
-            var user = await _userManager.Users.FirstAsync(u => u.Id == id, cancellationToken);
-
-            if (user == null)
-                return await Result<User>.FailAsync("User not found");
-
-            var result = await _userManager.DeleteAsync(user);
+            var result = await userManager.UpdateAsync(user);
 
             return await result.ToApplicationResultAsync();
         }
 
-        public async Task<IResult> DeleteBySubIdAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<IResult> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == userSubId, cancellationToken);
+            var user = await userManager.Users.FirstAsync(u => u.Id == id, cancellationToken);
 
             if (user == null)
                 return await Result<User>.FailAsync("User not found");
 
-            var result = await _userManager.DeleteAsync(user);
+            var result = await userManager.DeleteAsync(user);
+
+            return await result.ToApplicationResultAsync();
+        }
+
+        public async Task<IResult> DeleteBySubIdAsync(string? userSubId, CancellationToken cancellationToken = default)
+        {
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == userSubId, cancellationToken);
+
+            if (user == null)
+                return await Result<User>.FailAsync("User not found");
+
+            var result = await userManager.DeleteAsync(user);
 
             return await result.ToApplicationResultAsync();
         }

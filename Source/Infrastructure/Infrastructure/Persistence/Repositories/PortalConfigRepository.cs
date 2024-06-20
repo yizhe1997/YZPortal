@@ -13,9 +13,9 @@ namespace Infrastructure.Persistence.Repositories
             _repository = repository;
         }
 
-        public async Task<PortalConfig?> GetByUserSubIdFirstOrDefaultAsync(string? userSubId)
+        public async Task<PortalConfig?> GetByUserSubIdFirstOrDefaultAsync(string? userSubId, CancellationToken cancellationToken = default)
         {
-            return await _repository.Entities.FirstOrDefaultAsync(p => p.UserSubjectIdentifier == userSubId);
+            return await _repository.Entities.FirstOrDefaultAsync(p => p.UserSubjectIdentifier == userSubId, cancellationToken: cancellationToken);
         }
     }
 }

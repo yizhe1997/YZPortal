@@ -2,7 +2,7 @@
 {
     public class AddUsersToGroupCommand
     {
-        public string[] UserSubjectIds { get; set; } = Array.Empty<string>();
+        public string[] UserSubjectIds { get; set; } = [];
         public string? GroupId { get; set; }
     }
 }

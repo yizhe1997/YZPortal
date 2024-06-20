@@ -15,33 +15,20 @@ namespace Infrastructure.Services
 {
     // REF: https://developer.microsoft.com/en-us/graph/graph-explorer
     // REF: https://learn.microsoft.com/en-us/graph/query-parameters
-    public class GraphService : IGraphService
+    public class GraphService(IOptions<AzureAdB2CManagementConfig> azureAdB2CManagementConfig, IOptions<GraphConfig> graphConfig, IMapper mapper) : IGraphService
     {
-        // Variables
-        private readonly AzureAdB2CManagementConfig _azureAdB2CManagementConfig;
-        private readonly GraphConfig _graphConfig;
-        private readonly IMapper _mapper;
-
-        // Constructor
-        public GraphService(IOptions<AzureAdB2CManagementConfig> azureAdB2CManagementConfig, IOptions<GraphConfig> graphConfig, IMapper mapper)
-        {
-            _azureAdB2CManagementConfig = azureAdB2CManagementConfig.Value;
-            _graphConfig = graphConfig.Value;
-            _mapper = mapper;
-        }
-
         #region Users
 
-        public async Task<SearchResult<UserModel>> UsersToSearchResultAsync(ISearchParams request, System.Linq.Expressions.Expression<Func<UserModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchResult<UserModel>> UsersToSearchResultAsync(ISearchParams request, System.Linq.Expressions.Expression<Func<UserModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = default)
         {
             var users = await UsersGetAsync(request.Select, request.OrderBy, request.PageSize, request.PageNumber, cancellationToken);
 
-            var result = SearchResult<UserModel>.Success<UserModel>(request, users, _mapper, searchPredicate);
+            var result = SearchResult<UserModel>.Success<UserModel>(request, users, mapper, searchPredicate);
 
             return result;
         }
 
-        public async Task<List<UserModel>> UsersGetAsync(string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<List<UserModel>> UsersGetAsync(string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
@@ -56,9 +43,9 @@ namespace Infrastructure.Services
                 //requestConfiguration.QueryParameters.Filter = "startswith(displayName%2C+'J')"; // this is probably case specific?
                 //requestConfiguration.QueryParameters.Search = searchString;
                 //requestConfiguration.QueryParameters.Count = true;
-                requestConfiguration.QueryParameters.Select = select ?? Array.Empty<string>();
+                requestConfiguration.QueryParameters.Select = select ?? [];
                 requestConfiguration.QueryParameters.Top = pageSize;
-                requestConfiguration.QueryParameters.Orderby = orderBy ?? Array.Empty<string>();
+                requestConfiguration.QueryParameters.Orderby = orderBy ?? [];
 
             },
             cancellationToken);
@@ -71,35 +58,35 @@ namespace Infrastructure.Services
             // Get items for a particular page
             usersResponse = (UserCollectionResponse?)await GetItemsFromPageAsync(graphClient, usersResponse, pageNumber, cancellationToken);
 
-            var result = usersResponse?.Value != null ? _mapper.Map<List<UserModel>>(usersResponse.Value) : new List<UserModel>();
+            var result = usersResponse?.Value != null ? mapper.Map<List<UserModel>>(usersResponse.Value) : new List<UserModel>();
 
             return result;
         }
 
-        public async Task<Result<UserModel>> UserGetAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result<UserModel>> UserGetAsync(string? userSubId, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
             var user = await graphClient.Users[userSubId].GetAsync(requestConfiguration => requestConfiguration.Headers.Add("ConsistencyLevel", "eventual"), cancellationToken);
 
-            var result = user != null ? _mapper.Map<UserModel>(user) : new UserModel();
+            var result = user != null ? mapper.Map<UserModel>(user) : new UserModel();
 
             return await Result<UserModel>.SuccessAsync(result);
         }
 
-        public async Task<Result> UserUpdateAsync<T>(string? userSubId, T body, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> UserUpdateAsync<T>(string? userSubId, T body, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
             // Map fields to existing user and save
-            var requestBody = _mapper.Map(body, new User());
+            var requestBody = mapper.Map(body, new User());
 
             await graphClient.Users[userSubId].PatchAsync(requestBody, cancellationToken: cancellationToken);
 
             return await Result.SuccessAsync();
         }
 
-        public async Task<Result> UserDeleteAsync(string? userSubId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> UserDeleteAsync(string? userSubId, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
@@ -108,105 +95,105 @@ namespace Infrastructure.Services
             return await Result.SuccessAsync();
         }
 
-        public async Task<List<GroupModel>> UserGroupsGetAsync(string? userSubId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<List<GroupModel>> UserGroupsGetAsync(string? userSubId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
             // Construct the original and subsequent OdataNextLink URLs which contains all the query parameters present in the original request
             var userGroupsResponse = await graphClient.Users[userSubId].MemberOf.GraphGroup.GetAsync(requestConfiguration =>
             {
-                requestConfiguration.QueryParameters.Select = select ?? Array.Empty<string>();
+                requestConfiguration.QueryParameters.Select = select ?? [];
                 requestConfiguration.QueryParameters.Top = pageSize;
-                requestConfiguration.QueryParameters.Orderby = orderBy ?? Array.Empty<string>();
+                requestConfiguration.QueryParameters.Orderby = orderBy ?? [];
             },
             cancellationToken);
 
             // Get items for a particular page
             userGroupsResponse = (GroupCollectionResponse?)await GetItemsFromPageAsync(graphClient, userGroupsResponse, pageNumber, cancellationToken);
 
-            var result = userGroupsResponse?.Value != null ? _mapper.Map<List<GroupModel>>(userGroupsResponse.Value) : new List<GroupModel>();
+            var result = userGroupsResponse?.Value != null ? mapper.Map<List<GroupModel>>(userGroupsResponse.Value) : new List<GroupModel>();
 
             return result;
         }
 
-        public async Task<SearchResult<GroupModel>> UserGroupsToSearchResultAsync(string? userSubId, ISearchParams request, System.Linq.Expressions.Expression<Func<GroupModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchResult<GroupModel>> UserGroupsToSearchResultAsync(string? userSubId, ISearchParams request, System.Linq.Expressions.Expression<Func<GroupModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = default)
         {
             var groups = await UserGroupsGetAsync(userSubId, request.Select, request.OrderBy, request.PageSize, request.PageNumber, cancellationToken);
 
-            var result = SearchResult<GroupModel>.Success<GroupModel>(request, groups, _mapper, searchPredicate);
+            var result = SearchResult<GroupModel>.Success<GroupModel>(request, groups, mapper, searchPredicate);
 
             return result;
         }
 
-        public async Task<string[]> UserGroupDisplayNamesGetAsync(string? userSubId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken()) =>
-            (await UserGroupsGetAsync(userSubId, new string[] { nameof(Group.DisplayName) }, orderBy, pageSize, pageNumber, cancellationToken)).Select(x => x.DisplayName ?? string.Empty).ToArray() ?? Array.Empty<string>();
+        public async Task<string[]> UserGroupDisplayNamesGetAsync(string? userSubId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = default) =>
+            (await UserGroupsGetAsync(userSubId, new string[] { nameof(Group.DisplayName) }, orderBy, pageSize, pageNumber, cancellationToken)).Select(x => x.DisplayName ?? string.Empty).ToArray() ?? [];
 
         #endregion
 
         #region Groups
 
-        public async Task<List<GroupModel>> GroupsGetAsync(string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<List<GroupModel>> GroupsGetAsync(string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
             // Construct the original and subsequent OdataNextLink URLs which contains all the query parameters present in the original request
             var groupsResponse = await graphClient.Groups.GetAsync(requestConfiguration =>
             {
-                requestConfiguration.QueryParameters.Select = select ?? Array.Empty<string>();
+                requestConfiguration.QueryParameters.Select = select ?? [];
                 requestConfiguration.QueryParameters.Top = pageSize;
-                requestConfiguration.QueryParameters.Orderby = orderBy ?? Array.Empty<string>();
+                requestConfiguration.QueryParameters.Orderby = orderBy ?? [];
             },
             cancellationToken);
 
             // Get items for a particular page
             groupsResponse = (GroupCollectionResponse?)await GetItemsFromPageAsync(graphClient, groupsResponse, pageNumber, cancellationToken);
 
-            var result = groupsResponse?.Value != null ? _mapper.Map<List<GroupModel>>(groupsResponse.Value) : new List<GroupModel>();
+            var result = groupsResponse?.Value != null ? mapper.Map<List<GroupModel>>(groupsResponse.Value) : new List<GroupModel>();
 
             return result;
         }
 
-        public async Task<SearchResult<GroupModel>> GroupsToSearchResultAsync(ISearchParams request, System.Linq.Expressions.Expression<Func<GroupModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchResult<GroupModel>> GroupsToSearchResultAsync(ISearchParams request, System.Linq.Expressions.Expression<Func<GroupModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = default)
         {
             var groups = await GroupsGetAsync(request.Select, request.OrderBy, request.PageSize, request.PageNumber, cancellationToken);
 
-            var result = SearchResult<GroupModel>.Success<GroupModel>(request, groups, _mapper, searchPredicate);
+            var result = SearchResult<GroupModel>.Success<GroupModel>(request, groups, mapper, searchPredicate);
 
             return result;
         }
 
-        public async Task<List<UserModel>> GroupUsersGetAsync(string? groupId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<List<UserModel>> GroupUsersGetAsync(string? groupId, string[]? select = null, string[]? orderBy = null, int pageSize = 10, int pageNumber = 1, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
             // Construct the original and subsequent OdataNextLink URLs which contains all the query parameters present in the original request
             var usersInGroup = await graphClient.Groups[groupId].Members.GraphUser.GetAsync(requestConfiguration =>
             {
-                requestConfiguration.QueryParameters.Select = select ?? Array.Empty<string>();
+                requestConfiguration.QueryParameters.Select = select ?? [];
                 requestConfiguration.QueryParameters.Top = pageSize;
-                requestConfiguration.QueryParameters.Orderby = orderBy ?? Array.Empty<string>();
+                requestConfiguration.QueryParameters.Orderby = orderBy ?? [];
             },
             cancellationToken);
 
             // Get items for a particular page
             usersInGroup = (UserCollectionResponse?)await GetItemsFromPageAsync(graphClient, usersInGroup, pageNumber, cancellationToken);
 
-            var result = usersInGroup?.Value != null ? _mapper.Map<List<UserModel>>(usersInGroup.Value) : new List<UserModel>();
+            var result = usersInGroup?.Value != null ? mapper.Map<List<UserModel>>(usersInGroup.Value) : new List<UserModel>();
 
             return result;
         }
 
-        public async Task<SearchResult<UserModel>> GroupUsersToSearchResultAsync(string? groupId, ISearchParams request, System.Linq.Expressions.Expression<Func<UserModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchResult<UserModel>> GroupUsersToSearchResultAsync(string? groupId, ISearchParams request, System.Linq.Expressions.Expression<Func<UserModel, bool>>? searchPredicate = null, CancellationToken cancellationToken = default)
         {
             var users = await GroupUsersGetAsync(groupId, request.Select, request.OrderBy, request.PageSize, request.PageNumber, cancellationToken);
             
-            var result = SearchResult<UserModel>.Success<UserModel>(request, users, _mapper, searchPredicate);
+            var result = SearchResult<UserModel>.Success<UserModel>(request, users, mapper, searchPredicate);
 
             return result;
         }
 
         // Ref https://learn.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=csharp
-        public async Task<Result> GroupAddUsersAsync(AddUsersToGroupCommand request, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> GroupAddUsersAsync(AddUsersToGroupCommand request, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
@@ -214,7 +201,7 @@ namespace Infrastructure.Services
             var formattedUserIds = new List<string>();
             foreach (var userId in request.UserSubjectIds)
             {
-                formattedUserIds.Add($"{_graphConfig.BaseUrl}/directoryObjects/{userId}");
+                formattedUserIds.Add($"{graphConfig.Value.BaseUrl}/directoryObjects/{userId}");
             }
             var requestBody = new Group
             {
@@ -231,7 +218,7 @@ namespace Infrastructure.Services
             return await Result.SuccessAsync();
         }
 
-        public async Task<Result> GroupRemoveUserAsync(RemoveUserFromGroupCommand request, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> GroupRemoveUserAsync(RemoveUserFromGroupCommand request, CancellationToken cancellationToken = default)
         {
             var graphClient = GetGraphClient();
 
@@ -253,15 +240,15 @@ namespace Infrastructure.Services
             };
 
             // https://learn.microsoft.com/dotnet/api/azure.identity.clientsecretcredential
-            var clientSecretCredential = new ClientSecretCredential(_azureAdB2CManagementConfig.TenantId, _azureAdB2CManagementConfig.ClientId, _azureAdB2CManagementConfig.ClientSecret, options);
+            var clientSecretCredential = new ClientSecretCredential(azureAdB2CManagementConfig.Value.TenantId, azureAdB2CManagementConfig.Value.ClientId, azureAdB2CManagementConfig.Value.ClientSecret, options);
 
-            var graphClient = new GraphServiceClient(clientSecretCredential, _graphConfig.Scopes);
+            var graphClient = new GraphServiceClient(clientSecretCredential, graphConfig.Value.Scopes);
 
             return graphClient;
         }
 
         // REF: https://stackoverflow.com/questions/75690753/pagination-in-ms-graph-groups-in-sdk-v5
-        private static async Task<BaseCollectionPaginationCountResponse?> GetItemsFromPageAsync(GraphServiceClient graphClient, BaseCollectionPaginationCountResponse? collectionPage, int requestedPageNumber, CancellationToken cancellationToken = new CancellationToken())
+        private static async Task<BaseCollectionPaginationCountResponse?> GetItemsFromPageAsync(GraphServiceClient graphClient, BaseCollectionPaginationCountResponse? collectionPage, int requestedPageNumber, CancellationToken cancellationToken = default)
         {
             var pageCount = 1;
             var nextPageLink = collectionPage?.OdataNextLink;

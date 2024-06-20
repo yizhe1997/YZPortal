@@ -13,36 +13,23 @@ namespace Application.Features.Users.UserProfileImages.Commands
     {
     }
 
-    public class UploadUserProfileImageCommandHandler : IRequestHandler<UploadUserProfileImageCommand, Result>
+    public class UploadUserProfileImageCommandHandler(
+        IUnitOfWork<Guid> unitOfWork,
+        IUserProfileImageRepository userProfileImageRepository,
+        IStringLocalizer<SharedResource> localizer,
+        IDataFileStorageService dataFileStorageService) : IRequestHandler<UploadUserProfileImageCommand, Result>
     {
-        private readonly IDataFileStorageService _dataFileStorageService;
-        private readonly IUnitOfWork<Guid> _unitOfWork;
-        private readonly IStringLocalizer<SharedResource> _localizer;
-        private readonly IUserProfileImageRepository _userProfileImageRepository;
-
-        public UploadUserProfileImageCommandHandler(
-            IUnitOfWork<Guid> unitOfWork,
-            IUserProfileImageRepository userProfileImageRepository,
-            IStringLocalizer<SharedResource> localizer,
-            IDataFileStorageService dataFileStorageService)
-        {
-            _unitOfWork = unitOfWork;
-            _localizer = localizer;
-            _dataFileStorageService = dataFileStorageService;
-            _userProfileImageRepository = userProfileImageRepository;
-        }
-
         public async Task<Result> Handle(UploadUserProfileImageCommand command, CancellationToken cancellationToken)
         {
             if (command.File is null) { return await Result.FailAsync("File required"); }
 
-            var user = await _unitOfWork.Repository<User>().GetByIdAsync(command.RefId, cancellationToken);
-            if (user is null) { return await Result.FailAsync(_localizer["Not Found"]); }
+            var user = await unitOfWork.Repository<User>().GetByIdAsync(command.RefId, cancellationToken);
+            if (user is null) { return await Result.FailAsync(localizer["Not Found"]); }
 
-            var userProfileImage = await _userProfileImageRepository.GetByUserIdFirstOrDefaultAsync(command.RefId);
+            var userProfileImage = await userProfileImageRepository.GetByUserIdFirstOrDefaultAsync(command.RefId, cancellationToken);
             if (userProfileImage is not null) { return await Result.FailAsync("User has profile image"); }
             
-            var uploadDataFileResult = (await _dataFileStorageService.UploadDataFileAsync<UploadUserProfileImageCommand>(command, cancellationToken));
+            var uploadDataFileResult = (await dataFileStorageService.UploadDataFileAsync<UploadUserProfileImageCommand>(command, cancellationToken));
 
             userProfileImage = new UserProfileImage
             {
@@ -54,8 +41,8 @@ namespace Application.Features.Users.UserProfileImages.Commands
                 Url = uploadDataFileResult.Item1.Messages[0]
             };
 
-            await _unitOfWork.Repository<UserProfileImage>().AddAsync(userProfileImage, cancellationToken);
-            await _unitOfWork.Commit(cancellationToken);
+            await unitOfWork.Repository<UserProfileImage>().AddAsync(userProfileImage, cancellationToken);
+            await unitOfWork.Commit(cancellationToken);
 
             return await Result.SuccessAsync(uploadDataFileResult.Item1.Messages[0]);
         }

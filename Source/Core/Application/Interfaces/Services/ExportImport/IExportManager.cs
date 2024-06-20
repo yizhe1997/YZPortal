@@ -17,14 +17,14 @@ public interface IExportManager
     /// A task that represents the asynchronous operation
     /// The task result contains the result in XML format
     /// </returns>
-    Task<string> ExportProductCategoriesToXmlAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = new CancellationToken());
+    Task<string> ExportProductCategoriesToXmlAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Export categories to XLSX
     /// </summary>
     /// <param name="categories">Categories</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    Task<MemoryStream> ExportProductCategoriesToXlsxAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = new CancellationToken());
+    Task<MemoryStream> ExportProductCategoriesToXlsxAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = default);
 
     #endregion
 
@@ -38,14 +38,14 @@ public interface IExportManager
     /// A task that represents the asynchronous operation
     /// The task result contains the result in XML format
     /// </returns>
-    Task<string> ExportProductsToXmlAsync(List<ProductExportDto> products, CancellationToken cancellationToken = new CancellationToken());
+    Task<string> ExportProductsToXmlAsync(List<ProductExportDto> products, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Export products to XLSX
     /// </summary>
     /// <param name="products">Products</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    Task<MemoryStream> ExportProductsToXlsxAsync(List<ProductExportDto> products, CancellationToken cancellationToken = new CancellationToken());
+    Task<MemoryStream> ExportProductsToXlsxAsync(List<ProductExportDto> products, CancellationToken cancellationToken = default);
 
     #endregion
 }

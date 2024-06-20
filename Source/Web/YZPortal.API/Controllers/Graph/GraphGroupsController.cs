@@ -11,25 +11,16 @@ using Application.Constants;
 
 namespace YZPortal.API.Controllers.Graph
 {
-    public class GraphGroupsController : ApiControllerBase
+    public class GraphGroupsController(IGraphService graphService, ICacheService cache, IMediator mediator, LinkGenerator linkGenerator) : ApiControllerBase(mediator, linkGenerator)
     {
-        private readonly ICacheService _cache;
-        private readonly IGraphService _graphService;
-
-        public GraphGroupsController(IGraphService graphService, ICacheService cache, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
-        {
-            _graphService = graphService;
-            _cache = cache;
-        }
-
         [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
         [RequiredScope(ScopeConstants.APIAccess)]
         [HttpGet]
-        public async Task<ActionResult<SearchResult<GroupModel>>> GetGraphGroups([FromQuery] GetGraphGroupsRequest request)
+        public async Task<ActionResult<SearchResult<GroupModel>>> GetGraphGroups([FromQuery] GetGraphGroupsRequest request, CancellationToken cancellationToken)
         {
             var response = string.IsNullOrEmpty(request.UserSubId) ?
-                await _cache.GetOrSetAsync(nameof(GetGraphGroups), () => _graphService.GroupsToSearchResultAsync(request)) :
-                await _graphService.UserGroupsToSearchResultAsync(request.UserSubId, request);
+                await cache.GetOrSetAsync(nameof(GetGraphGroups), () => graphService.GroupsToSearchResultAsync(request), cancellationToken) :
+                await graphService.UserGroupsToSearchResultAsync(request.UserSubId, request, cancellationToken: cancellationToken);
 
             return Ok(response);
         }
@@ -37,26 +28,26 @@ namespace YZPortal.API.Controllers.Graph
         [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
         [RequiredScope(ScopeConstants.APIAccess)]
         [HttpPost("AddUser")]
-        public async Task<ActionResult<Result>> AddUserToGraphGroup([FromBody] AddUsersToGroupCommand request)
+        public async Task<ActionResult<Result>> AddUserToGraphGroup([FromBody] AddUsersToGroupCommand request, CancellationToken cancellationToken)
         {
-            var response = await _graphService.GroupAddUsersAsync(request);
+            var response = await graphService.GroupAddUsersAsync(request, cancellationToken);
             return Ok(response);
         }
 
         [Authorize(AuthenticationSchemes = Constants.AzureAdB2C)]
         [RequiredScope(ScopeConstants.APIAccess)]
         [HttpPost("RemoveUser")]
-        public async Task<ActionResult<Result>> RemoveUserFromGraphGroup([FromBody] RemoveUserFromGroupCommand request)
+        public async Task<ActionResult<Result>> RemoveUserFromGraphGroup([FromBody] RemoveUserFromGroupCommand request, CancellationToken cancellationToken)
         {
-            var response = await _graphService.GroupRemoveUserAsync(request);
+            var response = await graphService.GroupRemoveUserAsync(request, cancellationToken);
             return Ok(response);
         }
 
         [Authorize(AuthenticationSchemes = "Basic")]
         [HttpGet("DisplayNames")]
-        public async Task<IActionResult> GetGraphGroupDisplayNamesForUser([FromQuery] string ObjectId)
+        public async Task<IActionResult> GetGraphGroupDisplayNamesForUser([FromQuery] string ObjectId, CancellationToken cancellationToken)
         {
-            var response = await _graphService.UserGroupDisplayNamesGetAsync(ObjectId);
+            var response = await graphService.UserGroupDisplayNamesGetAsync(ObjectId, cancellationToken: cancellationToken);
 
             return Ok(new
             {

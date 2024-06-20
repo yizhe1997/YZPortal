@@ -1,18 +1,19 @@
-﻿using Application.Interfaces.Indexes;
+﻿using Application.Interfaces;
+using Application.Interfaces.Indexes;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 
 namespace Application.Models
 {
-    public class SearchResult<T> : PaginatedResult<T>
-    {
+	public class SearchResult<T> : PaginatedResult<T>, ISearchResult<T>
+	{
         public string SearchString { get; set; } = string.Empty;
         public string Lang { get; set; } = "en";
-        public string[] OrderBy { get; set; } = Array.Empty<string>();
-        public string[] Select { get; set; } = Array.Empty<string>();
+        public string[] OrderBy { get; set; } = [];
+        public string[] Select { get; set; } = [];
 
-        public SearchResult(bool succeeded, ISearchParams searchParams, List<T> data, int totalItems, List<string> messages) : base(succeeded, searchParams, data, totalItems, messages)
+        public SearchResult(bool succeeded, ISearchParams searchParams, List<T> data, int totalItems) : base(succeeded, searchParams, data, totalItems)
         {
             // update object instance with all search properties required by the view
             SearchString = searchParams.SearchString;
@@ -26,12 +27,11 @@ namespace Application.Models
         {
         }
 
-        // TODO: fix the null
         #region Async Methods
 
         #region Success Methods
 
-        public static async Task<SearchResult<T>> SuccessAsync(ISearchParams searchParams, IQueryable<T> query, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, List<string> messages = null, CancellationToken cancellationToken = new CancellationToken())
+        public static async Task<SearchResult<T>> SuccessAsync(ISearchParams searchParams, IQueryable<T> query, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, CancellationToken cancellationToken = default)
         {
             #region Query formulation
 
@@ -67,22 +67,22 @@ namespace Application.Models
             var count = await query.CountAsync(cancellationToken);
             var items = await query.Skip((searchParams.PageNumber - 1) * searchParams.PageSize).Take(searchParams.PageSize).ToListAsync(cancellationToken);
 
-            return new SearchResult<T>(true, searchParams, items, count, messages);
+            return new SearchResult<T>(true, searchParams, items, count);
         }
 
-        public static async Task<SearchResult<TModel>> SuccessAsync<TModel>(ISearchParams searchParams, IQueryable<T> query, IMapper mapper, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, List<string> messages = null, CancellationToken cancellationToken = new CancellationToken())
+        public static async Task<SearchResult<TModel>> SuccessAsync<TModel>(ISearchParams searchParams, IQueryable<T> query, IMapper mapper, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, CancellationToken cancellationToken = default)
         {
-            var searchResult = await SuccessAsync(searchParams, query, searchPredicate, messages, cancellationToken);
+            var searchResult = await SuccessAsync(searchParams, query, searchPredicate, cancellationToken);
             var mappedSearchResult = mapper.Map<SearchResult<TModel>>(searchResult);
             return mappedSearchResult;
         }
 
-        public static async Task<SearchResult<T>> SuccessAsync(ISearchParams searchParams, List<T> data, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, List<string> messages = null, CancellationToken cancellationToken = new CancellationToken()) =>
-            await SuccessAsync(searchParams, data.AsQueryable(), searchPredicate, messages, cancellationToken);
+        public static async Task<SearchResult<T>> SuccessAsync(ISearchParams searchParams, List<T> data, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, CancellationToken cancellationToken = default) =>
+            await SuccessAsync(searchParams, data.AsQueryable(), searchPredicate, cancellationToken);
 
-        public static async Task<SearchResult<TModel>> SuccessAsync<TModel>(ISearchParams searchParams, List<T> data, IMapper mapper, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, List<string> messages = null, CancellationToken cancellationToken = new CancellationToken())
+        public static async Task<SearchResult<TModel>> SuccessAsync<TModel>(ISearchParams searchParams, List<T> data, IMapper mapper, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, CancellationToken cancellationToken = default)
         {
-            var searchResult = await SuccessAsync(searchParams, data, searchPredicate, messages, cancellationToken);
+            var searchResult = await SuccessAsync(searchParams, data, searchPredicate, cancellationToken);
             var mappedSearchResult = mapper.Map<SearchResult<TModel>>(searchResult);
             return mappedSearchResult;
         }
@@ -91,18 +91,24 @@ namespace Application.Models
 
         #region Failure Methods
 
-        public async static Task<SearchResult<T>> FailAsync(ISearchParams searchParams, List<string> messages = null) =>
-            await Task.FromResult(Fail(searchParams, messages));
+        public async static Task<SearchResult<T>> FailAsync(ISearchParams searchParams) =>
+            await Task.FromResult(Fail(searchParams));
 
-        #endregion
+		public async static Task<SearchResult<T>> FailAsync(ISearchParams searchParams, string error) =>
+			await Task.FromResult(Fail(searchParams, error));
 
-        #endregion
+		public async static Task<SearchResult<T>> FailAsync(ISearchParams searchParams, List<string> errors) =>
+			await Task.FromResult(Fail(searchParams, errors));
 
-        #region Non-Async Methods
+		#endregion
 
-        #region Success Methods
+		#endregion
 
-        public static SearchResult<T> Success(ISearchParams searchParams, IQueryable<T> query, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, List<string> messages = null)
+		#region Non-Async Methods
+
+		#region Success Methods
+
+		public static SearchResult<T> Success(ISearchParams searchParams, IQueryable<T> query, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null)
         {
             #region Query formulation
 
@@ -138,22 +144,22 @@ namespace Application.Models
             var count = query.Count();
             var items = query.Skip((searchParams.PageNumber - 1) * searchParams.PageSize).Take(searchParams.PageSize).ToList();
 
-            return new SearchResult<T>(true, searchParams, items, count, messages);
+            return new SearchResult<T>(true, searchParams, items, count);
         }
 
-        public static SearchResult<TModel> Success<TModel>(ISearchParams searchParams, IQueryable<T> query, IMapper mapper, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, List<string> messages = null)
+        public static SearchResult<TModel> Success<TModel>(ISearchParams searchParams, IQueryable<T> query, IMapper mapper, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null)
         {
-            var searchResult = Success(searchParams, query, searchPredicate, messages);
+            var searchResult = Success(searchParams, query, searchPredicate);
             var mappedSearchResult = mapper.Map<SearchResult<TModel>>(searchResult);
             return mappedSearchResult;
         }
 
-        public static SearchResult<T> Success(ISearchParams searchParams, List<T> data, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, List<string> messages = null) =>
-            Success(searchParams, data.AsQueryable(), searchPredicate, messages);
+        public static SearchResult<T> Success(ISearchParams searchParams, List<T> data, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null) =>
+            Success(searchParams, data.AsQueryable(), searchPredicate);
 
-        public static SearchResult<TModel> Success<TModel>(ISearchParams searchParams, List<T> data, IMapper mapper, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null, List<string> messages = null)
+        public static SearchResult<TModel> Success<TModel>(ISearchParams searchParams, List<T> data, IMapper mapper, System.Linq.Expressions.Expression<Func<T, bool>>? searchPredicate = null)
         {
-            var searchResult = Success(searchParams, data, searchPredicate, messages);
+            var searchResult = Success(searchParams, data, searchPredicate);
             var mappedSearchResult = mapper.Map<SearchResult<TModel>>(searchResult);
             return mappedSearchResult;
         }
@@ -162,11 +168,23 @@ namespace Application.Models
 
         #region Failure Methods
 
-        public static SearchResult<T> Fail(ISearchParams searchParams, List<string> messages = null) =>
-            new(false, searchParams, new List<T>(), 0, messages);
+        public static SearchResult<T> Fail(ISearchParams searchParams) =>
+            new(false, searchParams, [], 0);
 
-        #endregion
+		public static SearchResult<T> Fail(ISearchParams searchParams, string error) =>
+			new(false, searchParams, [], 0)
+            {
+                Errors = [error]
+            };
 
-        #endregion
-    }
+		public static SearchResult<T> Fail(ISearchParams searchParams, List<string> errors) =>
+			new(false, searchParams, [], 0)
+			{
+				Errors = errors
+			};
+
+		#endregion
+
+		#endregion
+	}
 }

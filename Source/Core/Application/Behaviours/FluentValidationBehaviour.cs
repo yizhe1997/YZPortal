@@ -3,14 +3,9 @@ using MediatR;
 
 namespace Application.Behaviours
 {
-    public class FluentValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+    public class FluentValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
     {
-        private readonly List<IValidator<TRequest>> _validators;
-
-        public FluentValidationBehaviour(IEnumerable<IValidator<TRequest>> validators)
-        {
-            _validators = validators.ToList();
-        }
+        private readonly List<IValidator<TRequest>> _validators = validators.ToList();
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
@@ -21,6 +16,7 @@ namespace Application.Behaviours
                 .Where(f => f != null)
                 .ToList();
 
+            //TODO: return result instead of throwing exception...
             if (failures.Count != 0)
             {
                 throw new ValidationException(failures);

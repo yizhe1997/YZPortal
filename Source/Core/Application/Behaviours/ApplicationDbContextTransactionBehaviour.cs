@@ -3,14 +3,9 @@ using MediatR;
 
 namespace Application.Behaviours
 {
-    public class ApplicationDbContextTransactionBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+    public class ApplicationDbContextTransactionBehaviour<TRequest, TResponse>(IApplicationDbContext context) : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
     {
-        private readonly IApplicationDbContext _context;
-
-        public ApplicationDbContextTransactionBehaviour(IApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly IApplicationDbContext _context = context;
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {

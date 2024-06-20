@@ -1,4 +1,5 @@
 ﻿@using Application.Models;
+@using Application.Requests.Indexes
 @using Application.Requests.Users;
 ﻿@using BootstrapBlazor.Components
 @using Microsoft.AspNetCore.Components
@@ -9,6 +10,7 @@
 @using IdentityModel = Application.Models.Identity;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject DownloadService DownloadService
+@inject ToastService ToastService
 @implements IDisposable
 @implements IAsyncDisposable
 
@@ -113,7 +115,11 @@
 
     private async Task<bool> OnFileDelete(UploadFile item)
     {
-        await YZPortalApiClient.DeleteUserProfileImageAsync(User.Id);
+        var deleteUserProfileImageAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+            async () => await YZPortalApiClient.DeleteUserProfileImageAsync(User.Id),
+            ToastService,
+            title: "Delete Data"
+        );
 
         DefaultFileList = null;
 
@@ -136,11 +142,14 @@
             }
             else if (CheckValidAvatarFormat(format))
             {
-                var result = await YZPortalApiClient.UploadUserProfileImageAsync(User.Id, file.File);
+                var uploadUserProfileImageAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+                    async () => await YZPortalApiClient.UploadUserProfileImageAsync(User.Id, file.File),
+                    ToastService,
+                    title: "Create Data"
+                );
 
                 // service
-                DefaultFileList = new(new[] { new UploadFile { PrevUrl = result.Messages[0] ?? "" } });
-                // await SaveToFile(file);
+                DefaultFileList = new(new[] { new UploadFile { PrevUrl = uploadUserProfileImageAsyncResult.Messages[0] ?? "" } });
 
                 IsRefreshParentComponentRequired = true;
                 StateHasChanged();
@@ -170,22 +179,36 @@
         // Add groups
         foreach (var selectedGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
         {
-            await YZPortalApiClient.GraphGroupAddUsers(selectedGraphGroup, userSubIds);
+            var graphGroupAddUsersAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+                async () => await YZPortalApiClient.GraphGroupAddUsersAsync(selectedGraphGroup, userSubIds),
+                ToastService,
+                title: "Create Data",
+                hideSuccessToast: true
+            );
         }
 
         // Remove groups
         foreach (var selectedGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
         {
-            await YZPortalApiClient.GraphGroupRemoveUser(selectedGraphGroup, User.SubjectIdentifier);
+            var graphGroupRemoveUserAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+                async () => await YZPortalApiClient.GraphGroupRemoveUserAsync(selectedGraphGroup, User.SubjectIdentifier),
+                ToastService,
+                title: "Delete Data",
+                hideSuccessToast: true
+            );
         }
 
-        await YZPortalApiClient.UpdateUserAsync(User.SubjectIdentifier, new UpdateUserCommand()
-        {
-            DisplayName = User.DisplayName,
-            FirstName = User.FirstName,
-            LastName = User.LastName,
-            MobilePhone = User.MobilePhone
-        });
+        var updateUserAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+            async () => await YZPortalApiClient.UpdateUserAsync(User.SubjectIdentifier, new UpdateUserCommand()
+                {
+                    DisplayName = User.DisplayName,
+                    FirstName = User.FirstName,
+                    LastName = User.LastName,
+                    MobilePhone = User.MobilePhone
+                }),
+            ToastService,
+            title: "Save Data"
+        );
 
         // TODO: only invoke if successfully edit
         IsRefreshParentComponentRequired = true;
@@ -198,11 +221,21 @@
         if (!string.IsNullOrEmpty(User.UserProfileImageUrl))
             DefaultFileList = new(new[] { new UploadFile { PrevUrl = User.UserProfileImageUrl } });
 
-        var graphGroups = await YZPortalApiClient.GetGraphGroups();
-        this.GraphGroups = GenerateDataSource(graphGroups.Data);
+        var getGraphGroupsAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+            async () => await YZPortalApiClient.GetGraphGroupsAsync(new SearchRequest()),
+            ToastService,
+            title: "Load Data",
+            hideSuccessToast: true
+        );
+        this.GraphGroups = GenerateDataSource(getGraphGroupsAsyncResult.Data);
 
-        var selectedGraphGroups = await YZPortalApiClient.GetGraphGroups(User.SubjectIdentifier);
-        this.SelectedGraphGroups = ExistingGraphGroups = selectedGraphGroups.Data.Select(x => x.Id).ToList();
+        var getSelectedGraphGroupsAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+            async () => await YZPortalApiClient.GetGraphGroupsAsync(new SearchRequest(), User.SubjectIdentifier),
+            ToastService,
+            title: "Load Data",
+            hideSuccessToast: true
+        );
+        this.SelectedGraphGroups = ExistingGraphGroups = getSelectedGraphGroupsAsyncResult.Data.Select(x => x.Id).ToList();
 
         await base.OnInitializedAsync();
     }

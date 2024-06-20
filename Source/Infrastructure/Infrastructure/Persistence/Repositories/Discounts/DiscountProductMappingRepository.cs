@@ -4,13 +4,7 @@ using Domain.Entities.Discounts;
 
 namespace Infrastructure.Persistence.Repositories.Discounts
 {
-    public class DiscountProductMappingRepository : IDiscountProductMappingRepository
+    public class DiscountProductMappingRepository(IGenericRepository<DiscountProductMapping, Guid> repository) : IDiscountProductMappingRepository
     {
-        private readonly IGenericRepository<DiscountProductMapping, Guid> _repository;
-
-        public DiscountProductMappingRepository(IGenericRepository<DiscountProductMapping, Guid> repository)
-        {
-            _repository = repository;
-        }
     }
 }

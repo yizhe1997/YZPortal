@@ -5,6 +5,7 @@
 @using BootstrapBlazor.Components;
 @inject YZPortalApiHttpClient YZPortalApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ToastService ToastService
 
 <Drawer Placement="Placement.Right" @bind-IsOpen="@IsRightDrawerOpen" IsBackdrop="true">
     <div class="layout-drawer-body">
@@ -101,7 +102,7 @@
                 </div>
             </div>
         </div>
-        <div class="btn btn-info w-100" @onclick="@OnSave">Save Settings</div>
+        <div class="btn btn-info w-100" @onclick="@UpdateUserPortalConfig">Save Settings</div>
         <div class="btn btn-info w-100" @onclick="@OnCancel">Cancel</div>
     </div>
 </Drawer>
@@ -116,22 +117,23 @@
     [Parameter]
     public EventCallback<bool> IsRightDrawerOpenChanged { get; set; }
 
-    /// <summary>
-    /// Save new configs if user save changes
-    /// </summary>
-    private async Task OnSave()
+    private async Task UpdateUserPortalConfig()
     {
-        // Update portal config
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var newPortalConfig = await YZPortalApiClient.UpdatePortalConfigAsync(authState.User.GetSubClaim() ?? string.Empty, new UpdateUserPortalConfigCommand
-        {
-            IsFixedFooter = PortalConfig.IsFixedFooter,
-            IsFixedHeader = PortalConfig.IsFixedHeader,
-            IsFullSide = PortalConfig.IsFullSide,
-            Theme = PortalConfig.Theme,
-            ShowFooter = PortalConfig.ShowFooter,
-            UseTabSet = PortalConfig.UseTabSet,
-        });
+        
+        var updateUserPortalConfigAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+            async () => await YZPortalApiClient.UpdateUserPortalConfigAsync(authState.User.GetSubClaim() ?? string.Empty, new UpdateUserPortalConfigCommand
+                {
+                    IsFixedFooter = PortalConfig.IsFixedFooter,
+                    IsFixedHeader = PortalConfig.IsFixedHeader,
+                    IsFullSide = PortalConfig.IsFullSide,
+                    Theme = PortalConfig.Theme,
+                    ShowFooter = PortalConfig.ShowFooter,
+                    UseTabSet = PortalConfig.UseTabSet,
+                }),
+            ToastService,
+            title: "Update Data"
+        );
 
         IsRightDrawerOpen = false;
         await IsRightDrawerOpenChanged.InvokeAsync(IsRightDrawerOpen);

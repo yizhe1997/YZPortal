@@ -10,26 +10,17 @@ namespace Application.Features.Users.Configs.Queries.GetConfigs
         public string? UserSubId { get; set; }
     }
 
-    public class GetConfigsQueryHandler : IRequestHandler<GetUserConfigsQuery, Result<ConfigsDto>>
+    public class GetConfigsQueryHandler(
+        IMapper mapper,
+        IPortalConfigRepository portalConfigRepository) : IRequestHandler<GetUserConfigsQuery, Result<ConfigsDto>>
     {
-        private readonly IPortalConfigRepository _portalConfigRepository;
-        private readonly IMapper _mapper;
-
-        public GetConfigsQueryHandler(
-            IMapper mapper,
-            IPortalConfigRepository portalConfigRepository)
-        {
-            _mapper = mapper;
-            _portalConfigRepository = portalConfigRepository;
-        }
-
         public async Task<Result<ConfigsDto>> Handle(GetUserConfigsQuery request, CancellationToken cancellationToken)
         {
-            var portalConfig = await _portalConfigRepository.GetByUserSubIdFirstOrDefaultAsync(request.UserSubId);
+            var portalConfig = await portalConfigRepository.GetByUserSubIdFirstOrDefaultAsync(request.UserSubId, cancellationToken);
 
             return await Result<ConfigsDto>.SuccessAsync(new ConfigsDto
             {
-                PortalConfig = _mapper.Map<PortalConfigDto>(portalConfig)
+                PortalConfig = mapper.Map<PortalConfigDto>(portalConfig)
             });
         }
     }

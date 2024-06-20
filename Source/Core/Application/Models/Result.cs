@@ -4,7 +4,12 @@ namespace Application.Models
 {
     public class Result : IResult
     {
-        public List<string> Messages { get; set; } = new List<string>();
+        public List<string> Messages { get; set; } = [];
+
+        public List<string> Errors { get; set; } = [];
+
+        // TODO: integrate when required
+        public List<string> Warnings { get; set; } = [];
 
         public bool Succeeded { get; set; }
 
@@ -19,26 +24,31 @@ namespace Application.Models
 
         public static Result Success(string message)
         {
-            return new Result { Succeeded = true, Messages = new List<string> { message } };
+            return new Result { Succeeded = true, Messages = [message] };
         }
 
-        #endregion
+		public static Result Success(List<string> messages)
+		{
+			return new Result { Succeeded = true, Messages = messages };
+		}
 
-        #region Failure Methods
+		#endregion
 
-        public static Result Fail()
+		#region Failure Methods
+
+		public static Result Fail()
         {
             return new Result { Succeeded = false };
         }
 
-        public static Result Fail(string message)
+        public static Result Fail(string error)
         {
-            return new Result { Succeeded = false, Messages = new List<string> { message } };
+            return new Result { Succeeded = false, Errors = [error] };
         }
 
-        public static Result Fail(List<string> messages)
+        public static Result Fail(List<string> errors)
         {
-            return new Result { Succeeded = false, Messages = messages };
+            return new Result { Succeeded = false, Errors = errors };
         }
 
         #endregion
@@ -59,11 +69,16 @@ namespace Application.Models
             return Task.FromResult(Success(message));
         }
 
-        #endregion
+		public static Task<Result> SuccessAsync(List<string> messages)
+		{
+			return Task.FromResult(Success(messages));
+		}
 
-        #region Failure Methods
+		#endregion
 
-        public static Task<Result> FailAsync()
+		#region Failure Methods
+
+		public static Task<Result> FailAsync()
         {
             return Task.FromResult(Fail());
         }
@@ -96,9 +111,9 @@ namespace Application.Models
             return new Result<T> { Succeeded = true };
         }
 
-        public new static Result<T> Success(string message)
+        public new static Result<T> Success(string messages)
         {
-            return new Result<T> { Succeeded = true, Messages = new List<string> { message } };
+            return new Result<T> { Succeeded = true, Messages = [messages] };
         }
 
         public static Result<T> Success(T data)
@@ -108,7 +123,7 @@ namespace Application.Models
 
         public static Result<T> Success(T data, string message)
         {
-            return new Result<T> { Succeeded = true, Data = data, Messages = new List<string> { message } };
+            return new Result<T> { Succeeded = true, Data = data, Messages = [message] };
         }
 
         public static Result<T> Success(T data, List<string> messages)
@@ -125,14 +140,14 @@ namespace Application.Models
             return new Result<T> { Succeeded = false };
         }
 
-        public new static Result<T> Fail(string message)
+        public new static Result<T> Fail(string error)
         {
-            return new Result<T> { Succeeded = false, Messages = new List<string> { message } };
+            return new Result<T> { Succeeded = false, Errors = [error] };
         }
 
-        public new static Result<T> Fail(List<string> messages)
+        public new static Result<T> Fail(List<string> errors)
         {
-            return new Result<T> { Succeeded = false, Messages = messages };
+            return new Result<T> { Succeeded = false, Errors = errors };
         }
 
         #endregion
@@ -172,14 +187,14 @@ namespace Application.Models
             return Task.FromResult(Fail());
         }
 
-        public new static Task<Result<T>> FailAsync(string message)
+        public new static Task<Result<T>> FailAsync(string error)
         {
-            return Task.FromResult(Fail(message));
+            return Task.FromResult(Fail(error));
         }
 
-        public new static Task<Result<T>> FailAsync(List<string> messages)
+        public new static Task<Result<T>> FailAsync(List<string> errors)
         {
-            return Task.FromResult(Fail(messages));
+            return Task.FromResult(Fail(errors));
         }
 
         #endregion

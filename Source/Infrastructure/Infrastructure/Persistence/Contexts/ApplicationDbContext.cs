@@ -130,7 +130,7 @@ namespace Infrastructure.Persistence.Contexts
 
         #region Transaction Behaviour
 
-        public async Task BeginTransactionAsync(CancellationToken cancellationToken)
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
             if (_currentTransaction != null)
             {
@@ -142,7 +142,7 @@ namespace Infrastructure.Persistence.Contexts
             }
         }
 
-        public async Task CommitTransactionAsync(CancellationToken cancellationToken)
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -166,7 +166,7 @@ namespace Infrastructure.Persistence.Contexts
             }
         }
 
-        public async Task RollbackTransactionAsync(CancellationToken cancellationToken)
+        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
         {
             try
             {

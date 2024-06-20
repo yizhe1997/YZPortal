@@ -15,154 +15,239 @@ using Application.Features.Products.Commands.AddProduct;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Forms;
 using Application.Features.Users.UserProfileImages.Commands;
+using System.Net;
+using BootstrapBlazor.Components;
+using Application.Interfaces;
 
 namespace YZPortal.Client.Clients.YZPortalApi
 {
-    // TODO: the ? statements can be removed for some?
     // TODO: Advanced query
-    public class YZPortalApiHttpClient
+    public class YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService localStorageService, IJSRuntime jSRuntime)
     {
-        private readonly ILogger<YZPortalApiHttpClient> _logger;
-        private readonly HttpClient _http;
-        private readonly ILocalStorageService _localStorageService;
-        private readonly IJSRuntime _jSRuntime;
-
-        public YZPortalApiHttpClient(ILogger<YZPortalApiHttpClient> logger, HttpClient http, ILocalStorageService localStorageService, IJSRuntime jSRuntime)
-        {
-            _logger = logger;
-            _http = http;
-            _localStorageService = localStorageService;
-            _jSRuntime = jSRuntime;
-        }
-
         #region Helpers
 
-        public HttpRequestMessage CreateSearchHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null)
+		public HttpRequestMessage CreateSearchHttpRequestMessage(string relativeUri, SearchRequest searchRequest)
+		{
+			// Construct HttpRequestMessage with GET Http method
+			var requestMsg = CreatePaginationHttpRequestMessage(relativeUri, searchRequest);
+
+			// Add search query params to HttpRequestMessage
+			if (!string.IsNullOrEmpty(searchRequest.SearchString))
+				requestMsg.AddQueryParam(nameof(SearchRequest.SearchString), searchRequest.SearchString);
+
+			if (searchRequest.OrderBy.Length != 0)
+			{
+				foreach (var val in searchRequest.OrderBy)
+				{
+					requestMsg.AddQueryParam(nameof(SearchRequest.OrderBy), val);
+				}
+			}
+
+			return requestMsg;
+		}
+
+		public HttpRequestMessage CreatePaginationHttpRequestMessage(string relativeUri, PagedRequest pagedRequest)
         {
             // Construct HttpRequestMessage with GET Http method
-            var requestMsg = CreatePaginationHttpRequestMessage(relativeUri, pageSize, pageNumber);
-
-            // Add search query params to HttpRequestMessage
-            if (!string.IsNullOrEmpty(searchString))
-                requestMsg.AddQueryParam(nameof(SearchRequest.SearchString), searchString);
-
-            if (orderBy != null)
-            {
-                foreach (var val in orderBy)
-                {
-                    requestMsg.AddQueryParam(nameof(SearchRequest.OrderBy), val);
-                }
-            }
-
-            return requestMsg;
-        }
-
-        public HttpRequestMessage CreatePaginationHttpRequestMessage(string relativeUri, int pageSize = 10, int pageNumber = 1)
-        {
-            // Construct HttpRequestMessage with GET Http method
-            var requestMsg = new HttpRequestMessage(HttpMethod.Get, _http.BaseAddress + relativeUri);
+            var requestMsg = new HttpRequestMessage(HttpMethod.Get, http.BaseAddress + relativeUri);
 
             // Add pagination query params to HttpRequestMessage
-            requestMsg.AddQueryParam(nameof(PagedRequest.PageSize), pageSize.ToString());
-            requestMsg.AddQueryParam(nameof(PagedRequest.PageNumber), pageNumber.ToString());
+            requestMsg.AddQueryParam(nameof(PagedRequest.PageSize), pagedRequest.PageSize.ToString());
+            requestMsg.AddQueryParam(nameof(PagedRequest.PageNumber), pagedRequest.PageNumber.ToString());
 
             return requestMsg;
         }
 
         public async Task SetHttpRequestMessageHeadersAsync(CancellationToken cancellationToken = default)
         {
-            var preferredLanguage = await _localStorageService.GetUserCulture(cancellationToken);
+            var preferredLanguage = await localStorageService.GetUserCulture(cancellationToken);
 
             if (!string.IsNullOrEmpty(preferredLanguage))
-                _http.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(preferredLanguage));
+                http.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(preferredLanguage));
         }
 
-        #endregion
+		// TODO: use interfaces for HandleResponseAsync overloads
+		public static async Task<SearchResult<T>> HandleResponseAsync<T>(SearchRequest searchRequest, HttpResponseMessage response, CancellationToken cancellationToken)
+		{
+			if (response.IsSuccessStatusCode)
+			{
+				return await response.Content.ReadFromJsonAsync<SearchResult<T>>(cancellationToken: cancellationToken) ?? 
+                    await SearchResult<T>.FailAsync(searchRequest, "Response was null which was not expected");
+			}
+			else
+			{
+				return response.StatusCode switch
+				{
+					HttpStatusCode.NotFound => await SearchResult<T>.FailAsync(searchRequest, "Resource not found"),
+					HttpStatusCode.BadRequest => await SearchResult<T>.FailAsync(searchRequest, "Invalid request"),
+					HttpStatusCode.Unauthorized => await SearchResult<T>.FailAsync(searchRequest, "Unauthorized access"),
+					HttpStatusCode.Forbidden => await SearchResult<T>.FailAsync(searchRequest, "Access forbidden"),
+					HttpStatusCode.InternalServerError => await SearchResult<T>.FailAsync(searchRequest, "Server error"),
+					_ => await SearchResult<T>.FailAsync(searchRequest, $"Request failed"),
+				};
+			}
+		}
 
-        #region Graph
+		public static async Task<Result<T>> HandleResponseAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
+		{
+			if (response.IsSuccessStatusCode)
+			{
+				return await response.Content.ReadFromJsonAsync<Result<T>>(cancellationToken: cancellationToken) ??
+					await Result<T>.FailAsync("Response was null which was not expected");
+			}
+			else
+			{
+				return response.StatusCode switch
+				{
+					HttpStatusCode.NotFound => await Result<T>.FailAsync("Resource not found"),
+					HttpStatusCode.BadRequest => await Result<T>.FailAsync("Invalid request"),
+					HttpStatusCode.Unauthorized => await Result<T>.FailAsync("Unauthorized access"),
+					HttpStatusCode.Forbidden => await Result<T>.FailAsync("Access forbidden"),
+					HttpStatusCode.InternalServerError => await Result<T>.FailAsync("Server error"),
+					_ => await Result<T>.FailAsync($"Request failed"),
+				};
+			}
+		}
 
-        #region Users
+		public static async Task<Result> HandleResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+		{
+			if (response.IsSuccessStatusCode)
+			{
+				return await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken) ??
+					await Result.FailAsync("Response was null which was not expected");
+			}
+			else
+			{
+				return response.StatusCode switch
+				{
+					HttpStatusCode.NotFound => await Result.FailAsync("Resource not found"),
+					HttpStatusCode.BadRequest => await Result.FailAsync("Invalid request"),
+					HttpStatusCode.Unauthorized => await Result.FailAsync("Unauthorized access"),
+					HttpStatusCode.Forbidden => await Result.FailAsync("Access forbidden"),
+					HttpStatusCode.InternalServerError => await Result.FailAsync("Server error"),
+					_ => await Result.FailAsync($"Request failed"),
+				};
+			}
+		}
 
-        public async Task<SearchResult<GraphModel.UserModel>> GetGraphUsers(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
-        {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
+        public static async Task<T> ExecuteCallGuardedAsync<T>(
+			Func<Task<T>> service,
+			ToastService toastService,
+			string? title = null,
+            string? successContent = null,
+            string? errorContent = null,
+            string? warningContent = null,
+			bool hideSuccessToast = false,
+            bool hideErrorToast = false,
+            bool hideWarningToast = false,
+            bool isAutoHide = true) where T : IResult
+		{
+			var result = await service();
 
-            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/GraphUsers", pageSize, pageNumber, searchString, orderBy);
+			if (result.Succeeded && !hideSuccessToast)
+			{
+                await toastService.Success(title, successContent ?? string.Join("", result.Messages), autoHide: isAutoHide);
+            }
+			else if (!result.Succeeded && !hideErrorToast)
+                await toastService.Error(title, errorContent ?? string.Join("", result.Errors), autoHide: isAutoHide);
 
-            using var response = await _http.SendAsync(requestMsg, cancellationToken);
+			if (result.Warnings.Count != 0 && !hideWarningToast)
+                await toastService.Warning(title, warningContent ?? string.Join("", result.Warnings), autoHide: isAutoHide);
+
+            return result;
+        }
+
+		#endregion
+
+		#region Graph
+
+		#region Users
+
+		public async Task<SearchResult<GraphModel.UserModel>> GetGraphUsersAsync(SearchRequest searchRequest, CancellationToken cancellationToken = default)
+		{
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<SearchResult<GraphModel.UserModel>>(cancellationToken: cancellationToken) ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                }
+				var requestMsg = CreateSearchHttpRequestMessage($"api/v1/GraphUsers", searchRequest);
 
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
+				using var response = await http.SendAsync(requestMsg, cancellationToken);
 
-            return new SearchResult<GraphModel.UserModel>();
-        }
+				return await HandleResponseAsync<GraphModel.UserModel>(searchRequest, response, cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				return await SearchResult<GraphModel.UserModel>.FailAsync(searchRequest, ex.Message);
+			}
+		}
 
         #endregion
 
         #region Groups
 
-        public async Task<SearchResult<GraphModel.GroupModel>> GetGraphGroups(string? userSubId = null, int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchResult<GraphModel.GroupModel>> GetGraphGroupsAsync(SearchRequest searchRequest, string? userSubId = null, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/GraphGroups", pageSize, pageNumber, searchString, orderBy);
-
-            if (!string.IsNullOrEmpty(userSubId))
-                requestMsg.AddQueryParam("userSubId", userSubId);
-
-            using var response = await _http.SendAsync(requestMsg, cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<SearchResult<GraphModel.GroupModel>>(cancellationToken: cancellationToken) ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                }
+				var requestMsg = CreateSearchHttpRequestMessage($"api/v1/GraphGroups", searchRequest);
 
-                return output;
-            }
+				if (!string.IsNullOrEmpty(userSubId))
+					requestMsg.AddQueryParam("userSubId", userSubId);
+
+				using var response = await http.SendAsync(requestMsg, cancellationToken);
+
+				return await HandleResponseAsync<GraphModel.GroupModel>(searchRequest, response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-
-            return new SearchResult<GraphModel.GroupModel>();
+				return await SearchResult<GraphModel.GroupModel>.FailAsync(searchRequest, ex.Message);
+			}
         }
 
-        public async Task GraphGroupAddUsers(string? groupId = null, string[]? userSubIds = null, CancellationToken cancellationToken = new CancellationToken())
+		public async Task<Result> GraphGroupAddUsersAsync(string? groupId, string[]? userSubIds = null, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
+			try
+			{
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.PostAsJsonAsync("/api/v1/GraphGroups/AddUser", new
-            {
-                GroupId = groupId,
-                UserSubjectIds = userSubIds ?? Array.Empty<string>()
-            },
-            cancellationToken);
-        }
+				using var response = await http.PostAsJsonAsync("/api/v1/GraphGroups/AddUser", new
+				{
+					GroupId = groupId,
+					UserSubjectIds = userSubIds ?? []
+				},
+				cancellationToken);
 
-        public async Task GraphGroupRemoveUser(string? groupId = null, string? userSubId = null, CancellationToken cancellationToken = new CancellationToken())
+				return await HandleResponseAsync(response, cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				return await Result.FailAsync(ex.Message);
+			}
+
+		}
+
+		public async Task<Result> GraphGroupRemoveUserAsync(string? groupId, string? userSubId, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
+			try
+			{
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.PostAsJsonAsync("/api/v1/GraphGroups/RemoveUser", new
-            {
-                GroupId = groupId,
-                UserSubjectId = userSubId
-            },
-            cancellationToken);
-        }
+				using var response = await http.PostAsJsonAsync("/api/v1/GraphGroups/RemoveUser", new
+				{
+					GroupId = groupId,
+					UserSubjectId = userSubId
+				},
+				cancellationToken);
+
+				return await HandleResponseAsync(response, cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				return await Result.FailAsync(ex.Message);
+			}
+		}
 
         #endregion
 
@@ -170,184 +255,155 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Users
 
-        public async Task<Result> CreateUserAsync(CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> CreateUserAsync(CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            using var response = await _http.PostAsJsonAsync("/api/v1/Users", new { }, cancellationToken: cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken) ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                return output;
-            }
+				using var response = await http.PostAsJsonAsync("/api/v1/Users", new { }, cancellationToken: cancellationToken);
+
+				return await HandleResponseAsync(response, cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				return await Result.FailAsync(ex.Message);
+			}
+		}
+
+        public async Task<Result> UpdateUserAsync(string? subId, UpdateUserCommand? updateUserCommand = null, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+				using var response = await http.PutAsJsonAsync($"/api/v1/Users/{subId}", updateUserCommand, cancellationToken: cancellationToken);
+
+				return await HandleResponseAsync(response, cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				return await Result.FailAsync(ex.Message);
+			}
+		}
+
+        public async Task<Result> UpdateCurrentUserViaHttpContextAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+				using var response = await http.PutAsJsonAsync($"/api/v1/Users/UpdateCurrentUserViaHttpContext", new { }, cancellationToken: cancellationToken);
+
+				return await HandleResponseAsync(response, cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				return await Result.FailAsync(ex.Message);
+			}
+		}
+
+        public async Task<Result<IdentityModel.UserModel>> GetUserAsync(string? subId, CancellationToken cancellationToken = default)
+        {
+            
+            try
+            {
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+				using var response = await http.GetAsync($"api/v1/Users/{subId}", cancellationToken);
+
+				return await HandleResponseAsync<IdentityModel.UserModel>(response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Result();
+				return await Result<IdentityModel.UserModel>.FailAsync(ex.Message);
+			}
         }
 
-        public async Task<Result> UpdateUserAsync(string? subId, UpdateUserCommand? updateUserCommand = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchResult<IdentityModel.UserModel>> GetUsersAsync(SearchRequest searchRequest, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            using var response = await _http.PutAsJsonAsync($"/api/v1/Users/{subId}", updateUserCommand, cancellationToken: cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken) ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                return output;
-            }
+				var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Users", searchRequest);
+
+				using var response = await http.SendAsync(requestMsg, cancellationToken);
+
+				return await HandleResponseAsync<IdentityModel.UserModel>(searchRequest, response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Result();
+				return await SearchResult<IdentityModel.UserModel>.FailAsync(searchRequest, ex.Message);
+			}
         }
 
-        public async Task<Result> UpdateCurrentUserViaHttpContextAsync(CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result> DeleteUserAsync(string? subId, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            using var response = await _http.PutAsJsonAsync($"/api/v1/Users/UpdateCurrentUserViaHttpContext", new { }, cancellationToken: cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken) ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                return output;
-            }
+				using var response = await http.DeleteAsync($"api/v1/Users/{subId}", cancellationToken);
+
+				return await HandleResponseAsync(response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Result();
-        }
-
-        public async Task<Result<IdentityModel.UserModel>> GetUserAsync(string subId, CancellationToken cancellationToken = new CancellationToken())
-        {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            using var response = await _http.GetAsync($"api/v1/Users/{subId}", cancellationToken);
-            try
-            {
-                var output = await response.Content.ReadFromJsonAsync<Result<IdentityModel.UserModel>>(cancellationToken: cancellationToken) ?? new();
-
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                }
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Result<IdentityModel.UserModel>();
-        }
-
-        public async Task<SearchResult<IdentityModel.UserModel>> GetUsersAsync(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
-        {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Users", pageSize, pageNumber, searchString, orderBy);
-
-            using var response = await _http.SendAsync(requestMsg, cancellationToken);
-            try
-            {
-                var output = await response.Content.ReadFromJsonAsync<SearchResult<IdentityModel.UserModel>>(cancellationToken: cancellationToken) ?? new();
-
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                }
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-
-            return new SearchResult<IdentityModel.UserModel>();
-        }
-
-        public async Task<Result> DeleteUserAsync(string subId, CancellationToken cancellationToken = new CancellationToken())
-        {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            using var response = await _http.DeleteAsync($"api/v1/Users/{subId}", cancellationToken);
-            try
-            {
-                var output = await response.Content.ReadFromJsonAsync<Result>(cancellationToken: cancellationToken) ?? new();
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-            return new Result();
+				return await Result.FailAsync(ex.Message);
+			}
         }
 
         #region User Profile Image
 
-        public async Task<Result> DeleteUserProfileImageAsync(Guid userId)
+        public async Task<Result> DeleteUserProfileImageAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync();
-
-            using var response = await _http.DeleteAsync($"api/v1/UserProfileImages/{userId}");
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<Result>() ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                return output;
-            }
+				using var response = await http.DeleteAsync($"api/v1/UserProfileImages/{userId}", cancellationToken);
+
+				return await HandleResponseAsync(response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-            return new Result();
+				return await Result.FailAsync(ex.Message);
+			}
         }
 
-        public async Task<Result> UploadUserProfileImageAsync(Guid userId, IBrowserFile image)
+        public async Task<Result> UploadUserProfileImageAsync(Guid userId, IBrowserFile image, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync();
-
-            using var ms = image.OpenReadStream();
-            var streamContent = new StreamContent(ms, Convert.ToInt32(image.Size));
-            streamContent.Headers.ContentType = new MediaTypeHeaderValue(image.ContentType);
-
-            using var content = new MultipartFormDataContent
-            {
-                { streamContent, "command." + nameof(UploadUserProfileImageCommand.File), image.Name }
-            };
-            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
-
-            using var response = await _http.PostAsync($"api/v1/UserProfileImages/{userId}", content);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<Result>() ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                return output;
-            }
+				using var ms = image.OpenReadStream(cancellationToken: cancellationToken);
+				var streamContent = new StreamContent(ms, Convert.ToInt32(image.Size));
+				streamContent.Headers.ContentType = new MediaTypeHeaderValue(image.ContentType);
+
+				using var content = new MultipartFormDataContent
+			    {
+				    { streamContent, "command." + nameof(UploadUserProfileImageCommand.File), image.Name }
+			    };
+				content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
+
+				using var response = await http.PostAsync($"api/v1/UserProfileImages/{userId}", content, cancellationToken);
+
+				return await HandleResponseAsync(response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-            return new Result();
+				return await Result.FailAsync(ex.Message);
+			}
         }
 
-        public async Task GetUserProfileImageAsync(Guid userId, CancellationToken cancellationToken = new CancellationToken())
+        // TODO: clean
+        public async Task GetUserProfileImageAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/UserProfileImages/{userId}");
-
-            using var response = await _http.SendAsync(requestMsg, cancellationToken);
+            using var response = await http.GetAsync($"api/v1/UserProfileImages/{userId}", cancellationToken);
             try
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
@@ -359,7 +415,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
                 var contentDisposition = response.Content.Headers.ContentDisposition;
                 var fileName = contentDisposition?.FileNameStar ?? contentDisposition?.FileName ?? "downloadedFile";
 
-                await _jSRuntime.InvokeVoidAsync("BlazorDownloadFile", new
+                await jSRuntime.InvokeVoidAsync("BlazorDownloadFile", new
                 {
                     Content = bytes,
                     FileName = fileName,
@@ -368,7 +424,7 @@ namespace YZPortal.Client.Clients.YZPortalApi
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                logger.LogError(ex.Message);
             }
         }
 
@@ -376,46 +432,36 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Configs
 
-        public async Task<Result<ConfigsDto>> GetConfigsAsync(string userSubId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result<ConfigsDto>> GetUserConfigsAsync(string userSubId, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            using var response = await _http.GetAsync($"api/v1/Configs/{userSubId}", cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<Result<ConfigsDto>>(cancellationToken: cancellationToken) ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                }
+				using var response = await http.GetAsync($"api/v1/Configs/{userSubId}", cancellationToken);
 
-                return output;
-            }
+				return await HandleResponseAsync<ConfigsDto>(response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Result<ConfigsDto>();
+				return await Result<ConfigsDto>.FailAsync(ex.Message);
+			}
         }
 
-        public async Task<Result<PortalConfigDto>> UpdatePortalConfigAsync(string? userSubId, UpdateUserPortalConfigCommand? updateUserPortalConfigCommand = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result<PortalConfigDto>> UpdateUserPortalConfigAsync(string? userSubId, UpdateUserPortalConfigCommand? updateUserPortalConfigCommand = null, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
+			try
+			{
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-            using var response = await _http.PutAsJsonAsync($"/api/v1/Configs/portalConfiguration/{userSubId}", updateUserPortalConfigCommand, cancellationToken: cancellationToken);
-            try
-            {
-                var output = await response.Content.ReadFromJsonAsync<Result<PortalConfigDto>>(cancellationToken: cancellationToken) ?? new();
+                using var response = await http.PutAsJsonAsync($"/api/v1/Configs/portalConfiguration/{userSubId}", updateUserPortalConfigCommand, cancellationToken: cancellationToken);
 
-                return output;
-            }
+				return await HandleResponseAsync<PortalConfigDto>(response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Result<PortalConfigDto>();
+				return await Result<PortalConfigDto>.FailAsync(ex.Message);
+			}
         }
 
         #endregion
@@ -426,41 +472,36 @@ namespace YZPortal.Client.Clients.YZPortalApi
 
         #region Products
 
-        public async Task<SearchResult<ProductDto>> GetProductsAsync(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchResult<ProductDto>> GetProductsAsync(SearchRequest searchRequest, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Products", pageSize, pageNumber, searchString, orderBy);
-
-            using var response = await _http.SendAsync(requestMsg, cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<SearchResult<ProductDto>>(cancellationToken: cancellationToken) ?? new();
+                await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                }
+                var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Products", searchRequest);
 
-                return output;
-            }
+                using var response = await http.SendAsync(requestMsg, cancellationToken);
+
+				return await HandleResponseAsync<ProductDto>(searchRequest, response, cancellationToken);
+			}
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                return await SearchResult<ProductDto>.FailAsync(searchRequest, ex.Message);
             }
-
-            return new SearchResult<ProductDto>();
         }
 
-        public async Task<byte[]> GetProductsExcelAsync(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
+		// TODO: return type change to result
+		public async Task<byte[]> GetProductsExcelAsync(SearchRequest searchRequest, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Products/ExportExcel", pageSize, pageNumber, searchString, orderBy);
-
-            using var response = await _http.SendAsync(requestMsg, cancellationToken);
             try
             {
-                var output = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+				var requestMsg = CreateSearchHttpRequestMessage($"api/v1/Products/ExportExcel", searchRequest);
+
+				using var response = await http.SendAsync(requestMsg, cancellationToken);
+
+				var output = await response.Content.ReadAsByteArrayAsync(cancellationToken);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
                 {
@@ -470,92 +511,76 @@ namespace YZPortal.Client.Clients.YZPortalApi
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                logger.LogError(ex.Message);
             }
 
             return [];
         }
 
-        public async Task<Result<Guid>> CreateProductAsync(AddProductCommand command)
+        public async Task<Result<Guid>> CreateProductAsync(AddProductCommand command, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync();
-
-            using var response = await _http.PostAsJsonAsync("/api/v1/Products", command);
-
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<Result<Guid>>() ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                return output;
+				using var response = await http.PostAsJsonAsync("/api/v1/Products", command, cancellationToken: cancellationToken);
+
+				return await HandleResponseAsync<Guid>(response, cancellationToken);
+			}
+            catch (Exception ex)
+            {
+				return await Result<Guid>.FailAsync(ex.Message);
+			}
+        }
+
+        public async Task<Result<Guid>> DeleteProductAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
+
+				using var response = await http.DeleteAsync($"/api/v1/Products/{id}", cancellationToken);
+
+				return await HandleResponseAsync<Guid>(response, cancellationToken);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Result<Guid>();
+				return await Result<Guid>.FailAsync(ex.Message);
+			}
         }
-
-        public async Task<Result<Guid>> DeleteProductAsync(Guid id)
-        {
-            await SetHttpRequestMessageHeadersAsync();
-
-            using var response = await _http.DeleteAsync($"/api/v1/Products/{id}");
-
-            try
-            {
-                var output = await response.Content.ReadFromJsonAsync<Result<Guid>>() ?? new();
-
-                return output;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-
-            return new Result<Guid>();
-        }
-
 
         #endregion
 
         #region Catergories
 
-        public async Task<SearchResult<ProductCategoryDto>> GetProductCategoriesAsync(int pageSize = 10, int pageNumber = 1, string? searchString = null, string[]? orderBy = null, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<SearchResult<ProductCategoryDto>> GetProductCategoriesAsync(SearchRequest searchRequest, CancellationToken cancellationToken = default)
         {
-            await SetHttpRequestMessageHeadersAsync(cancellationToken);
-
-            var requestMsg = CreateSearchHttpRequestMessage($"api/v1/ProductCategories", pageSize, pageNumber, searchString, orderBy);
-
-            using var response = await _http.SendAsync(requestMsg, cancellationToken);
             try
             {
-                var output = await response.Content.ReadFromJsonAsync<SearchResult<ProductCategoryDto>>(cancellationToken: cancellationToken) ?? new();
+				await SetHttpRequestMessageHeadersAsync(cancellationToken);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) // NOTE: THEN TOKEN HAS EXPIRED
-                {
-                }
+				var requestMsg = CreateSearchHttpRequestMessage($"api/v1/ProductCategories", searchRequest);
 
-                return output;
+				using var response = await http.SendAsync(requestMsg, cancellationToken);
+
+				return await HandleResponseAsync<ProductCategoryDto>(searchRequest, response, cancellationToken);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-
-            return new SearchResult<ProductCategoryDto>();
+				return await SearchResult<ProductCategoryDto>.FailAsync(searchRequest, ex.Message);
+			}
         }
 
-        #endregion
+		#endregion
 
-        #endregion
+		#endregion
 
-        #region Promotions
+		#region Promotions
 
-        #region Discounts
+		#region Discounts
 
-        #endregion
+		#endregion
 
-        #endregion
-    }
+		#endregion
+	}
 }

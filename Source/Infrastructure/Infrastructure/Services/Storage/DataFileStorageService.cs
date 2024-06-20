@@ -8,29 +8,17 @@ using Microsoft.Extensions.Options;
 using Application.Requests;
 using Domain.Entities.Misc;
 using Application.Features.Users.UserProfileImages.Commands;
-using Application.Interfaces.Repositories.Users;
 using Azure.Storage.Blobs.Models;
 
 namespace Infrastructure.Services.Storage
 {
-    public class DataFileStorageService : IDataFileStorageService
+    public class DataFileStorageService(BlobServiceClient blobClient, IOptions<AzureStorageConfig> azureStorageConfig) : IDataFileStorageService
     {
-        private readonly IUserProfileImageRepository _fileRepository;
-        private readonly BlobServiceClient _blobClient;
-        private readonly AzureStorageConfig _azureStorageConfig;
-
-        public DataFileStorageService(BlobServiceClient blobClient, IOptions<AzureStorageConfig> azureStorageConfig, IUserProfileImageRepository fileRepository)
-        {
-            _blobClient = blobClient;
-            _azureStorageConfig = azureStorageConfig.Value;
-            _fileRepository = fileRepository;
-        }
-
-        public async Task<Result> DeleteDataFileAsync(DataFile dataFile, CancellationToken cancellationToken)
+        public async Task<Result> DeleteDataFileAsync(DataFile dataFile, CancellationToken cancellationToken = default)
         {
             var blobClient = new BlobClient(new Uri(dataFile.Url ?? ""));
 
-            if (await blobClient.ExistsAsync())
+            if (await blobClient.ExistsAsync(cancellationToken))
             {
                 await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
 
@@ -40,11 +28,11 @@ namespace Infrastructure.Services.Storage
             return await Result.FailAsync("Data file not found");
         }
 
-        public async Task<Result<DownloadFileModel>> DownloadDataFileAsync(DataFile dataFile, CancellationToken cancellationToken)
+        public async Task<Result<DownloadFileModel>> DownloadDataFileAsync(DataFile dataFile, CancellationToken cancellationToken = default)
         {
             var blobClient = new BlobClient(new Uri(dataFile.Url ?? ""));
 
-            if (await blobClient.ExistsAsync())
+            if (await blobClient.ExistsAsync(cancellationToken))
             {
                 var stream = new MemoryStream();
 
@@ -80,7 +68,7 @@ namespace Infrastructure.Services.Storage
             switch (typeof(T).Name)
             {
                 case nameof(UploadUserProfileImageCommand):
-                    containerName = _azureStorageConfig.UserProfileImageContainer;
+                    containerName = azureStorageConfig.Value.UserProfileImageContainer;
                     break;
                 default:
                     return new Tuple<Result, string>(
@@ -107,15 +95,15 @@ namespace Infrastructure.Services.Storage
 
             #region Execution
 
-            var containerClient = _blobClient.GetBlobContainerClient(containerName);
+            var containerClient = blobClient.GetBlobContainerClient(containerName);
 
-            if (await containerClient.ExistsAsync())
+            if (await containerClient.ExistsAsync(cancellationToken))
             {
                 var blobClient = containerClient.GetBlobClient(fileName);
 
-                if (await blobClient.ExistsAsync())
+                if (await blobClient.ExistsAsync(cancellationToken))
                 {
-                    await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+                    await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
                 }
 
                 // For now the ACL via SASUrl is sufficient

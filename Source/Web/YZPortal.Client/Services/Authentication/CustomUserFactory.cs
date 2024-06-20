@@ -6,12 +6,8 @@ using System.Text.Json.Serialization;
 // REF: https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/azure-active-directory-groups-and-roles?view=aspnetcore-7.0
 namespace YZPortal.Client.Services.Authentication
 {
-    public class CustomUserFactory : AccountClaimsPrincipalFactory<CustomUserAccount>
+    public class CustomUserFactory(IAccessTokenProviderAccessor accessor) : AccountClaimsPrincipalFactory<CustomUserAccount>(accessor)
     {
-        public CustomUserFactory(IAccessTokenProviderAccessor accessor) : base(accessor)
-        {
-        }
-
         public async override ValueTask<ClaimsPrincipal> CreateUserAsync(CustomUserAccount account, RemoteAuthenticationUserOptions options)
         {
             var initialUser = await base.CreateUserAsync(account, options);
@@ -37,6 +33,6 @@ namespace YZPortal.Client.Services.Authentication
     public class CustomUserAccount : RemoteUserAccount
     {
         [JsonPropertyName("roles")]
-        public string[] Roles { get; set; } = Array.Empty<string>()!;
+        public string[] Roles { get; set; } = []!;
     }
 }

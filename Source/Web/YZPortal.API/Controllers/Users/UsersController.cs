@@ -10,19 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace YZPortal.API.Controllers.Users
 {
-    public class UsersController : AuthApiController
+    public class UsersController(IGraphService graphService, IUserService userService, ICurrentUserService currentUserService, IMediator mediator, LinkGenerator linkGenerator) : AuthApiController(mediator, linkGenerator)
     {
-        private readonly IGraphService _graphService;
-        private readonly IUserService _userService;
-        private readonly ICurrentUserService _currentUserService;
-
-        public UsersController(IGraphService graphService, IUserService userService, ICurrentUserService currentUserService, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
-        {
-            _userService = userService;
-            _currentUserService = currentUserService;
-            _graphService = graphService;
-        }
-
         [HttpPost("TriggerApiControllerException")]
         public async Task<ActionResult<Result>> TriggerApiControllerExceptionAsync()
         {
@@ -33,9 +22,9 @@ namespace YZPortal.API.Controllers.Users
         /// Returns a list of application user.
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<SearchResult<UserModel>>> GetUsers([FromQuery] SearchRequest request)
+        public async Task<ActionResult<SearchResult<UserModel>>> GetUsers([FromQuery] SearchRequest request, CancellationToken cancellationToken)
         {
-            var response = await _userService.GetSearchResultAsync(request);
+            var response = await userService.GetSearchResultAsync(request);
             return Ok(response);
         }
 
@@ -43,12 +32,12 @@ namespace YZPortal.API.Controllers.Users
         /// Deletes application user.
         /// </summary>
         [HttpDelete("{userSubId}")]
-        public async Task<ActionResult<Result>> DeleteUser([FromRoute] string userSubId)
+        public async Task<ActionResult<Result>> DeleteUser([FromRoute] string userSubId, CancellationToken cancellationToken)
         {
-            var response = await _userService.DeleteBySubIdAsync(userSubId);
+            var response = await userService.DeleteBySubIdAsync(userSubId, cancellationToken);
 
             // TODO: Move to scheduler 
-            await _graphService.UserDeleteAsync(userSubId);
+            await graphService.UserDeleteAsync(userSubId, cancellationToken);
 
             return Ok(response);
         }
@@ -57,9 +46,9 @@ namespace YZPortal.API.Controllers.Users
         /// Gets application user detail.
         /// </summary>
         [HttpGet("{userSubId}")]
-        public async Task<ActionResult<Result<UserModel>>> GetUser([FromRoute] string userSubId)
+        public async Task<ActionResult<Result<UserModel>>> GetUser([FromRoute] string userSubId, CancellationToken cancellationToken)
         {
-            var response = await _userService.GetBySubIdAsync(userSubId);
+            var response = await userService.GetBySubIdAsync(userSubId, cancellationToken);
 
             return Ok(response);
         }
@@ -68,11 +57,11 @@ namespace YZPortal.API.Controllers.Users
         /// Create a new application user associated with the current user context.
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult<Result>> CreateUser()
+        public async Task<ActionResult<Result>> CreateUser(CancellationToken cancellationToken)
         {
-            var response = await _userService.CreateAsync(_currentUserService);
+            var response = await userService.CreateAsync(currentUserService, cancellationToken);
 
-            return CreatedAtAction(nameof(GetUser), new { subjectId = _currentUserService.NameIdentifier }, response);
+            return CreatedAtAction(nameof(GetUser), new { subjectId = currentUserService.NameIdentifier }, response);
         }
 
         // TODO: properly handle transaction scope... https://stackoverflow.com/questions/36636272/transactions-with-asp-net-identity-usermanager
@@ -80,21 +69,21 @@ namespace YZPortal.API.Controllers.Users
         /// Updates the details of the application user.
         /// </summary>
         [HttpPut("{userSubId}")]
-        public async Task<ActionResult<Result>> UpdateUser([FromRoute] string userSubId, [FromBody] UpdateUserCommand request)
+        public async Task<ActionResult<Result>> UpdateUser([FromRoute] string userSubId, [FromBody] UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            await _userService.UpdateAsync(userSubId, request);
+            await userService.UpdateAsync(userSubId, request, cancellationToken);
 
-            var response = await _graphService.UserUpdateAsync(userSubId, request);
+            var response = await graphService.UserUpdateAsync(userSubId, request, cancellationToken);
 
             return Ok(response);
         }
 
         [HttpPut(nameof(UpdateCurrentUserViaHttpContext))]
-        public async Task<ActionResult<Result>> UpdateCurrentUserViaHttpContext()
+        public async Task<ActionResult<Result>> UpdateCurrentUserViaHttpContext(CancellationToken cancellationToken)
         {
-            await _mediator.Send(new DeleteIdentityCommand() { UserSubId = _currentUserService.NameIdentifier });
+            await _mediator.Send(new DeleteIdentityCommand() { UserSubId = currentUserService.NameIdentifier }, cancellationToken);
 
-            var response = await _userService.UpdateAsync(_currentUserService.NameIdentifier, _currentUserService);
+            var response = await userService.UpdateAsync(currentUserService.NameIdentifier, currentUserService, cancellationToken);
 
             return Ok(response);
         }

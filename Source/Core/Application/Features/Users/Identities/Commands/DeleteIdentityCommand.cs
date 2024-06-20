@@ -6,33 +6,25 @@ using MediatR;
 
 namespace Application.Features.Users.UserProfileImages.Commands
 {
+    //TODO: make it bulk delete
     public class DeleteIdentityCommand : IRequest<Result>
     {
         public string? UserSubId { get; set; }
     }
 
-    public class DeleteIdentityCommandCommandHandler : IRequestHandler<DeleteIdentityCommand, Result>
+    public class DeleteIdentityCommandCommandHandler(
+        IIdentityRepository identityRepository,
+        IUnitOfWork<Guid> unitOfWork) : IRequestHandler<DeleteIdentityCommand, Result>
     {
-        private readonly IUnitOfWork<Guid> _unitOfWork;
-        private readonly IIdentityRepository _identityRepository;
-
-        public DeleteIdentityCommandCommandHandler(
-            IIdentityRepository identityRepository,
-            IUnitOfWork<Guid> unitOfWork)
-        {
-            _identityRepository = identityRepository;
-            _unitOfWork = unitOfWork;
-        }
-
         public async Task<Result> Handle(DeleteIdentityCommand command, CancellationToken cancellationToken)
         {
-            var userIdentities = await _identityRepository.GetByUserSubIdAsync(command.UserSubId);
-            if (userIdentities.Any())
+            var userIdentities = await identityRepository.GetByUserSubIdAsync(command.UserSubId, cancellationToken);
+            if (userIdentities.Count != 0)
             {
-                await _unitOfWork.Repository<Identity>().DeleteRangeAsync(userIdentities, cancellationToken);
-                await _unitOfWork.Commit(cancellationToken);
+                await unitOfWork.Repository<Identity>().DeleteRangeAsync(userIdentities, cancellationToken);
+                await unitOfWork.Commit(cancellationToken);
 
-                return await Result.SuccessAsync();
+                return await Result.SuccessAsync("Identity deleted successfully.");
             }
             else
             {

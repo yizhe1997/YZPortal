@@ -11,19 +11,14 @@ namespace Infrastructure.Services.ExportImport;
 /// </summary>
 public class ExportManager : IExportManager
 {
-    public ExportManager()
-    {
-
-    }
-
     #region Product Category
 
-    public async Task<string> ExportProductCategoriesToXmlAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<string> ExportProductCategoriesToXmlAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<MemoryStream> ExportProductCategoriesToXlsxAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<MemoryStream> ExportProductCategoriesToXlsxAsync(List<ProductCategoryExportDto> categories, CancellationToken cancellationToken = default)
     {
         var stream = new MemoryStream();
 
@@ -41,12 +36,12 @@ public class ExportManager : IExportManager
 
     #region Product
 
-    public async Task<string> ExportProductsToXmlAsync(List<ProductExportDto> products, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<string> ExportProductsToXmlAsync(List<ProductExportDto> products, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<MemoryStream> ExportProductsToXlsxAsync(List<ProductExportDto> products, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<MemoryStream> ExportProductsToXlsxAsync(List<ProductExportDto> products, CancellationToken cancellationToken = default)
     {
         var stream = new MemoryStream();
 

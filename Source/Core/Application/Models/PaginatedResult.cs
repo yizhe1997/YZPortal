@@ -1,23 +1,30 @@
-﻿using Application.Interfaces.Indexes;
+﻿using Application.Interfaces;
+using Application.Interfaces.Indexes;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace Application.Models
 {
-    public class PaginatedResult<T> : Result<T>
-    {
+    public class PaginatedResult<T> : Result<T>, IPaginatedResult<T>
+	{
         public int TotalItems { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int TotalPages { get; set; }
-        internal int StartPage { get; set; }
-        internal int EndPage { get; set; }
-        internal int StartIndex { get; set; }
-        internal int EndIndex { get; set; }
-        internal IEnumerable<int> Pages { get; set; } = Enumerable.Empty<int>();
-        public new List<T> Data { get; set; }
+		[JsonIgnore]
+		public int StartPage { get; set; }
+		[JsonIgnore]
+		public int EndPage { get; set; }
+		[JsonIgnore]
+		public int StartIndex { get; set; }
+		[JsonIgnore]
+		public int EndIndex { get; set; }
+		[JsonIgnore]
+		public IEnumerable<int> Pages { get; set; } = [];
+        public new List<T> Data { get; set; } = [];
 
-        public PaginatedResult(bool succeeded, IPaginationParams paginationParams, List<T> data, int totalItems, List<string> messages)
+        public PaginatedResult(bool succeeded, IPaginationParams paginationParams, List<T> data, int totalItems)
         {
             // A reminder: https://enterprisecraftsmanship.com/posts/error-handling-exception-or-result/
             try
@@ -91,7 +98,6 @@ namespace Application.Models
 
                 // Base
                 Succeeded = succeeded;
-                Messages = messages;
             }
             catch 
             {
@@ -100,11 +106,10 @@ namespace Application.Models
                 PageSize = paginationParams.PageSize;
 
                 // Add items to the underlying collection
-                Data = new();
+                Data = [];
 
                 // Base
                 Succeeded = false;
-                Messages = messages;
             }
         }
 
@@ -113,32 +118,31 @@ namespace Application.Models
         {
         }
 
-        // TODO: fix the null
         #region Async Methods
 
         #region Success Methods
 
-        public static async Task<PaginatedResult<T>> SuccessAsync(IPaginationParams paginationParams, IQueryable<T> query, List<string> messages, CancellationToken cancellationToken = new CancellationToken())
+        public static async Task<PaginatedResult<T>> SuccessAsync(IPaginationParams paginationParams, IQueryable<T> query, CancellationToken cancellationToken = default)
         {
             var count = await query.CountAsync(cancellationToken);
             var items = await query.Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize).Take(paginationParams.PageSize).ToListAsync(cancellationToken);
 
-            return new PaginatedResult<T>(true, paginationParams, items, count, messages);
+            return new PaginatedResult<T>(true, paginationParams, items, count);
         }
 
-        public static async Task<PaginatedResult<TModel>> SuccessAsync<TModel>(IPaginationParams paginationParams, IQueryable<T> query, IMapper mapper, List<string> messages = null, CancellationToken cancellationToken = new CancellationToken())
+        public static async Task<PaginatedResult<TModel>> SuccessAsync<TModel>(IPaginationParams paginationParams, IQueryable<T> query, IMapper mapper, CancellationToken cancellationToken = default)
         {
-            var paginatedResult = await SuccessAsync(paginationParams, query, messages, cancellationToken);
+            var paginatedResult = await SuccessAsync(paginationParams, query, cancellationToken);
             var mappedPaginatedResult = mapper.Map<PaginatedResult<TModel>>(paginatedResult);
             return mappedPaginatedResult;
         }
 
-        public static async Task<PaginatedResult<T>> SuccessAsync(IPaginationParams paginationParams, List<T> data, List<string> messages, CancellationToken cancellationToken = new CancellationToken()) =>
-            await SuccessAsync(paginationParams, data.AsQueryable(), messages, cancellationToken);
+        public static async Task<PaginatedResult<T>> SuccessAsync(IPaginationParams paginationParams, List<T> data, CancellationToken cancellationToken = default) =>
+            await SuccessAsync(paginationParams, data.AsQueryable(), cancellationToken);
 
-        public static async Task<PaginatedResult<TModel>> SuccessAsync<TModel>(IPaginationParams paginationParams, List<T> data, IMapper mapper, List<string> messages = null, CancellationToken cancellationToken = new CancellationToken())
+        public static async Task<PaginatedResult<TModel>> SuccessAsync<TModel>(IPaginationParams paginationParams, List<T> data, IMapper mapper, CancellationToken cancellationToken = default)
         {
-            var paginatedResult = await SuccessAsync(paginationParams, data, messages, cancellationToken);
+            var paginatedResult = await SuccessAsync(paginationParams, data, cancellationToken);
             var mappedPaginatedResult = mapper.Map<PaginatedResult<TModel>>(paginatedResult);
             return mappedPaginatedResult;
         }
@@ -147,38 +151,44 @@ namespace Application.Models
 
         #region Failure Methods
 
-        public async static Task<PaginatedResult<T>> FailAsync(IPaginationParams paginationParams, List<string> messages = null) =>
-            await Task.FromResult(Fail(paginationParams, messages));
+        public async static Task<PaginatedResult<T>> FailAsync(IPaginationParams paginationParams) =>
+            await Task.FromResult(Fail(paginationParams));
 
-        #endregion
+		public async static Task<PaginatedResult<T>> FailAsync(IPaginationParams paginationParams, string error) =>
+			await Task.FromResult(Fail(paginationParams, error));
 
-        #endregion
+		public async static Task<PaginatedResult<T>> FailAsync(IPaginationParams paginationParams, List<string> errors) =>
+			await Task.FromResult(Fail(paginationParams, errors));
 
-        #region Non-Async Methods
+		#endregion
 
-        #region Success Methods
+		#endregion
 
-        public static PaginatedResult<T> Success(IPaginationParams paginationParams, IQueryable<T> query, List<string> messages = null)
+		#region Non-Async Methods
+
+		#region Success Methods
+
+		public static PaginatedResult<T> Success(IPaginationParams paginationParams, IQueryable<T> query)
         {
             var count = query.Count();
             var items = query.Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize).Take(paginationParams.PageSize).ToList();
 
-            return new PaginatedResult<T>(true, paginationParams, items, count, messages);
+            return new PaginatedResult<T>(true, paginationParams, items, count);
         }
 
-        public static PaginatedResult<TModel> Success<TModel>(IPaginationParams paginationParams, IQueryable<T> query, IMapper mapper, List<string> messages = null)
+        public static PaginatedResult<TModel> Success<TModel>(IPaginationParams paginationParams, IQueryable<T> query, IMapper mapper)
         {
-            var paginatedResult = Success(paginationParams, query, messages);
+            var paginatedResult = Success(paginationParams, query);
             var mappedPaginatedResult = mapper.Map<PaginatedResult<TModel>>(paginatedResult);
             return mappedPaginatedResult;
         }
 
-        public static PaginatedResult<T> Success(IPaginationParams paginationParams, List<T> data, List<string> messages = null) =>
-            Success(paginationParams, data.AsQueryable(), messages);
+        public static PaginatedResult<T> Success(IPaginationParams paginationParams, List<T> data) =>
+            Success(paginationParams, data.AsQueryable());
 
-        public static PaginatedResult<TModel> Success<TModel>(IPaginationParams paginationParams, IMapper mapper, List<T> data, List<string> messages = null)
+        public static PaginatedResult<TModel> Success<TModel>(IPaginationParams paginationParams, IMapper mapper, List<T> data)
         {
-            var paginatedResult = Success(paginationParams, data.AsQueryable(), messages);
+            var paginatedResult = Success(paginationParams, data.AsQueryable());
             var mappedPaginatedResult = mapper.Map<PaginatedResult<TModel>>(paginatedResult);
             return mappedPaginatedResult;
         }
@@ -187,11 +197,23 @@ namespace Application.Models
 
         #region Failure Methods
 
-        public static PaginatedResult<T> Fail(IPaginationParams paginationParams, List<string> messages = null) =>
-            new(false, paginationParams, new List<T>(), 0, messages);
+        public static PaginatedResult<T> Fail(IPaginationParams paginationParams) =>
+            new(false, paginationParams, [], 0);
 
-        #endregion
+		public static PaginatedResult<T> Fail(IPaginationParams paginationParams, string error) =>
+			new(false, paginationParams, [], 0)
+			{
+				Errors = [error]
+			};
 
-        #endregion
-    }
+		public static PaginatedResult<T> Fail(IPaginationParams paginationParams, List<string> errors) =>
+			new(false, paginationParams, [], 0)
+			{
+				Errors = errors
+			};
+
+		#endregion
+
+		#endregion
+	}
 }

@@ -6,7 +6,7 @@ namespace Application.Requests.Indexes
     {
         public string SearchString { get; set; } = string.Empty;
         public string Lang { get; set; } = "en";
-        public string[] OrderBy { get; set; } = Array.Empty<string>();
-        public string[] Select { get; set; } = Array.Empty<string>();
+        public string[] OrderBy { get; set; } = [];
+        public string[] Select { get; set; } = [];
     }
 }

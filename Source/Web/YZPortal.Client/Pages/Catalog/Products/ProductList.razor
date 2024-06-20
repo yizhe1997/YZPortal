@@ -3,6 +3,7 @@
 @using Application.Features.Products.Queries.GetProducts
 @using Application.Models.Identity;
 @using Application.Models;
+@using Application.Requests.Indexes
 @using Domain.Entities.Products
 @using Domain.Enums.Memberships;
 @using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,7 @@
 @inject YZPortalApiConfig YZPortalApiConfig
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@inject ToastService ToastService
 
 <h1>Users</h1>
 <div class="tabs-body-content">
@@ -40,6 +42,7 @@
 		   ShowExtendEditButton="false"
 		   ShowExtendDeleteButton="false"
 		   TableSize="TableSize.Normal"
+		   ShowToastAfterSaveOrDeleteModel="false"
 		   OnDeleteAsync="@OnDeleteAsync"
 		   OnQueryAsync="@OnQueryAsync">
 		<TableExtensionToolbarTemplate>
@@ -117,7 +120,13 @@
 
 	private async Task DownloadFileFromURL()
 	{
-		var result = await YZPortalApiClient.GetProductsExcelAsync(pageSize: queryPageOptions.PageItems, pageNumber: queryPageOptions.PageIndex, searchString: queryPageOptions.SearchText, orderBy: orderby.ToArray());
+		var result = await YZPortalApiClient.GetProductsExcelAsync(new SearchRequest()
+			{
+				PageSize = queryPageOptions.PageItems,
+				PageNumber = queryPageOptions.PageIndex,
+				SearchString = queryPageOptions.SearchText ?? "",
+				OrderBy = orderby.ToArray()
+			});
 
 		await JS.InvokeVoidAsync("BlazorDownloadFile", new
 		{
@@ -125,25 +134,6 @@
 			FileName = $"{nameof(ProductCategory)}.xlsx",
 			ContentType = "application/octet-stream"
 		});
-	}
-
-	private async Task<bool> OnValidSubmit(string? userSubId, IEnumerable<string?> SelectedGraphGroups, IEnumerable<string?> ExistingGraphGroups)
-	{
-		var userSubIds = new string[] { userSubId ?? string.Empty };
-
-		// Add groups
-		foreach (var selectdGraphGroup in SelectedGraphGroups.Except(ExistingGraphGroups))
-		{
-			await YZPortalApiClient.GraphGroupAddUsers(selectdGraphGroup, userSubIds);
-		}
-
-		// Remove groups
-		foreach (var selectdGraphGroup in ExistingGraphGroups.Except(SelectedGraphGroups))
-		{
-			await YZPortalApiClient.GraphGroupRemoveUser(selectdGraphGroup, userSubId);
-		}
-
-		return await Task.FromResult(true);
 	}
 
 	private async Task<QueryData<ProductDto>> OnQueryAsync(QueryPageOptions options)
@@ -154,7 +144,7 @@
 			IsTableAutoRefreshEnabled = false;
 			StateHasChanged();
 		}
-		
+
 		queryPageOptions = options;
 		orderby.Clear();
 
@@ -163,12 +153,23 @@
 			orderby.Add(options.SortName + " " + options.SortOrder.ToString());
 		}
 
-		var result = await YZPortalApiClient.GetProductsAsync(pageSize: options.PageItems, pageNumber: options.PageIndex, searchString: options.SearchText, orderBy: orderby.ToArray());
+		var getProductsAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+			async () => await YZPortalApiClient.GetProductsAsync(new SearchRequest()
+				{
+					PageSize = options.PageItems,
+					PageNumber = options.PageIndex,
+					SearchString = options.SearchText ?? "",
+					OrderBy = orderby.ToArray()
+				}),
+			ToastService,
+			title: "Load Data",
+			hideSuccessToast : true
+		);
 
 		return await Task.FromResult(new QueryData<ProductDto>()
 			{
-				Items = result.Data,
-				TotalCount = result.TotalItems,
+				Items = getProductsAsyncResult.Data,
+				TotalCount = getProductsAsyncResult.TotalItems,
 				IsSorted = orderby.Any(),
 				IsSearch = !string.IsNullOrEmpty(options.SearchText)
 			});
@@ -177,14 +178,23 @@
 	private async Task<bool> OnDeleteAsync(IEnumerable<ProductDto> items)
 	{
 		var products = items.ToList();
+		var isAnyDeleted = false;
+
 		foreach (var product in products)
 		{
-			var response = await YZPortalApiClient.DeleteProductAsync(product.Id);
+			var deleteProductAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+				async () => await YZPortalApiClient.DeleteProductAsync(product.Id),
+				ToastService,
+				title: "Delete Data"
+			);
 
-			if (response.Succeeded)
+			if (deleteProductAsyncResult.Succeeded)
+			{
+				isAnyDeleted = true;
 				Products?.Remove(product);
+			}
 		}
 
-		return await Task.FromResult(true);
+		return await Task.FromResult(isAnyDeleted);
 	}
 }

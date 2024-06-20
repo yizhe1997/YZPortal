@@ -4,6 +4,6 @@ namespace Application.Interfaces.Repositories
 {
     public interface IPortalConfigRepository
     {
-        Task<PortalConfig?> GetByUserSubIdFirstOrDefaultAsync(string? userSubId);
+        Task<PortalConfig?> GetByUserSubIdFirstOrDefaultAsync(string? userSubId, CancellationToken cancellationToken = default);
     }
 }

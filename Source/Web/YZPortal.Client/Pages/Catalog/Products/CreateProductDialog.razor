@@ -6,7 +6,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Diagnostics.CodeAnalysis;
 @using YZPortal.Client.Clients.YZPortalApi
-
+@inject ToastService ToastService
 @inject YZPortalApiHttpClient YZPortalApiClient
 
 <Row id="@nameof(CreateProductDialog)" ItemsPerRow="ItemsPerRow.One">
@@ -77,11 +77,17 @@
 
     private async Task Submit()
     {
-        await YZPortalApiClient.CreateProductAsync(Product);
+        var createProductAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+            async () => await YZPortalApiClient.CreateProductAsync(Product), 
+            ToastService,
+            title: "Create Data"
+        );
 
-        // TODO: only invoke if successfully created, check guid
-        await RefreshParentComponentCallback.InvokeAsync(true);
+        if (createProductAsyncResult.Succeeded)
+        {
+            await RefreshParentComponentCallback.InvokeAsync(true);
 
-        await CloseDialog.InvokeAsync();
+            await CloseDialog.InvokeAsync();
+        }
     }
 }

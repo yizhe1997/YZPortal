@@ -9,23 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace YZPortal.API.Controllers.Graph
 {
-    public class GraphUsersController : AuthApiController
+    public class GraphUsersController(IGraphService graphService, IMediator mediator, LinkGenerator linkGenerator) : AuthApiController(mediator, linkGenerator)
     {
-        private readonly IGraphService _graphService;
-        private const string _ = "API.Access";
-
-        public GraphUsersController(IGraphService graphService, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
-        {
-            _graphService = graphService;
-        }
-
         [Authorize(Policy = nameof(Role.Administrator))]
         [HttpGet("Graph")]
-        public async Task<ActionResult<SearchResult<UserModel>>> GetGraphUsers([FromQuery] SearchRequest request)
+        public async Task<ActionResult<SearchResult<UserModel>>> GetGraphUsers([FromQuery] SearchRequest request, CancellationToken cancellationToken)
         {
-            var response = await _graphService.UsersToSearchResultAsync(request);
+            var response = await graphService.UsersToSearchResultAsync(request);
             return Ok(response);
         }
-
     }
 }

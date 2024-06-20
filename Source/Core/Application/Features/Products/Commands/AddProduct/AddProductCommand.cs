@@ -12,28 +12,20 @@ namespace Application.Features.Products.Commands.AddProduct
         public string? Sku { get; set; }
     }
 
-    public class AddProductCommandCommandHandler : IRequestHandler<AddProductCommand, Result<Guid>>
+    public class AddProductCommandCommandHandler(
+            IUnitOfWork<Guid> unitOfWork,
+            IMapper mapper
+        ) : IRequestHandler<AddProductCommand, Result<Guid>>
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork<Guid> _unitOfWork;
-
-        public AddProductCommandCommandHandler(
-            IMapper mapper,
-            IUnitOfWork<Guid> unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper; ;
-        }
-
         public async Task<Result<Guid>> Handle(AddProductCommand command, CancellationToken cancellationToken)
         {
-            var product = _mapper.Map<AddProductCommand, Product>(command);
+            var product = mapper.Map<AddProductCommand, Product>(command);
 
-            await _unitOfWork.Repository<Product>().AddAsync(product);
+            await unitOfWork.Repository<Product>().AddAsync(product, cancellationToken);
 
-            await _unitOfWork.Commit(cancellationToken);
+            await unitOfWork.Commit(cancellationToken);
 
-            return await Result<Guid>.SuccessAsync(product.Id, "Product Created.");
+            return await Result<Guid>.SuccessAsync(product.Id, "Product created successfully.");
         }
     }
 }

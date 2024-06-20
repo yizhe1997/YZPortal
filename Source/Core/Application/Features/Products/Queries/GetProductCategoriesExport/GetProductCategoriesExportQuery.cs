@@ -11,29 +11,21 @@ namespace Application.Features.Products.Queries.GetProductCategoriesExport
     {
     }
 
-    public class GetProductCategoriesExportQueryHandler : IRequestHandler<GetProductCategoriesExportQuery, SearchResult<ProductCategoryExportDto>>
+    public class GetProductCategoriesExportQueryHandler(
+            IUnitOfWork<Guid> unitOfWork,
+            IMapper mapper
+        ) : IRequestHandler<GetProductCategoriesExportQuery, SearchResult<ProductCategoryExportDto>>
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork<Guid> _unitOfWork;
-
-        public GetProductCategoriesExportQueryHandler(
-            IMapper mapper,
-            IUnitOfWork<Guid> unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper; ;
-        }
-
         public async Task<SearchResult<ProductCategoryExportDto>> Handle(GetProductCategoriesExportQuery query, CancellationToken cancellationToken)
         {
             var result = await SearchResult<ProductCategory>.SuccessAsync<ProductCategoryExportDto>(query,
-                _unitOfWork.Repository<ProductCategory>().Entities.Select(x => new ProductCategory
+                unitOfWork.Repository<ProductCategory>().Entities.Select(x => new ProductCategory
                 {
                     Name = x.Name,
                     IsPublished = x.IsPublished,
                     DisplayOrder = x.DisplayOrder
                 }),
-                _mapper,
+                mapper,
                 x => x.Name.Contains(query.SearchString),
                 cancellationToken: cancellationToken);
 

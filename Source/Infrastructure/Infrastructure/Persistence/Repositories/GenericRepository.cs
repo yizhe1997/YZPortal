@@ -6,61 +6,54 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Persistence.Repositories
 {
     // TODO: testing
-    public class GenericRepository<T, TId> : IGenericRepository<T, TId> where T : class, IEntity<TId>
+    public class GenericRepository<T, TId>(ApplicationDbContext dbContext) : IGenericRepository<T, TId> where T : class, IEntity<TId>
     {
-        private readonly ApplicationDbContext _dbContext;
+        public IQueryable<T> Entities => dbContext.Set<T>();
 
-        public GenericRepository(ApplicationDbContext dbContext)
+        public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
         {
-            _dbContext = dbContext;
-        }
-
-        public IQueryable<T> Entities => _dbContext.Set<T>();
-
-        public async Task<T> AddAsync(T entity, CancellationToken cancellationToken)
-        {
-            await _dbContext.Set<T>().AddAsync(entity, cancellationToken);
+            await dbContext.Set<T>().AddAsync(entity, cancellationToken);
             return entity;
         }
 
-        public async Task<List<T>> AddRangeAsync(List<T> entity, CancellationToken cancellationToken)
+        public async Task<List<T>> AddRangeAsync(List<T> entity, CancellationToken cancellationToken = default)
         {
-            await _dbContext.Set<T>().AddRangeAsync(entity, cancellationToken);
+            await dbContext.Set<T>().AddRangeAsync(entity, cancellationToken);
             return entity;
         }
 
-        public Task UpdateAsync(T entity, CancellationToken cancellationToken)
+        public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
         {
-            T exist = _dbContext.Set<T>().Find(entity.Id);
-            _dbContext.Entry(exist).CurrentValues.SetValues(entity);
+            T exist = dbContext.Set<T>().Find(entity.Id);
+            dbContext.Entry(exist).CurrentValues.SetValues(entity);
             return Task.CompletedTask;
         }
 
-        public Task DeleteAsync(T entity, CancellationToken cancellationToken)
+        public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
         {
-            _dbContext.Set<T>().Remove(entity);
+            dbContext.Set<T>().Remove(entity);
             return Task.CompletedTask;
         }
 
-        public Task DeleteRangeAsync(List<T> entity, CancellationToken cancellationToken)
+        public Task DeleteRangeAsync(List<T> entity, CancellationToken cancellationToken = default)
         {
-            _dbContext.Set<T>().RemoveRange(entity);
+            dbContext.Set<T>().RemoveRange(entity);
             return Task.CompletedTask;
         }
 
-        public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Set<T>().ToListAsync(cancellationToken);
+            return await dbContext.Set<T>().ToListAsync(cancellationToken);
         }
 
-        public async Task<T?> GetByIdAsync(TId id, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<T?> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Set<T>().FindAsync(new object?[] { id }, cancellationToken: cancellationToken);
+            return await dbContext.Set<T>().FindAsync(new object?[] { id }, cancellationToken: cancellationToken);
         }
 
-        public async Task<List<T>> GetByIdsAsync(List<TId> ids, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<List<T>> GetByIdsAsync(List<TId> ids, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Set<T>().Where(entity => ids.Contains(entity.Id)).ToListAsync(cancellationToken);
+            return await dbContext.Set<T>().Where(entity => ids.Contains(entity.Id)).ToListAsync(cancellationToken);
         }
     }
 }

@@ -65,9 +65,9 @@ namespace Application.Extensions
             claimsPrincipal.FindFirst("sub")?.Value;
 
         public static string[] GetUserIdentities(this ClaimsPrincipal claimsPrincipal) =>
-            claimsPrincipal.FindAll("currentUserIdentities").Select(x => x.Value).ToArray() ?? Array.Empty<string>();
+            claimsPrincipal.FindAll("currentUserIdentities").Select(x => x.Value).ToArray() ?? [];
 
         public static string[] GetRoleClaim(this ClaimsPrincipal claimsPrincipal) =>
-            claimsPrincipal.FindAll(ClaimTypes.Role).Select(x => x.Value).ToArray() ?? Array.Empty<string>();
+            claimsPrincipal.FindAll(ClaimTypes.Role).Select(x => x.Value).ToArray() ?? [];
     }
 }

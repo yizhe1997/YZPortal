@@ -14,6 +14,7 @@ using Domain.Enums.Memberships;
 using Hangfire;
 using Infrastructure.Authentication;
 using Infrastructure.Configurations;
+using Infrastructure.ExceptionHandlers;
 using Infrastructure.Persistence.Contexts;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Persistence.Repositories.Users;
@@ -102,6 +103,9 @@ namespace Infrastructure.Extensions
             // Instrumentation
             services.AddInstrumentation(environment);
             services.AddInstrumentationExporters(configuration);
+
+            // Exception Handlers
+            services.AddExceptionHandlers();
         }
 
         #region Persistence
@@ -555,6 +559,13 @@ namespace Infrastructure.Extensions
         {
             services.AddTransient<IExportManager, ExportManager>();
             services.AddTransient<IImportManager, ImportManager>();
+        }
+
+        private static void AddExceptionHandlers(this IServiceCollection services)
+        {
+            services.AddExceptionHandler<RestExceptionHandler>();
+            services.AddExceptionHandler<ODataErrorExceptionHandler>();
+            services.AddExceptionHandler<ExceptionHandler>();
         }
 
         #endregion

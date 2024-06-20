@@ -4,6 +4,6 @@ namespace Application.Interfaces.Repositories.Users
 {
     public interface IUserProfileImageRepository
     {
-        Task<UserProfileImage?> GetByUserIdFirstOrDefaultAsync(Guid userId);
+        Task<UserProfileImage?> GetByUserIdFirstOrDefaultAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }

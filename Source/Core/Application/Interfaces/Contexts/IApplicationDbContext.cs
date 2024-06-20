@@ -31,13 +31,13 @@ namespace Application.Interfaces.Contexts
         #endregion
 
         int SaveChanges();
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
-        public Task BeginTransactionAsync(CancellationToken cancellationToken);
+        public Task BeginTransactionAsync(CancellationToken cancellationToken = default);
 
-        public Task CommitTransactionAsync(CancellationToken cancellationToken);
+        public Task CommitTransactionAsync(CancellationToken cancellationToken = default);
 
-        public Task RollbackTransactionAsync(CancellationToken cancellationToken);
+        public Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
 
     }
 }

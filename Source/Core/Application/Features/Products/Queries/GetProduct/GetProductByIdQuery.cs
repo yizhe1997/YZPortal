@@ -11,24 +11,16 @@ namespace Application.Features.Products.Queries.GetProduct
         public Guid Id { get; set; }
     }
 
-    public class GetProductQueryHandler : IRequestHandler<GetProductByIdQuery, Result<GetProductByIdDto>>
+    public class GetProductQueryHandler(
+            IUnitOfWork<Guid> unitOfWork,
+            IMapper mapper
+        ) : IRequestHandler<GetProductByIdQuery, Result<GetProductByIdDto>>
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork<Guid> _unitOfWork;
-
-        public GetProductQueryHandler(
-            IMapper mapper,
-            IUnitOfWork<Guid> unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper; ;
-        }
-
         public async Task<Result<GetProductByIdDto>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
         {
-            var entity = await _unitOfWork.Repository<Product>().GetByIdAsync(query.Id, cancellationToken);
+            var entity = await unitOfWork.Repository<Product>().GetByIdAsync(query.Id, cancellationToken);
 
-            var product = _mapper.Map<GetProductByIdDto>(entity);
+            var product = mapper.Map<GetProductByIdDto>(entity);
 
             return await Result<GetProductByIdDto>.SuccessAsync(product);
         }

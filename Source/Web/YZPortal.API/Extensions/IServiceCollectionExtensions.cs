@@ -95,7 +95,7 @@ namespace YZPortal.API.Extensions
                                 {
                                     {
                                         azureAdB2CSwaggerOptions.Scope,
-                                        "Provides authorization token for Dealer Portal WebAPI"
+                                        "Provides authorization token for this API"
                                     }
                                 }
                         }

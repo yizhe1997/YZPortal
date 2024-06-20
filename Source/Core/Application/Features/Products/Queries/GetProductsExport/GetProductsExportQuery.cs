@@ -11,23 +11,15 @@ namespace Application.Features.Products.Queries.GetProductsExport
     {
     }
 
-    public class GetProductsExportQueryHandler : IRequestHandler<GetProductsExportQuery, SearchResult<ProductExportDto>>
+    public class GetProductsExportQueryHandler(
+            IUnitOfWork<Guid> unitOfWork,
+            IMapper mapper
+        ) : IRequestHandler<GetProductsExportQuery, SearchResult<ProductExportDto>>
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork<Guid> _unitOfWork;
-
-        public GetProductsExportQueryHandler(
-            IMapper mapper,
-            IUnitOfWork<Guid> unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper; ;
-        }
-
         public async Task<SearchResult<ProductExportDto>> Handle(GetProductsExportQuery query, CancellationToken cancellationToken)
         {
             var result = await SearchResult<Product>.SuccessAsync<ProductExportDto>(query,
-                _unitOfWork.Repository<Product>().Entities.Select(x => new Product
+                unitOfWork.Repository<Product>().Entities.Select(x => new Product
                 {
                     Name = x.Name,
                     Sku = x.Sku,
@@ -35,7 +27,7 @@ namespace Application.Features.Products.Queries.GetProductsExport
                     StockQuantity = x.StockQuantity,
                     Price = x.Price
                 }),
-                _mapper,
+                mapper,
                 x => x.Name.Contains(query.SearchString) ||
                 x.Sku.Contains(query.SearchString),
                 cancellationToken: cancellationToken);

@@ -9,25 +9,12 @@ using Domain.Entities.Products;
 
 namespace YZPortal.API.Controllers.Products.ProductCategories
 {
-    public class ProductCategoriesController : AuthApiController
+    public class ProductCategoriesController(
+        IExportManager exportManager,
+        //IImportManager importManager,
+        IMediator mediator,
+        LinkGenerator linkGenerator) : AuthApiController(mediator, linkGenerator)
     {
-        protected readonly IExportManager _exportManager;
-        protected readonly IImportManager _importManager;
-
-        #region Ctor
-
-        public ProductCategoriesController(
-            IExportManager exportManager,
-            IImportManager importManager,
-            IMediator mediator, 
-            LinkGenerator linkGenerator) : base(mediator, linkGenerator)
-        {
-            _exportManager = exportManager;
-            _importManager = importManager;
-        }
-
-        #endregion
-
         /// <summary>
         /// Gets a list of product categories.
         /// </summary>
@@ -47,7 +34,7 @@ namespace YZPortal.API.Controllers.Products.ProductCategories
         {
             var response = await _mediator.Send(query);
 
-            var stream = await _exportManager.ExportProductCategoriesToXlsxAsync(response.Data);
+            var stream = await exportManager.ExportProductCategoriesToXlsxAsync(response.Data);
 
             return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
@@ -63,7 +50,7 @@ namespace YZPortal.API.Controllers.Products.ProductCategories
         {
             var response = await _mediator.Send(query);
 
-            var xml = await _exportManager.ExportProductCategoriesToXmlAsync(response.Data);
+            var xml = await exportManager.ExportProductCategoriesToXmlAsync(response.Data);
 
             return File(Encoding.UTF8.GetBytes(xml), "application/xml", $"{nameof(ProductCategory)}.xml");
         }
