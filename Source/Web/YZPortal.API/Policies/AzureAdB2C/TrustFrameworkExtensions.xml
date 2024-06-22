@@ -29,6 +29,11 @@
 				</DefaultPartnerClaimTypes>
 				<UserHelpText>Collection of groups assigned to graph user.</UserHelpText>
 			</ClaimType>
+			<ClaimType Id="isForgotPassword">
+				<DisplayName>isForgotPassword</DisplayName>
+				<DataType>boolean</DataType>
+				<AdminHelpText>Whether the user has selected Forgot your Password</AdminHelpText>
+			</ClaimType>
 		</ClaimsSchema>
 	</BuildingBlocks>
 	<ClaimsProviders>
@@ -259,6 +264,27 @@
 				</TechnicalProfile>
 			</TechnicalProfiles>
 		</ClaimsProvider>
+		<ClaimsProvider>
+			<DisplayName>Local Account</DisplayName>
+			<TechnicalProfiles>
+				<TechnicalProfile Id="ForgotPassword">
+					<DisplayName>Forgot your password?</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="isForgotPassword" DefaultValue="true" AlwaysUseDefaultValue="true"/>
+					</OutputClaims>
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+				</TechnicalProfile>
+				<TechnicalProfile Id="SelfAsserted-LocalAccountSignin-Email">
+					<Metadata>
+						<Item Key="setting.forgotPasswordLinkOverride">ForgotPasswordExchange</Item>
+					</Metadata>
+				</TechnicalProfile>
+				<TechnicalProfile Id="LocalAccountWritePasswordUsingObjectId">
+					<UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+				</TechnicalProfile>
+			</TechnicalProfiles>
+		</ClaimsProvider>
 	</ClaimsProviders>
 	<UserJourneys>
 		<UserJourney Id="CustomSignUpSignIn">
@@ -269,6 +295,7 @@
 						<ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
 						<ClaimsProviderSelection TargetClaimsExchangeId="AzureADCommonExchange" />
 						<ClaimsProviderSelection TargetClaimsExchangeId="GoogleExchange" />
+						<ClaimsProviderSelection TargetClaimsExchangeId="ForgotPasswordExchange" />
 					</ClaimsProviderSelections>
 					<ClaimsExchanges>
 						<ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
@@ -287,10 +314,22 @@
 						<ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
 						<ClaimsExchange Id="AzureADCommonExchange" TechnicalProfileReferenceId="AADCommon-OpenIdConnect" />
 						<ClaimsExchange Id="GoogleExchange" TechnicalProfileReferenceId="Google-OAuth2" />
+						<ClaimsExchange Id="ForgotPasswordExchange" TechnicalProfileReferenceId="ForgotPassword" />
 					</ClaimsExchanges>
 				</OrchestrationStep>
+				<OrchestrationStep Order="3" Type="InvokeSubJourney">
+					<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+							<Value>isForgotPassword</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<JourneyList>
+						<Candidate SubJourneyReferenceId="PasswordReset" />
+					</JourneyList>
+				</OrchestrationStep>
 				<!-- For social IDP authentication, attempt to find the user account in the directory. -->
-				<OrchestrationStep Order="3" Type="ClaimsExchange">
+				<OrchestrationStep Order="4" Type="ClaimsExchange">
 					<Preconditions>
 						<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
 							<Value>authenticationSource</Value>
@@ -305,7 +344,7 @@
 				<!-- Show self-asserted page only if the directory does not have the user account already (i.e. we do not have an objectId). 
           This can only happen when authentication happened using a social IDP. If local account was created or authentication done
           using ESTS in step 2, then an user account must exist in the directory by this time. -->
-				<OrchestrationStep Order="4" Type="ClaimsExchange">
+				<OrchestrationStep Order="5" Type="ClaimsExchange">
 					<Preconditions>
 						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
 							<Value>objectId</Value>
@@ -318,7 +357,7 @@
 				</OrchestrationStep>
 				<!-- This step reads any user attributes that we may not have received when authenticating using ESTS so they can be sent 
           in the token. -->
-				<OrchestrationStep Order="5" Type="ClaimsExchange">
+				<OrchestrationStep Order="6" Type="ClaimsExchange">
 					<Preconditions>
 						<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
 							<Value>authenticationSource</Value>
@@ -333,7 +372,7 @@
 				<!-- The previous step (SelfAsserted-Social) could have been skipped if there were no attributes to collect 
              from the user. So, in that case, create the user in the directory if one does not already exist 
              (verified using objectId which would be set from the last step if account was created in the directory. -->
-				<OrchestrationStep Order="6" Type="ClaimsExchange">
+				<OrchestrationStep Order="7" Type="ClaimsExchange">
 					<Preconditions>
 						<Precondition Type="ClaimsExist" ExecuteActionsIf="true">
 							<Value>objectId</Value>
@@ -344,14 +383,33 @@
 						<ClaimsExchange Id="AADUserWrite" TechnicalProfileReferenceId="AAD-UserWriteUsingAlternativeSecurityId" />
 					</ClaimsExchanges>
 				</OrchestrationStep>
-				<OrchestrationStep Order="7" Type="ClaimsExchange">
+				<OrchestrationStep Order="8" Type="ClaimsExchange">
 					<ClaimsExchanges>
 						<ClaimsExchange Id="RESTYZAPI-GetGroupsFromMSGraph" TechnicalProfileReferenceId="RESTYZAPI-GetGroupsFromMSGraph" />
 					</ClaimsExchanges>
 				</OrchestrationStep>
-				<OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+				<OrchestrationStep Order="9" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
 			</OrchestrationSteps>
 			<ClientDefinition ReferenceId="DefaultWeb" />
 		</UserJourney>
 	</UserJourneys>
+	<SubJourneys>
+		<SubJourney Id="PasswordReset" Type="Call">
+			<OrchestrationSteps>
+				<!-- Validate user's email address. -->
+				<OrchestrationStep Order="1" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="PasswordResetUsingEmailAddressExchange" TechnicalProfileReferenceId="LocalAccountDiscoveryUsingEmailAddress" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+
+				<!-- Collect and persist a new password. -->
+				<OrchestrationStep Order="2" Type="ClaimsExchange">
+					<ClaimsExchanges>
+						<ClaimsExchange Id="NewCredentials" TechnicalProfileReferenceId="LocalAccountWritePasswordUsingObjectId" />
+					</ClaimsExchanges>
+				</OrchestrationStep>
+			</OrchestrationSteps>
+		</SubJourney>
+	</SubJourneys>
 </TrustFrameworkPolicy>

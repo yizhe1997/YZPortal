@@ -2,7 +2,6 @@
 using Application.Interfaces.Indexes;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 
 namespace Application.Models
 {
@@ -12,16 +11,11 @@ namespace Application.Models
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int TotalPages { get; set; }
-		[JsonIgnore]
-		public int StartPage { get; set; }
-		[JsonIgnore]
-		public int EndPage { get; set; }
-		[JsonIgnore]
-		public int StartIndex { get; set; }
-		[JsonIgnore]
-		public int EndIndex { get; set; }
-		[JsonIgnore]
-		public IEnumerable<int> Pages { get; set; } = [];
+		//public int StartPage { get; set; }
+		//public int EndPage { get; set; }
+		//public int StartIndex { get; set; }
+		//public int EndIndex { get; set; }
+		//public IEnumerable<int> Pages { get; set; } = [];
         public new List<T> Data { get; set; } = [];
 
         public PaginatedResult(bool succeeded, IPaginationParams paginationParams, List<T> data, int totalItems)
@@ -87,11 +81,11 @@ namespace Application.Models
                 PageNumber = paginationParams.PageNumber;
                 PageSize = paginationParams.PageSize;
                 TotalPages = totalPages;
-                StartPage = startPage;
-                EndPage = endPage;
-                StartIndex = startIndex;
-                EndIndex = endIndex;
-                Pages = pages;
+                //StartPage = startPage;
+                //EndPage = endPage;
+                //StartIndex = startIndex;
+                //EndIndex = endIndex;
+                //Pages = pages;
 
                 // Add items to the underlying collection
                 Data = data;

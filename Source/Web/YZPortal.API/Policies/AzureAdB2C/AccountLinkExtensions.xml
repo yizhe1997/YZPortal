@@ -897,6 +897,7 @@
 						<ClaimsProviderSelection TargetClaimsExchangeId="MicrosoftAccountExchange"/>
 						<ClaimsProviderSelection TargetClaimsExchangeId="TwitterExchange"/>
 						<ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange"/>
+						<ClaimsProviderSelection TargetClaimsExchangeId="ForgotPasswordExchange" />
 					</ClaimsProviderSelections>
 					<ClaimsExchanges>
 						<ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email"/>
@@ -916,10 +917,22 @@
 						<ClaimsExchange Id="MicrosoftAccountExchange" TechnicalProfileReferenceId="MSA-OIDC-SignIn"/>
 						<ClaimsExchange Id="TwitterExchange" TechnicalProfileReferenceId="Twitter-OAUTH1-SignIn"/>
 						<ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-HasEmailFlagged"/>
+						<ClaimsExchange Id="ForgotPasswordExchange" TechnicalProfileReferenceId="ForgotPassword" />
 					</ClaimsExchanges>
 				</OrchestrationStep>
+				<OrchestrationStep Order="3" Type="InvokeSubJourney">
+					<Preconditions>
+						<Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+							<Value>isForgotPassword</Value>
+							<Action>SkipThisOrchestrationStep</Action>
+						</Precondition>
+					</Preconditions>
+					<JourneyList>
+						<Candidate SubJourneyReferenceId="PasswordReset" />
+					</JourneyList>
+				</OrchestrationStep>
 				<!-- if social account auth, try find an account with the incoming email, and return the LocalAccountEmail-->
-				<OrchestrationStep Order="3" Type="ClaimsExchange">
+				<OrchestrationStep Order="4" Type="ClaimsExchange">
 					<Preconditions>
 						<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
 							<Value>authenticationSource</Value>
@@ -936,7 +949,7 @@
 
         Since all signups will provision as local (as signInName.emailaddress is being populated for local and social sign ups)
         If LocalAccountEmail exists, then this Social ID must be linked to an existing Local Account unless its already linked -->
-				<OrchestrationStep Order="4" Type="InvokeSubJourney">
+				<OrchestrationStep Order="5" Type="InvokeSubJourney">
 					<Preconditions>
 						<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
 							<Value>authenticationSource</Value>
@@ -963,7 +976,7 @@
 
         If LocalAccountEmail does not exist, and is not LocalAccount auth, then this Social Id must be provisioned as normal
         If its a local account auth, then skip this entirely -->
-				<OrchestrationStep Order="5" Type="InvokeSubJourney">
+				<OrchestrationStep Order="6" Type="InvokeSubJourney">
 					<Preconditions>
 						<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
 							<Value>authenticationSource</Value>
@@ -985,17 +998,17 @@
 						<Candidate SubJourneyReferenceId="ProvisionOrSignInNewSocialAccount" />
 					</JourneyList>
 				</OrchestrationStep>
-				<OrchestrationStep Order="6" Type="ClaimsExchange">
+				<OrchestrationStep Order="7" Type="ClaimsExchange">
 					<ClaimsExchanges>
 						<ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
 					</ClaimsExchanges>
 				</OrchestrationStep>
-				<OrchestrationStep Order="7" Type="ClaimsExchange">
+				<OrchestrationStep Order="8" Type="ClaimsExchange">
 					<ClaimsExchanges>
 						<ClaimsExchange Id="RESTYZAPI-GetGroupsFromMSGraph" TechnicalProfileReferenceId="RESTYZAPI-GetGroupsFromMSGraph" />
 					</ClaimsExchanges>
 				</OrchestrationStep>
-				<OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
+				<OrchestrationStep Order="9" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer"/>
 			</OrchestrationSteps>
 			<ClientDefinition ReferenceId="DefaultWeb"/>
 		</UserJourney>

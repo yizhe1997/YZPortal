@@ -19,11 +19,11 @@
 		int PageNumber { get; set; }
 		int PageSize { get; set; }
 		int TotalPages { get; set; }
-		int StartPage { get; set; }
-		int EndPage { get; set; }
-		int StartIndex { get; set; }
-		int EndIndex { get; set; }
-		IEnumerable<int> Pages { get; set; }
+		//int StartPage { get; set; }
+		//int EndPage { get; set; }
+		//int StartIndex { get; set; }
+		//int EndIndex { get; set; }
+		//IEnumerable<int> Pages { get; set; }
 		new List<T> Data { get; set; }
 	}
 	public interface ISearchResult<T> : IPaginatedResult<T>

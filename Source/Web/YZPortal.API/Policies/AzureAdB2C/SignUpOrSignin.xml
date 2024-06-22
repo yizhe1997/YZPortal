@@ -13,6 +13,7 @@
 			<DisplayName>PolicyProfile</DisplayName>
 			<Protocol Name="OpenIdConnect" />
 			<OutputClaims>
+				<OutputClaim ClaimTypeReferenceId="isForgotPassword" DefaultValue="false" />
 				<OutputClaim ClaimTypeReferenceId="displayName" />
 				<OutputClaim ClaimTypeReferenceId="givenName" />
 				<OutputClaim ClaimTypeReferenceId="surname" />
