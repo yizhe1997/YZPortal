@@ -9,6 +9,9 @@
 			<!--points to refresh token journey when app makes refresh token request-->
 			<Endpoint Id="Token" UserJourneyReferenceId="RedeemRefreshToken" />
 		</Endpoints>
+		<UserJourneyBehaviors>
+			<ScriptExecution>Allow</ScriptExecution>
+		</UserJourneyBehaviors>
 		<TechnicalProfile Id="PolicyProfile">
 			<DisplayName>PolicyProfile</DisplayName>
 			<Protocol Name="OpenIdConnect" />

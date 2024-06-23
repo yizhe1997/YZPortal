@@ -15,7 +15,7 @@
 @layout LoginLayout
 
 <div hidden>
-    <RemoteAuthenticatorView Action="@Action" OnLogInSucceeded="@HandleAuthenticationAsync" />
+    <RemoteAuthenticatorView Action="@Action" OnLogOutSucceeded="@OnLogOutSucceeded" OnLogInSucceeded="@OnLogInSucceeded" />
 </div>
 
 @code{
@@ -26,7 +26,7 @@
     [Parameter]
     public EventCallback<ConfigsDto> ConfigsModelChanged { get; set; }
 
-    private async Task HandleAuthenticationAsync()
+    private async Task OnLogInSucceeded()
     {
         // Create user in server if subject claim does not exist and update user if it does
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -75,5 +75,10 @@
                 await ConfigsModelChanged.InvokeAsync(ConfigsModel);
             }
         }
+    }
+
+    private void OnLogOutSucceeded()
+    {
+        Navigation.NavigateTo("/");
     }
 }

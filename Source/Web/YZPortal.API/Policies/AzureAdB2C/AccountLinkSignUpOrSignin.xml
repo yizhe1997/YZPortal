@@ -21,6 +21,7 @@
 		</Endpoints>
 		<UserJourneyBehaviors>
 			<JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="d76765d5-7c6d-4e0a-8d6e-76cfa0740e0a" DeveloperMode="false" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
+			<ScriptExecution>Allow</ScriptExecution>
 		</UserJourneyBehaviors>
 		<TechnicalProfile Id="PolicyProfile">
 			<DisplayName>PolicyProfile</DisplayName>

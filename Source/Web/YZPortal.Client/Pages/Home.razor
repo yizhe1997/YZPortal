@@ -2,6 +2,9 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @layout LoginLayout
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.Extensions.Options
+@inject IOptionsSnapshot<RemoteAuthenticationOptions<ApiAuthorizationProviderOptions>> Options
 
 @page "/"
 
@@ -15,5 +18,7 @@
 
         if (identity is not null)
             Navigation.NavigateTo("/dashboard");
+        else
+            Navigation.NavigateToLogin(Options.Get(Microsoft.Extensions.Options.Options.DefaultName).AuthenticationPaths.LogInPath);
     }
 }

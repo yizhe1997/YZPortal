@@ -35,6 +35,103 @@
 				<AdminHelpText>Whether the user has selected Forgot your Password</AdminHelpText>
 			</ClaimType>
 		</ClaimsSchema>
+		
+		<ContentDefinitions>
+
+			<!-- This content definition is to render an error page that displays unhandled errors. -->
+			<ContentDefinition Id="api.error">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/exception.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:globalexception:1.2.1</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Error page</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.idpselections">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/idpSelector.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:providerselection:1.2.1</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Idp selection page</Item>
+					<Item Key="language.intro">Sign in</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.idpselections.signup">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/idpSelector.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:providerselection:1.2.1</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Idp selection page</Item>
+					<Item Key="language.intro">Sign up</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.signuporsignin">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/unified.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:unifiedssp:2.1.5</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Signin and Signup</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.selfasserted">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/selfAsserted.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Collect information from user page</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.selfasserted.profileupdate">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/selfAsserted.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Collect information from user page</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.localaccountsignup">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/selfAsserted.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Local account sign up page</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.localaccountpasswordreset">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/selfAsserted.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Local account change password page</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.socialccountsignup">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/selfAsserted.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Collect information from user page</Item>
+				</Metadata>
+			</ContentDefinition>
+
+			<ContentDefinition Id="api.localaccountsignin">
+				<LoadUri>https://yzportalazurestorage.blob.core.windows.net/yzportal/templates/AzureBlue/selfAsserted.html</LoadUri>
+				<RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+				<DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+				<Metadata>
+					<Item Key="DisplayName">Collect information from user page</Item>
+				</Metadata>
+			</ContentDefinition>
+
+		</ContentDefinitions>
 	</BuildingBlocks>
 	<ClaimsProviders>
 		<ClaimsProvider>
