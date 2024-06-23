@@ -20,7 +20,7 @@ namespace Infrastructure.Services.Storage
 
             if (await blobClient.ExistsAsync(cancellationToken))
             {
-                await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+                await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken, snapshotsOption: DeleteSnapshotsOption.IncludeSnapshots);
 
                 return await Result.SuccessAsync();
             }
