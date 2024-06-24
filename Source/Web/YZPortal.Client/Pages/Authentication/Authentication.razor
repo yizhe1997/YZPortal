@@ -77,6 +77,18 @@
         }
     }
 
+    // REF: https://stackoverflow.com/questions/65694182/cancelling-new-user-signup-in-azure-ad-b2c-redirects-to-sites-home-page-produce
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            if (Action == "login-failed")
+            {
+                Navigation.NavigateTo($"/");
+            }
+        }
+    }
+
     private void OnLogOutSucceeded()
     {
         Navigation.NavigateTo("/");

@@ -7,7 +7,7 @@
 	PolicyId="B2C_1A_AccountLink_SUSI" 
 	PublicPolicyUri="http://yzorganization.onmicrosoft.com/B2C_1A_AccountLink_SUSI" 
 	TenantObjectId="4369f48a-7236-4eeb-b728-295446bfdec9" 
-	DeploymentMode="Development" 
+	DeploymentMode="Production" 
 	UserJourneyRecorderEndpoint="urn:journeyrecorder:applicationinsights">
 	<BasePolicy>
 		<TenantId>yzorganization.onmicrosoft.com</TenantId>

@@ -143,6 +143,7 @@ on the local host. Presently, the backend API supports the following configurati
 ### 4.4. Security
 #### 4.4.1 CORS
 - [Middleware](https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-8.0) 
+- [CORS test](https://cors-test.codehappy.dev/)
 
 - #### 4.4.2 Storage Protection
 - [SAS URLs in Microsoft Azure Blob Storage](https://tejaksha-k.medium.com/understanding-sas-urls-in-microsoft-azure-blob-storage-aa358d7ca8bf#:~:text=SAS%20URLs%20provide%20a%20secure,to%20a%20third%2Dparty%20user.)
