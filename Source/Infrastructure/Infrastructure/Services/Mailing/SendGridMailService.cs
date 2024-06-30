@@ -7,16 +7,9 @@ using SendGrid;
 namespace Infrastructure.Services.Mailing
 {
     // TODO: Tos, Bccs, and CCs consider the display name
-    public class SendGridMailService : IMailService
+    public class SendGridMailService(IOptions<MailConfig> mailConfig, ISendGridClient sendGridClient) : IMailService
     {
-        private readonly MailConfig _mailConfig;
-        private readonly ISendGridClient _sendGridClient;
-
-        public SendGridMailService(IOptions<MailConfig> mailConfig, ISendGridClient sendGridClient)
-        {
-            _mailConfig = mailConfig.Value;
-            _sendGridClient = sendGridClient;
-        }
+        private readonly MailConfig _mailConfig = mailConfig.Value;
 
         public async Task SendAsync(CreateMailCommand request)
         {

@@ -24,7 +24,7 @@ namespace YZPortal.API.Controllers.Users
         [HttpGet]
         public async Task<ActionResult<SearchResult<UserModel>>> GetUsers([FromQuery] SearchRequest request, CancellationToken cancellationToken)
         {
-            var response = await userService.GetSearchResultAsync(request);
+            var response = await userService.GetSearchResultAsync(request, cancellationToken);
             return Ok(response);
         }
 

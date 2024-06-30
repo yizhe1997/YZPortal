@@ -8,30 +8,22 @@ using System.Text;
 
 namespace Infrastructure.Services
 {
-    public class JwtService : IJwtService
+    public class JwtService(IOptions<JwtIssuerConfig> jwtConfig) : IJwtService
     {
-        private readonly JwtIssuerConfig _jwtConfig;
-
-        public JwtService(IOptions<JwtIssuerConfig> jwtConfig)
-        {
-            _jwtConfig = jwtConfig.Value;
-        }
-
         public async Task<string> CreateToken(string subject, List<Claim> claims)
         {
-            claims ??= new List<Claim>();
-
+            claims ??= [];
             claims.Add(new Claim(JwtRegisteredClaimNames.Sub, subject));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, await _jwtConfig.JtiGenerator()));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(_jwtConfig.IssuedAt).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, await jwtConfig.Value.JtiGenerator()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(jwtConfig.Value.IssuedAt).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
 
             var jwt = new JwtSecurityToken(
-                _jwtConfig.Issuer,
-                _jwtConfig.Audience,
+                jwtConfig.Value.Issuer,
+                jwtConfig.Value.Audience,
                 claims,
-                _jwtConfig.NotBefore,
-                _jwtConfig.Expires,
-                new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.SecretKey ?? string.Empty)), SecurityAlgorithms.HmacSha256));
+                jwtConfig.Value.NotBefore,
+                jwtConfig.Value.Expires,
+                new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Value.SecretKey ?? string.Empty)), SecurityAlgorithms.HmacSha256));
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             return encodedJwt;

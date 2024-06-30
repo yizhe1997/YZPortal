@@ -7,24 +7,17 @@ using System.Net;
 
 namespace Infrastructure.Services.Mailing
 {
-    public class GoogleMailService : IMailService
+    public class GoogleMailService(IOptions<MailConfig> mailConfig) : IMailService
     {
-        private readonly MailConfig _mailConfig;
-
-        public GoogleMailService(IOptions<MailConfig> mailConfig)
-        {
-            _mailConfig = mailConfig.Value;
-        }
-
         public async Task SendAsync(CreateMailCommand request)
         {
-            var smtpClient = new SmtpClient(_mailConfig.GoogleSMTP.HostName)
+            var smtpClient = new SmtpClient(mailConfig.Value.GoogleSMTP.HostName)
             {
-                EnableSsl = _mailConfig.GoogleSMTP.EnableSSL,
+                EnableSsl = mailConfig.Value.GoogleSMTP.EnableSSL,
                 UseDefaultCredentials = false,
-                Port = _mailConfig.GoogleSMTP.Port,
+                Port = mailConfig.Value.GoogleSMTP.Port,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(_mailConfig.GoogleSMTP.NetworkCredUsername, _mailConfig.GoogleSMTP.NetworkCredPassword) 
+                Credentials = new NetworkCredential(mailConfig.Value.GoogleSMTP.NetworkCredUsername, mailConfig.Value.GoogleSMTP.NetworkCredPassword) 
             };
 
             var mailMessage = new MailMessage
@@ -32,7 +25,7 @@ namespace Infrastructure.Services.Mailing
                 Subject = request.Subject,
                 Body = request.HtmlContent,
                 IsBodyHtml = true,
-                From = new MailAddress(_mailConfig.GoogleSMTP.FromEmail, _mailConfig.GoogleSMTP.FromName),
+                From = new MailAddress(mailConfig.Value.GoogleSMTP.FromEmail, mailConfig.Value.GoogleSMTP.FromName),
             };
 
             // Reply-Tos
@@ -41,7 +34,7 @@ namespace Infrastructure.Services.Mailing
                 mailMessage.ReplyToList.Add(new MailAddress(x.Email, x.Name));
             });
 
-            mailMessage.ReplyToList.Add(new MailAddress(_mailConfig.GoogleSMTP.FromEmail, _mailConfig.GoogleSMTP.FromName));
+            mailMessage.ReplyToList.Add(new MailAddress(mailConfig.Value.GoogleSMTP.FromEmail, mailConfig.Value.GoogleSMTP.FromName));
 
             // Attachments
             request.Attachments.ForEach(x =>

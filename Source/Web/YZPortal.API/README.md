@@ -107,14 +107,7 @@ on the local host. Presently, the backend API supports the following configurati
 ## 4. References
 ### 4.1. Identity
 #### 4.1.1. AZURE AD B2C
-- [B2C account auto link](https://github.com/azure-ad-b2c/samples/tree/master/policies/auto-account-linking)
-- [Azure Active Directory B2C logs with Application Insights](https://learn.microsoft.com/en-us/azure/active-directory-b2c/troubleshoot-with-application-insights?pivots=b2c-custom-policy)
-- [Custom policy samples](https://github.com/azure-ad-b2c/samples) 
-- [Custom policy add email claim](https://stackoverflow.com/questions/46778129/azure-ad-b2c-emails-claim-in-custom-policy?rq=3)
-- [Unable to see email address in clims after siginin](https://learn.microsoft.com/en-us/answers/questions/738212/b2c-custom-policy-unable-to-see-email-address-in-c)
 - [B2C example for MVC](https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/tree/master/1-WebApp-OIDC/1-5-B2C)
-- [Password reset flow](https://learn.microsoft.com/en-us/azure/active-directory-b2c/add-password-reset-policy?pivots=b2c-custom-policy#self-service-password-reset-recommended)
-- [Customize html](https://learn.microsoft.com/en-us/azure/active-directory-b2c/customize-ui-with-html?pivots=b2c-custom-policy)
 
 ### 4.2. SMTP
 - [FromForm and lists are not serialized correctly from swagger](https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1107)
