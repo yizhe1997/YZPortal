@@ -7,14 +7,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace YZPortal.API.Filters
 {
-    internal class SecurityRequirementsOperationFilter : IOperationFilter
+    internal class SecurityRequirementsOperationFilter(IConfiguration configuration) : IOperationFilter
     {
-        public IConfiguration Configuration { get; }
-
-        public SecurityRequirementsOperationFilter(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public IConfiguration Configuration { get; } = configuration;
 
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {

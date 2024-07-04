@@ -6,19 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace YZPortal.API.Controllers
 {
-    public class MailController : AuthApiController
+    public class MailController(IMailService mailService, IMediator mediator, LinkGenerator linkGenerator) : AuthApiController(mediator, linkGenerator)
     {
-        private readonly IMailService _mailService;
-
-        public MailController(IMailService mailService, IMediator mediator, LinkGenerator linkGenerator) : base(mediator, linkGenerator)
-        {
-            _mailService = mailService;
-        }
-
         [HttpPost]
         public async Task<ActionResult<Result>> CreateMail([FromForm] CreateMailCommand command)
         {
-            await _mailService.SendAsync(command);
+            await mailService.SendAsync(command);
 
             return Ok();
         }

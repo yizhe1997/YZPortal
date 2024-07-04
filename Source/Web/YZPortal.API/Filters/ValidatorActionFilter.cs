@@ -4,15 +4,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace YZPortal.API.Filters
 {
-    public class ValidatorActionFilter : ActionFilterAttribute
+    public class ValidatorActionFilter(ISerializerService serializer) : ActionFilterAttribute
     {
-        private readonly ISerializerService _serializer;
-
-        public ValidatorActionFilter(ISerializerService serializer)
-        {
-            _serializer = serializer;
-        }
-
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             // Check if the controller is an API controller
@@ -31,7 +24,7 @@ namespace YZPortal.API.Filters
                         errors.Add(valuePair.Key, valuePair.Value.Errors.Select(x => x.ErrorMessage).ToArray());
                     }
 
-                    string content = _serializer.Serialize(new { errors });
+                    string content = serializer.Serialize(new { errors });
                     result.Content = content;
                     result.ContentType = "application/json";
 

@@ -3,13 +3,7 @@ using FluentValidation;
 
 namespace Application.Features.Products.Commands.AddProduct
 {
-    public class DeleteProductCommandValidator : AbstractValidator<DeleteProductCommand>
+    public class DeleteProductCommandValidator(IApplicationDbContext context) : AbstractValidator<DeleteProductCommand>
     {
-        private readonly IApplicationDbContext _context;
-
-        public DeleteProductCommandValidator(IApplicationDbContext context)
-        {
-            _context = context;
-        }
     }
 }

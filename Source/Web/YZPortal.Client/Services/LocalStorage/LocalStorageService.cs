@@ -8,14 +8,8 @@ namespace YZPortal.Client.Services.LocalStorage
 		internal const string UserConfigs = "userConfigs";
 	}
 
-	public class LocalStorageService : ILocalStorageService
+	public class LocalStorageService(Blazored.LocalStorage.ILocalStorageService localStorageService) : ILocalStorageService
     {
-        private readonly Blazored.LocalStorage.ILocalStorageService _localStorageService;
-
-		public LocalStorageService(Blazored.LocalStorage.ILocalStorageService localStorageService)
-        {
-            _localStorageService = localStorageService;
-        }
 
         #region User
 
@@ -23,24 +17,24 @@ namespace YZPortal.Client.Services.LocalStorage
 
         public async Task SetUserPortalConfig(PortalConfigDto data, CancellationToken cancellationToken = new CancellationToken())
         {
-            await _localStorageService.SetItemAsync("PortalConfigModel", data, cancellationToken);
+            await localStorageService.SetItemAsync("PortalConfigModel", data, cancellationToken);
         }
 
         public async Task SetUserConfigs(ConfigsDto data, CancellationToken cancellationToken = new CancellationToken())
         {
-            await _localStorageService.SetItemAsync(LocalStorageProperties.UserConfigs, data, cancellationToken);
+            await localStorageService.SetItemAsync(LocalStorageProperties.UserConfigs, data, cancellationToken);
         }
 
         public async Task RemoveUserConfigs(CancellationToken cancellationToken = new CancellationToken())
 		{
-			await _localStorageService.RemoveItemAsync(LocalStorageProperties.UserConfigs, cancellationToken);
+			await localStorageService.RemoveItemAsync(LocalStorageProperties.UserConfigs, cancellationToken);
 		}
 
 		public async Task<ConfigsDto> GetUserConfigs(CancellationToken cancellationToken = new CancellationToken())
 		{
-			if (await _localStorageService.ContainKeyAsync(LocalStorageProperties.UserConfigs, cancellationToken))
+			if (await localStorageService.ContainKeyAsync(LocalStorageProperties.UserConfigs, cancellationToken))
 			{
-                return await _localStorageService.GetItemAsync<ConfigsDto>(LocalStorageProperties.UserConfigs, cancellationToken);
+                return await localStorageService.GetItemAsync<ConfigsDto>(LocalStorageProperties.UserConfigs, cancellationToken);
             }
 
 			return new ConfigsDto();
@@ -50,9 +44,9 @@ namespace YZPortal.Client.Services.LocalStorage
 
         public async Task<string> GetUserCulture(CancellationToken cancellationToken = new CancellationToken())
         {
-            if (await _localStorageService.ContainKeyAsync("BlazorCulture", cancellationToken))
+            if (await localStorageService.ContainKeyAsync("BlazorCulture", cancellationToken))
             {
-                return await _localStorageService.GetItemAsync<string>("BlazorCulture", cancellationToken);
+                return await localStorageService.GetItemAsync<string>("BlazorCulture", cancellationToken);
             }
 
             return string.Empty;
@@ -66,7 +60,7 @@ namespace YZPortal.Client.Services.LocalStorage
 
             foreach (var constant in localStorageServiceConsts)
             {
-                await _localStorageService.RemoveItemAsync(constant, cancellationToken).ConfigureAwait(false);
+                await localStorageService.RemoveItemAsync(constant, cancellationToken).ConfigureAwait(false);
             }
         }
     }

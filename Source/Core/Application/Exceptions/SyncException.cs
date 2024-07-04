@@ -1,9 +1,6 @@
 ﻿namespace Application.Exceptions
 {
-    public class SyncException : Exception
+    public class SyncException(string message, Exception innerException) : Exception(message, innerException)
     {
-        public SyncException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
     }
 }
