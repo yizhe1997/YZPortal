@@ -49,15 +49,15 @@ public class Product : AuditableEntity<Guid>
     /// <summary>
     /// Navigation property for DiscountProductMapping entity
     /// </summary>
-    public List<DiscountProductMapping> DiscountProductMappings { get; set; } = new List<DiscountProductMapping>();
+    public List<DiscountProductMapping> DiscountProductMappings { get; set; } = [];
 
     /// <summary>
     /// Navigation property for ProductCategoryMapping entity
     /// </summary>
-    public List<ProductCategoryMapping> ProductCategoryMappings { get; set; } = new List<ProductCategoryMapping>();
+    public List<ProductCategoryMapping> ProductCategoryMappings { get; set; } = [];
 
     /// <summary>
     /// Navigation property for ProductAttributeMapping entity
     /// </summary>
-    public List<ProductAttributeMapping> ProductAttributeMappings { get; set; } = new List<ProductAttributeMapping>();
+    public List<ProductAttributeMapping> ProductAttributeMappings { get; set; } = [];
 }

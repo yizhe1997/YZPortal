@@ -11,7 +11,7 @@ namespace Infrastructure.Services.Mailing
     {
         private readonly MailConfig _mailConfig = mailConfig.Value;
 
-        public async Task SendAsync(CreateMailCommand request)
+        public async Task SendAsync(CreateMailCommand request, CancellationToken token = default)
         {
             //    var message = new SendGridMessage();
 

@@ -1,7 +1,7 @@
 ﻿using Application.Models;
 using Application.Models.File;
 using Application.Requests;
-using Domain.Entities.Misc;
+using Domain.Entities.Media;
 
 namespace Application.Interfaces.Services
 {

@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Misc;
+﻿using Domain.Entities.Media;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities.Users;

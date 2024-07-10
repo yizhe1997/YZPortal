@@ -39,7 +39,7 @@ namespace Domain.Entities.Users
 
         public string? IdentityProvider { get; set; }
         public string? LastidpAccessToken { get; set; } // TODO: check how to do this for custom policy?
-        public List<Identity> Identities { get; set; } = new List<Identity>();
+        public List<Identity> Identities { get; set; } = [];
 
         #endregion
 

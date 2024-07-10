@@ -3,7 +3,7 @@ using Application.Models;
 using Domain.Entities.Products;
 using MediatR;
 
-namespace Application.Features.Products.Commands.AddProduct
+namespace Application.Features.Products.Commands.DeleteProduct
 {
     public class DeleteProductCommand : IRequest<Result<Guid>>
     {

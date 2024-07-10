@@ -2,6 +2,6 @@
 {
     public interface IEmailTemplateService
     {
-        string GenerateEmailTemplate<T>(string templateName, T mailTemplateModel);
+        Task<string> GenerateEmailTemplate<T>(string templateName, T mailTemplateModel);
     }
 }

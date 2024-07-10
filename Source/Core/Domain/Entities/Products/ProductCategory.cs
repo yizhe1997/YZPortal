@@ -65,10 +65,10 @@ public class ProductCategory : AuditableEntity<Guid>
     /// <summary>
     /// Navigation property for ProductCategoryMapping entity
     /// </summary>
-    public List<ProductCategoryMapping> ProductCategoryMappings { get; set; } = new List<ProductCategoryMapping>();
+    public List<ProductCategoryMapping> ProductCategoryMappings { get; set; } = [];
 
     /// <summary>
     /// Navigation property for DiscountProductCategoryMapping entity
     /// </summary>
-    public List<DiscountProductCategoryMapping> DiscountProductCategoryMappings { get; set; } = new List<DiscountProductCategoryMapping>();
+    public List<DiscountProductCategoryMapping> DiscountProductCategoryMappings { get; set; } = [];
 }

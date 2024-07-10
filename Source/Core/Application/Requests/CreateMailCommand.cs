@@ -6,13 +6,12 @@ namespace Application.Requests
     public class CreateMailCommand
     {
         public string? Subject { get; set; }
-
         public string? HtmlContent { get; set; }
-        public List<MailModel> Tos { get; set; } = new();
-        public List<MailModel> ReplyTos { get; set; } = new();
-        public List<MailModel> Ccs { get; set; } = new();
-        public List<MailModel> Bccs { get; set; } = new();
-        public List<IFormFile> Attachments { get; set; } = new();
+        public List<MailModel> Tos { get; set; } = [];
+        public List<MailModel> ReplyTos { get; set; } = [];
+        public List<MailModel> Ccs { get; set; } = [];
+        public List<MailModel> Bccs { get; set; } = [];
+        public List<IFormFile> Attachments { get; set; } = [];
 
         // TODO:
         // Key = email, Value = name

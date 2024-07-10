@@ -6,9 +6,9 @@ using Azure.Storage.Sas;
 using Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 using Application.Requests;
-using Domain.Entities.Misc;
 using Application.Features.Users.UserProfileImages.Commands;
 using Azure.Storage.Blobs.Models;
+using Domain.Entities.Media;
 
 namespace Infrastructure.Services.Storage
 {

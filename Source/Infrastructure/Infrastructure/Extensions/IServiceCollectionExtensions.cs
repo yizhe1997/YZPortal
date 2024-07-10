@@ -4,6 +4,7 @@ using Application.Interfaces.Contexts;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Repositories.Users;
 using Application.Interfaces.Services;
+using Application.Interfaces.Services.Events;
 using Application.Interfaces.Services.ExportImport;
 using Application.Interfaces.Services.Identity;
 using Application.Interfaces.Services.Mailing;
@@ -19,7 +20,9 @@ using Infrastructure.Persistence.Contexts;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Persistence.Repositories.Users;
 using Infrastructure.Services;
+using Infrastructure.Services.BackgroundJob;
 using Infrastructure.Services.Caching;
+using Infrastructure.Services.Events;
 using Infrastructure.Services.ExportImport;
 using Infrastructure.Services.Identity;
 using Infrastructure.Services.Mailing;
@@ -106,6 +109,9 @@ namespace Infrastructure.Extensions
 
             // Exception Handlers
             services.AddExceptionHandlers();
+
+            // Event
+            services.AddEvents();
         }
 
         #region Persistence
@@ -437,6 +443,8 @@ namespace Infrastructure.Extensions
 
             // Add the processing server as IHostedService
             services.AddHangfireServer();
+
+            services.AddTransient<IJobService, HangFireService>();
         }
 
         private static void AddCorsPolicy(this IServiceCollection services, IConfiguration configuration)
@@ -568,6 +576,10 @@ namespace Infrastructure.Extensions
             services.AddExceptionHandler<ExceptionHandler>();
         }
 
+        private static void AddEvents(this IServiceCollection services)
+        {
+            services.AddTransient<IEventPublisher, EventPublisher>();
+        }
         #endregion
     }
 }

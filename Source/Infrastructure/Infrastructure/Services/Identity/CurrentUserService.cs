@@ -19,6 +19,6 @@ namespace Infrastructure.Services.Identity
         public string? IdentityProvider => httpContextAccessor.HttpContext?.User.GetIdentityProvider();
         public string? IpAddress => httpContextAccessor.HttpContext?.Request.Host.ToUriComponent();
         //public IEnumerable<Claim> Claims => _httpContextAccessor.HttpContext?.User.Claims ?? new List<Claim>();
-        public List<Domain.Entities.Users.Identity> Identities => httpContextAccessor.HttpContext?.User.GetUserIdentities().Select(x => serializer.Deserialize<Domain.Entities.Users.Identity>(x)).ToList() ?? new List<Domain.Entities.Users.Identity>();
+        public List<Domain.Entities.Users.Identity> Identities => httpContextAccessor.HttpContext?.User.GetUserIdentities().Select(x => serializer.Deserialize<Domain.Entities.Users.Identity>(x)).ToList() ?? [];
     }
 }

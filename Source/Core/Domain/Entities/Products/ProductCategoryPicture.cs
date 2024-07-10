@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Misc;
+﻿using Domain.Entities.Media;
 
 namespace Domain.Entities.Products;
 

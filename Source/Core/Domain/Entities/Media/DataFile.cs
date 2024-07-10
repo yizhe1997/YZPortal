@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Auditable;
 
-namespace Domain.Entities.Misc
+namespace Domain.Entities.Media
 {
     public abstract class DataFile : AuditableEntity<Guid>
     {

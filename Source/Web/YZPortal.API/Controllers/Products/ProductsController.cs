@@ -8,6 +8,7 @@ using Domain.Entities.Products;
 using Microsoft.AspNetCore.Mvc;
 using Application.Features.Products.Queries.GetProduct;
 using Application.Features.Products.Commands.AddProduct;
+using Application.Features.Products.Commands.DeleteProduct;
 
 namespace YZPortal.API.Controllers.Products.ProductCategories
 {

@@ -1,15 +1,26 @@
 ﻿using Application.Interfaces.Services.Mailing;
+using RazorLight;
+using System.Reflection;
 using System.Text;
 
 namespace Infrastructure.Services.Mailing
 {
     public class EmailTemplateService : IEmailTemplateService
     {
-        public string GenerateEmailTemplate<T>(string templateName, T mailTemplateModel)
+        public async Task<string> GenerateEmailTemplate<T>(string templateName, T mailTemplateModel)
         {
             string template = GetTemplate(templateName);
 
-            return template;
+            RazorLightEngine engine = new RazorLightEngineBuilder()
+            .UseEmbeddedResourcesProject(Assembly.GetEntryAssembly())
+            .Build();
+            
+            string htmlContent = await engine.CompileRenderStringAsync(
+                templateName,  // cache key
+                template,
+                mailTemplateModel);
+
+            return htmlContent;
         }
 
         public static string GetTemplate(string templateName)

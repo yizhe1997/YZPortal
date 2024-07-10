@@ -2,7 +2,7 @@
 {
     public class ChatPaylodModel
     {
-        public string? Username { get; set; }
+        public string? UserName { get; set; }
         public string? Message { get; set; }
         public bool IsMine { get; set; }
         public bool IsNotice { get; set; }

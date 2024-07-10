@@ -4,7 +4,7 @@ using Application.Models;
 using Domain.Entities.Users;
 using MediatR;
 
-namespace Application.Features.Users.UserProfileImages.Commands
+namespace Application.Features.Users.Identities.Commands
 {
     //TODO: make it bulk delete
     public class DeleteIdentityCommand : IRequest<Result>

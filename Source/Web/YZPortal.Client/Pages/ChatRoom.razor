@@ -33,7 +33,7 @@
         else
         {
             <div class="@payload.CSS">
-                <div class="user">@payload.Username: @payload.Message</div>
+                <div class="user">@payload.UserName: @payload.Message</div>
             </div>
         }
     }
@@ -98,7 +98,7 @@
         {
             await BroadcastMessageToGroupAsync(HubConnection, new ChatPaylodModel()
             {
-                Username = Username,
+                UserName = Username,
                 Message = message,
                 IsMine = true,
                 IsNotice = isNotice
@@ -163,7 +163,7 @@
     {
         return hubConnection.On<ChatPaylodModel>(ChatHubConstants.TransferMessage, (model) =>
         {
-            model.IsMine = model.Username?.Equals(Username, StringComparison.OrdinalIgnoreCase) ?? false;
+            model.IsMine = model.UserName?.Equals(Username, StringComparison.OrdinalIgnoreCase) ?? false;
 
             ChatPaylods.Add(model);
 

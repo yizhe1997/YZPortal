@@ -111,6 +111,7 @@ on the local host. Presently, the backend API supports the following configurati
 
 ### 4.2. SMTP
 - [FromForm and lists are not serialized correctly from swagger](https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1107)
+- [How to Render a Razor Template to send Emails](https://www.twilio.com/en-us/blog/render-emails-using-razor-templating#How-to-Render-a-Razor-Template-to-send-Emails)
 
 #### 4.2.1. Gmail SMTP 
 - [How to](https://kinsta.com/blog/gmail-smtp-server/)
@@ -179,3 +180,7 @@ on the local host. Presently, the backend API supports the following configurati
 
 ### 4.10.0 Exception
 - [Exption Handler](https://www.roundthecode.com/dotnet-tutorials/exception-handling-own-middleware-dotnet-8)
+
+### 4.11.0 Evemts
+- [Example](https://code-maze.com/csharp-event-driven-architecture/)
+- [Publishing domain events with MediatR](https://dev.to/pbouillon/publishing-domain-events-with-mediatr-32mm)

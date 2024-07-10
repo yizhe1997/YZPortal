@@ -6,7 +6,6 @@ public static class ChatHubConstants
 
     public const string BroadcastToGroupAsync = nameof(BroadcastToGroupAsync);
 
-
     #endregion
 
     #region Client

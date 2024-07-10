@@ -9,7 +9,7 @@ namespace Infrastructure.Services.Mailing
 {
     public class GoogleMailService(IOptions<MailConfig> mailConfig) : IMailService
     {
-        public async Task SendAsync(CreateMailCommand request)
+        public async Task SendAsync(CreateMailCommand request, CancellationToken token = default)
         {
             var smtpClient = new SmtpClient(mailConfig.Value.GoogleSMTP.HostName)
             {

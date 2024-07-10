@@ -1,10 +1,12 @@
 ﻿using Application.Interfaces;
+using Application.Interfaces.Services.Events;
 using Application.Interfaces.Services.Identity;
 using Application.Models;
 using Application.Models.Identity;
 using Application.Requests.Indexes;
 using AutoMapper;
 using Domain.Entities.Users;
+using Domain.Events.Users;
 using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +16,7 @@ namespace Infrastructure.Services.Identity
     internal class UserService(
         ICurrentUserService currentUserService,
         UserManager<User> userManager,
+        IEventPublisher eventPublisher,
         IMapper mapper) : IUserService
     {
         public async Task<SearchResult<UserModel>> GetSearchResultAsync(SearchRequest request, CancellationToken cancellationToken = default)
@@ -44,6 +47,7 @@ namespace Infrastructure.Services.Identity
                 x => x.DisplayName.Contains(request.SearchString) ||
                 x.Email.Contains(request.SearchString),
                 cancellationToken: cancellationToken);
+
             return result;
         }
 
@@ -83,6 +87,8 @@ namespace Infrastructure.Services.Identity
             var newUser = mapper.Map<User>(body);
 
             var result = await userManager.CreateAsync(newUser);
+
+            await eventPublisher.PublishAsync(new UserCreatedEvent(newUser));
 
             return await result.ToApplicationResultAsync();
         }

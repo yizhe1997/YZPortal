@@ -21,7 +21,7 @@ namespace Application.Models.Identity
 
         public string? IdentityProvider { get; set; } // TODO
         public string? LastidpAccessToken { get; set; } // TODO
-        public List<IdentityModel> Identities { get; set; } = new List<IdentityModel>();
+        public List<IdentityModel> Identities { get; set; } = [];
 
         #endregion
     }

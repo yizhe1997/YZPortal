@@ -58,7 +58,7 @@ namespace Infrastructure.Services
             // Get items for a particular page
             usersResponse = (UserCollectionResponse?)await GetItemsFromPageAsync(graphClient, usersResponse, pageNumber, cancellationToken);
 
-            var result = usersResponse?.Value != null ? mapper.Map<List<UserModel>>(usersResponse.Value) : new List<UserModel>();
+            var result = usersResponse?.Value != null ? mapper.Map<List<UserModel>>(usersResponse.Value) : [];
 
             return result;
         }
@@ -111,7 +111,7 @@ namespace Infrastructure.Services
             // Get items for a particular page
             userGroupsResponse = (GroupCollectionResponse?)await GetItemsFromPageAsync(graphClient, userGroupsResponse, pageNumber, cancellationToken);
 
-            var result = userGroupsResponse?.Value != null ? mapper.Map<List<GroupModel>>(userGroupsResponse.Value) : new List<GroupModel>();
+            var result = userGroupsResponse?.Value != null ? mapper.Map<List<GroupModel>>(userGroupsResponse.Value) : [];
 
             return result;
         }
@@ -148,7 +148,7 @@ namespace Infrastructure.Services
             // Get items for a particular page
             groupsResponse = (GroupCollectionResponse?)await GetItemsFromPageAsync(graphClient, groupsResponse, pageNumber, cancellationToken);
 
-            var result = groupsResponse?.Value != null ? mapper.Map<List<GroupModel>>(groupsResponse.Value) : new List<GroupModel>();
+            var result = groupsResponse?.Value != null ? mapper.Map<List<GroupModel>>(groupsResponse.Value) : [];
 
             return result;
         }
@@ -178,7 +178,7 @@ namespace Infrastructure.Services
             // Get items for a particular page
             usersInGroup = (UserCollectionResponse?)await GetItemsFromPageAsync(graphClient, usersInGroup, pageNumber, cancellationToken);
 
-            var result = usersInGroup?.Value != null ? mapper.Map<List<UserModel>>(usersInGroup.Value) : new List<UserModel>();
+            var result = usersInGroup?.Value != null ? mapper.Map<List<UserModel>>(usersInGroup.Value) : [];
 
             return result;
         }

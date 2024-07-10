@@ -20,5 +20,5 @@ public class ProductAttribute : AuditableEntity<Guid>
     /// <summary>
     /// Navigation property for ProductAttributeMapping entity
     /// </summary>
-    public List<ProductAttributeMapping> ProductAttributeMappings { get; set; } = new List<ProductAttributeMapping>();
+    public List<ProductAttributeMapping> ProductAttributeMappings { get; set; } = [];
 }

@@ -71,7 +71,7 @@ namespace Application.Extensions
         // Ref: https://code-maze.com/csharp-get-list-of-properties/
         public static List<string> GetPropertyNames(this Type type, BindingFlags binding = BindingFlags.Public | BindingFlags.Instance)
         {
-            return type.GetProperties(binding)?.Select(propertyInfo => propertyInfo.Name)?.ToList() ?? new();
+            return type.GetProperties(binding)?.Select(propertyInfo => propertyInfo.Name)?.ToList() ?? [];
         }
 
         public static bool CheckIfPropertyNameExist(this Type type, string Name, BindingFlags binding = BindingFlags.Public | BindingFlags.Instance)

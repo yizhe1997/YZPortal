@@ -119,5 +119,5 @@ public class Discount : AuditableEntity<Guid>
     /// <summary>
     /// Navigation property for DiscountMapping entity
     /// </summary>
-    public List<DiscountMapping> DiscountMappings { get; set; } = new List<DiscountMapping>();
+    public List<DiscountMapping> DiscountMappings { get; set; } = [];
 }
