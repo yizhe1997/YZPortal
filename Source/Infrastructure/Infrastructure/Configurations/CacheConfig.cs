@@ -11,7 +11,7 @@ namespace Infrastructure.Configurations
 
         public class RedisConfig
         {
-            public string? RedisURL { get; set; }
+            public string? Url { get; set; }
         }
     }
 }

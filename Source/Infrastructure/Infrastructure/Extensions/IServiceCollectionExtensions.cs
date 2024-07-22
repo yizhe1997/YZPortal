@@ -8,6 +8,9 @@ using Application.Interfaces.Services.Events;
 using Application.Interfaces.Services.ExportImport;
 using Application.Interfaces.Services.Identity;
 using Application.Interfaces.Services.Mailing;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
 using Domain.Entities.Users;
 using Domain.Enums;
@@ -35,8 +38,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
@@ -56,8 +62,11 @@ namespace Infrastructure.Extensions
 {
     public static class IServiceCollectionExtensions
     {
-        public static void AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+        public static void AddInfrastructureLayer(this IServiceCollection services, ConfigurationManager configuration, IWebHostEnvironment environment)
         {
+            // Configurations
+            services.AddConfigurationPipelines(configuration, environment);
+
             // Serializer
             services.AddSerializer();
 
@@ -432,6 +441,22 @@ namespace Infrastructure.Extensions
 
         #region Misc
 
+        private static void AddConfigurationPipelines(this IServiceCollection services, ConfigurationManager configuration, IWebHostEnvironment environment)
+        {
+            if (environment.IsProduction())
+            {
+                services.Configure<AzureKeyVaultConfig>(configuration.GetSection("AzureKeyVault"));
+
+                var azureKeyVaultConfig = configuration.GetSection("AzureKeyVault").Get<AzureKeyVaultConfig>() ?? new();
+
+                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
+
+                var client = new SecretClient(new Uri(azureKeyVaultConfig.Url), new DefaultAzureCredential());
+
+                configuration.AddAzureKeyVault(client, new KeyVaultSecretManager());
+            }
+        }
+
         private static void AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
         {
             // Add Hangfire services.
@@ -495,7 +520,7 @@ namespace Infrastructure.Extensions
                             options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions()
                             {
                                 AbortOnConnectFail = true,
-                                EndPoints = { cacheConfig.Redis.RedisURL }
+                                EndPoints = { cacheConfig.Redis.Url }
                             };
                         });
 
