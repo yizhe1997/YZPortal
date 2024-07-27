@@ -28,23 +28,27 @@ on the local host. Presently, the backend API supports the following configurati
 |AzureAdB2C__ValidateAuthority|[MSAL.NET ValidateAuthority property](https://learn.microsoft.com/en-us/dotnet/api/microsoft.authentication.webassembly.msal.msalauthenticationoptions.validateauthority?view=aspnetcore-8.0)|
 
 ## 4. References
-
-- [Nav menu](https://stackoverflow.com/questions/58914389/how-to-create-navmenu-with-collapsible-submenu-in-net-core-blazor-app)
-
+### 4.1. Authentication/Authorization
 - [JWT token authentication](https://trystanwilcock.com/2022/09/28/net-6-0-blazor-webassembly-jwt-token-authentication-from-scratch-c-sharp-wasm-tutorial/)
-
 - [Policy based authorization](https://chrissainty.com/securing-your-blazor-apps-configuring-policy-based-authorization-with-blazor/)
 
-- [Disposable](https://www.meziantou.net/canceling-background-tasks-when-a-user-navigates-away-from-a-blazor-component.htm)
+### 4.2. Containerization
+- [How to](https://github.com/jongio/BlazorDocker)
+- [How to](https://chrissainty.com/containerising-blazor-applications-with-docker-containerising-a-blazor-webassembly-app/)
+- [How to include class library reference into docker file](https://stackoverflow.com/questions/64557885/how-to-include-class-library-reference-into-docker-file/77592431#77592431)
+- [Redirect to https on nginx inside Docker container](https://stackoverflow.com/questions/72748458/redirect-to-https-on-nginx-inside-docker-container)
+- [Development SSL for .NET Core and NGINX in Docker](https://meikle.io/opensource/development-ssl-dotnetcore-docker.html)
 
+### 4.2. Misc
+- [Nav menu](https://stackoverflow.com/questions/58914389/how-to-create-navmenu-with-collapsible-submenu-in-net-core-blazor-app)
+
+- [Disposable](https://www.meziantou.net/canceling-background-tasks-when-a-user-navigates-away-from-a-blazor-component.htm)
 - [Disposable](https://www.infoworld.com/article/3649352/how-to-work-with-iasyncdisposable-in-net-6.html)
 
-- [Razor component lifecycle](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-8.0)
-
+- [Blazor component lifecycle](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-8.0)
 - [Blazor component lifecycle](https://blazor-university.com/components/component-lifecycles/)
 
 - [File upload](https://learn.microsoft.com/en-us/aspnet/core/blazor/file-uploads?view=aspnetcore-8.0)
-
 - [File download](https://learn.microsoft.com/en-us/aspnet/core/blazor/file-downloads?view=aspnetcore-8.0)
 
 - [Logging](https://learn.microsoft.com/en-us/aspnet/core/blazor/fundamentals/logging?view=aspnetcore-8.0)

@@ -1,0 +1,38 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP .NET Core service.
+
+# To run the container applications, initiate a command prompt at root and run the following command:
+# NOTE: make sure the https certs are generated before hand. Refer to docker files on steps to generate certs.
+# docker-compose -f "docker-compose.yml" up -d
+
+services:
+  yzportal.api:
+    image: yzportal.api
+    build:
+      context: .
+      dockerfile: Dockerfile.YZPortal.API
+    ports:
+        - 5000:80
+        - 5001:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=P@ssw0rd123
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ${USERPROFILE}/.aspnet/https:/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+  yzportal.client:
+    image: yzportal.client
+    build:
+      context: .
+      dockerfile: Dockerfile.YZPortal.Client
+    ports:
+        - 5207:80
+        - 7195:443
+    depends_on: 
+        yzportal.api:
+            condition: service_started
+    volumes:
+      - ${USERPROFILE}/nginx/ssl.crt:/etc/nginx/ssl.crt
+      - ${USERPROFILE}/nginx/ssl.key:/etc/nginx/ssl.key
+  

@@ -139,8 +139,15 @@ on the local host. Presently, the backend API supports the following configurati
 - [Middleware](https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-8.0) 
 - [CORS test](https://cors-test.codehappy.dev/)
 
-- #### 4.4.2 Storage Protection
+#### 4.4.2 Storage Protection
 - [SAS URLs in Microsoft Azure Blob Storage](https://tejaksha-k.medium.com/understanding-sas-urls-in-microsoft-azure-blob-storage-aa358d7ca8bf#:~:text=SAS%20URLs%20provide%20a%20secure,to%20a%20third%2Dparty%20user.)
+
+#### 4.4.3 Refresh token
+- [OAuth 2.0 refresh tokens with Azure AD B2C](https://melmanm.github.io/misc/2023/01/29/article2-oauth-refresh-tokens-with-azure-b2c.html#refreshing-tokens-by-the-book)
+- [OAuth 2.0 authorization code flow in Azure Active Directory B2C](https://learn.microsoft.com/en-us/azure/active-directory-b2c/authorization-code-flow#1-get-an-authorization-code)
+
+#### 4.4.4 Configuration Protection
+- [Use Azure Managed Identities and Azure Key Vault to Protect Your .NET API Secrets](https://www.youtube.com/watch?v=OeYx4vUs1vw&ab_channel=IsraelQuiroz)
 
 ### 4.5. Caching
 #### 4.5.1 General
@@ -166,21 +173,19 @@ on the local host. Presently, the backend API supports the following configurati
 - [Manually Trigger a GitHub Action with “workflow_dispatch”](https://medium.com/@irfankaraman/manually-trigger-a-github-action-with-workflow-dispatch-124708e26afe)
 - [Azure AD B2C IEF deployment](https://learn.microsoft.com/en-us/azure/active-directory-b2c/deploy-custom-policies-github-action)
 
-### 4.8 Security
-#### 4.8.1 Refresh token
-- [OAuth 2.0 refresh tokens with Azure AD B2C](https://melmanm.github.io/misc/2023/01/29/article2-oauth-refresh-tokens-with-azure-b2c.html#refreshing-tokens-by-the-book)
-- [OAuth 2.0 authorization code flow in Azure Active Directory B2C](https://learn.microsoft.com/en-us/azure/active-directory-b2c/authorization-code-flow#1-get-an-authorization-code)
-
-### 4.9 Instrumentation
-#### 4.9.1 Logging
+### 4.8 Instrumentation
+#### 4.8.1 Logging
 - [Logging in Azure with Application Insights and Serilog](https://hackernoon.com/logging-in-azure-with-application-insights-and-serilog)
 - [Logging in .NET Core and ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-6.0)
 - [Azure App Service Logs](https://stackify.com/azure-app-service-log-files/)
 - [Azure App Service Logging](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/azure-app-service-logging-how-to-monitor-your-web-apps-in-real/ba-p/3800390)
 
-### 4.10.0 Exception
+### 4.9.0 Exception
 - [Exption Handler](https://www.roundthecode.com/dotnet-tutorials/exception-handling-own-middleware-dotnet-8)
 
-### 4.11.0 Evemts
+### 4.10.0 Events
 - [Example](https://code-maze.com/csharp-event-driven-architecture/)
 - [Publishing domain events with MediatR](https://dev.to/pbouillon/publishing-domain-events-with-mediatr-32mm)
+
+### 4.11.0 Containerization
+- [How to include class library reference into docker file](https://stackoverflow.com/questions/64557885/how-to-include-class-library-reference-into-docker-file/77592431#77592431)
