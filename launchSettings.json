@@ -1,0 +1,13 @@
+{
+  // TODO: get StartWithDebugging to work for the services
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "yzportal-api": "StartWithoutDebugging",
+        "yzportal-client": "StartWithoutDebugging"
+      }
+    }
+  }
+}

@@ -2,14 +2,14 @@
 
 # Follow the steps below for local testing:
 # 1. First, initiate a command prompt at root and run the following command to build docker image: 
-# docker build -f ./Dockerfile.YZPortal.API -t yzportal.api .
+# docker build -f ./Dockerfile.YZPortal.API -t yzportal-api .
 
 # 2. Next, run the following commands to generate ssl cert with password for https:
 # dotnet dev-certs https --clean
 # dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p P@ssw0rd123 --trust
 
 # 3. Finally, run the following command to create a container for the image:
-# docker run -p 5000:80 -p 5001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=8081 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ yzportal.api
+# docker run -p 5000:80 -p 5001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=8081 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ yzportal-api
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app

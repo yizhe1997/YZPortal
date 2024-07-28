@@ -10,8 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		docker-compose.yml = docker-compose.yml
-		Dockerfile.YZPortal.Client = Dockerfile.YZPortal.Client
 		Dockerfile.YZPortal.API = Dockerfile.YZPortal.API
+		Dockerfile.YZPortal.Client = Dockerfile.YZPortal.Client
 		nginx.conf = nginx.conf
 		README.md = README.md
 	EndProjectSection
@@ -38,36 +38,57 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTests", "Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YZPortal.Client", "Source\Web\YZPortal.Client\YZPortal.Client.csproj", "{E14D98CA-BAC3-424F-A0BE-BFB502982B5C}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{84A434CF-A0D1-4640-8D14-DDF65F493C3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		NoVariablesDefault|Any CPU = NoVariablesDefault|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2FC770AC-53ED-4956-8E77-7A6CE7D2CCB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2FC770AC-53ED-4956-8E77-7A6CE7D2CCB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FC770AC-53ED-4956-8E77-7A6CE7D2CCB6}.NoVariablesDefault|Any CPU.ActiveCfg = Release|Any CPU
+		{2FC770AC-53ED-4956-8E77-7A6CE7D2CCB6}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
 		{2FC770AC-53ED-4956-8E77-7A6CE7D2CCB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FC770AC-53ED-4956-8E77-7A6CE7D2CCB6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{50133E28-F143-476D-9A4B-79C4B141CE8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{50133E28-F143-476D-9A4B-79C4B141CE8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50133E28-F143-476D-9A4B-79C4B141CE8C}.NoVariablesDefault|Any CPU.ActiveCfg = Release|Any CPU
+		{50133E28-F143-476D-9A4B-79C4B141CE8C}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
 		{50133E28-F143-476D-9A4B-79C4B141CE8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50133E28-F143-476D-9A4B-79C4B141CE8C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BC920CBC-7250-452B-B3DD-FC25B003D533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BC920CBC-7250-452B-B3DD-FC25B003D533}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC920CBC-7250-452B-B3DD-FC25B003D533}.NoVariablesDefault|Any CPU.ActiveCfg = Release|Any CPU
+		{BC920CBC-7250-452B-B3DD-FC25B003D533}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
 		{BC920CBC-7250-452B-B3DD-FC25B003D533}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC920CBC-7250-452B-B3DD-FC25B003D533}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2BD2560D-E9DC-431F-A138-3F1B44E6D24E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2BD2560D-E9DC-431F-A138-3F1B44E6D24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BD2560D-E9DC-431F-A138-3F1B44E6D24E}.NoVariablesDefault|Any CPU.ActiveCfg = Release|Any CPU
+		{2BD2560D-E9DC-431F-A138-3F1B44E6D24E}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
 		{2BD2560D-E9DC-431F-A138-3F1B44E6D24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BD2560D-E9DC-431F-A138-3F1B44E6D24E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.NoVariablesDefault|Any CPU.ActiveCfg = Release|Any CPU
+		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
 		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEE43505-DCB9-4D80-ADBA-D948D3E04AEC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E14D98CA-BAC3-424F-A0BE-BFB502982B5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E14D98CA-BAC3-424F-A0BE-BFB502982B5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E14D98CA-BAC3-424F-A0BE-BFB502982B5C}.NoVariablesDefault|Any CPU.ActiveCfg = Release|Any CPU
+		{E14D98CA-BAC3-424F-A0BE-BFB502982B5C}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
 		{E14D98CA-BAC3-424F-A0BE-BFB502982B5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E14D98CA-BAC3-424F-A0BE-BFB502982B5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84A434CF-A0D1-4640-8D14-DDF65F493C3D}.Debug|Any CPU.ActiveCfg = NoVariablesDefault
+		{84A434CF-A0D1-4640-8D14-DDF65F493C3D}.Debug|Any CPU.Build.0 = NoVariablesDefault
+		{84A434CF-A0D1-4640-8D14-DDF65F493C3D}.NoVariablesDefault|Any CPU.ActiveCfg = NoVariablesDefault
+		{84A434CF-A0D1-4640-8D14-DDF65F493C3D}.NoVariablesDefault|Any CPU.Build.0 = NoVariablesDefault
+		{84A434CF-A0D1-4640-8D14-DDF65F493C3D}.Release|Any CPU.ActiveCfg = NoVariablesDefault
+		{84A434CF-A0D1-4640-8D14-DDF65F493C3D}.Release|Any CPU.Build.0 = NoVariablesDefault
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

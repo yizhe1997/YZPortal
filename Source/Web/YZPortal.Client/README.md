@@ -38,6 +38,7 @@ on the local host. Presently, the backend API supports the following configurati
 - [How to include class library reference into docker file](https://stackoverflow.com/questions/64557885/how-to-include-class-library-reference-into-docker-file/77592431#77592431)
 - [Redirect to https on nginx inside Docker container](https://stackoverflow.com/questions/72748458/redirect-to-https-on-nginx-inside-docker-container)
 - [Development SSL for .NET Core and NGINX in Docker](https://meikle.io/opensource/development-ssl-dotnetcore-docker.html)
+- [Docker support not available for Web Assembly project](https://stackoverflow.com/questions/64829076/blazor-webassembly-app-with-docker-support-linux)
 
 ### 4.2. Misc
 - [Nav menu](https://stackoverflow.com/questions/58914389/how-to-create-navmenu-with-collapsible-submenu-in-net-core-blazor-app)

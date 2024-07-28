@@ -1,12 +1,12 @@
 # Follow the steps below for local testing:
 # 1. First, open the command prompt at root and run the following command to build docker image: 
-# docker build -f ./Dockerfile.YZPortal.Client -t yzportal.client .
+# docker build -f ./Dockerfile.YZPortal.Client -t yzportal-client .
 
 # 2. Next, run the following command to generate ssl cert without password for https:
 # dotnet dev-certs https -ep %USERPROFILE%\nginx\ssl.crt -np --trust --format PEM
 
 # 3. Finally, run the following command to create a container for the image:
-# docker run -p 5207:80 -p 7195:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=7195 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ yzportal.client
+# docker run -p 5207:80 -p 7195:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=7195 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ yzportal-client
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
