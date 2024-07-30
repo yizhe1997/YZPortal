@@ -42,7 +42,6 @@ using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;

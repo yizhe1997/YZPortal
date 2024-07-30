@@ -13,7 +13,19 @@ namespace Application.Mappings.Products
         {
             CreateMap<Product, ProductDto>();
             CreateMap<Product, GetProductByIdDto>();
-            CreateMap<AddProductCommand, Product>();
+            CreateMap<AddProductCommand, Product>()
+                .ForMember(x => x.IsPublished, opt => opt.Ignore())
+                .ForMember(x => x.StockQuantity, opt => opt.Ignore())
+                .ForMember(x => x.Price, opt => opt.Ignore())
+                .ForMember(x => x.Cost, opt => opt.Ignore())
+                .ForMember(x => x.DiscountProductMappings, opt => opt.Ignore())
+                .ForMember(x => x.ProductCategoryMappings, opt => opt.Ignore())
+                .ForMember(x => x.ProductAttributeMappings, opt => opt.Ignore())
+                .ForMember(x => x.CreatedDate, opt => opt.Ignore())
+                .ForMember(x => x.CreatedBy, opt => opt.Ignore())
+                .ForMember(x => x.UpdatedDate, opt => opt.Ignore())
+                .ForMember(x => x.UpdatedBy, opt => opt.Ignore())
+                .ForMember(x => x.Id, opt => opt.Ignore());
             CreateMap<Product, ProductExportDto>();
         }
     }
