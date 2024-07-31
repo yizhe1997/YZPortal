@@ -35,7 +35,6 @@ jobs:
                     push: true
                     tags: ${{ secrets.DOCKERHUB_USERNAME }}/yzportal-api:latest
                     file: Dockerfile.YZPortal.API
-                    visibility: public
             -
                 name: Build and push yzportal-client
                 uses: docker/build-push-action@v6
@@ -44,4 +43,3 @@ jobs:
                     push: true
                     tags: ${{ secrets.DOCKERHUB_USERNAME }}/yzportal-client:latest
                     file: Dockerfile.YZPortal.Client
-                    visibility: public
