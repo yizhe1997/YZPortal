@@ -1,5 +1,5 @@
 # Follow the steps below for local testing:
-# 1. First, open the command prompt at root and run the following command to build docker image: 
+# 1. Right-click the solution folder -> select "Open in Terminal" -> initiate a "Developer Command Prompt" from the dropdown. Then run the following command to build docker image: 
 # docker build -f ./Dockerfile.YZPortal.Client -t yzportal-client .
 
 # 2. Next, run the following command to generate ssl cert without password for https:

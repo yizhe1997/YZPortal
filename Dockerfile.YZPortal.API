@@ -1,7 +1,7 @@
 # See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 # Follow the steps below for local testing:
-# 1. First, initiate a command prompt at root and run the following command to build docker image: 
+# 1. Right-click the solution folder -> select "Open in Terminal" -> initiate a "Developer Command Prompt" from the dropdown. Then run the following command to build docker image: 
 # docker build -f ./Dockerfile.YZPortal.API -t yzportal-api .
 
 # 2. Next, run the following commands to generate ssl cert with password for https:
@@ -9,13 +9,15 @@
 # dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p P@ssw0rd123 --trust
 
 # 3. Finally, run the following command to create a container for the image:
-# docker run -p 5000:80 -p 5001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=8081 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ yzportal-api
+# docker run -p 8080:80 -p 8081:443 -v %USERPROFILE%\.aspnet\https:/https:ro -v %APPDATA%\Microsoft\UserSecrets:/home/app/.microsoft/usersecrets:ro -v %APPDATA%\ASP.NET\Https:/home/app/.aspnet/https:ro -e ASPNETCORE_URLS="https://+:8081;http://+:8080" -e ASPNETCORE_HTTPS_PORTS=8081 -e ASPNETCORE_HTTP_PORTS=8080 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -e ASPNETCORE_ENVIRONMENT=Development yzportal-api
+
+# To debug using Visual Studio, launch the "Docker" profile from launchSettings.json and make sure to set as Debug mode:
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
+EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release

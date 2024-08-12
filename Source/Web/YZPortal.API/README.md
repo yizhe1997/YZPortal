@@ -189,3 +189,4 @@ on the local host. Presently, the backend API supports the following configurati
 
 ### 4.11.0 Containerization
 - [How to include class library reference into docker file](https://stackoverflow.com/questions/64557885/how-to-include-class-library-reference-into-docker-file/77592431#77592431)
+- [Updates to Docker images in .NET 8](https://andrewlock.net/exploring-the-dotnet-8-preview-updates-to-docker-images-in-dotnet-8/)
