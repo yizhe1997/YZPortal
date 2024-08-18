@@ -44,23 +44,18 @@ jobs:
                     tags: ${{ secrets.DOCKERHUB_USERNAME }}/yzportalapi:latest
                     file: Dockerfile.YZPortal.API
             - 
-                name: Checkout to the branch
-                uses: actions/checkout@v2
-
-            - 
                 name: Azure Login
                 uses: azure/login@v1
                 with:
                     client-id: ${{ secrets.YZPORTALAPI_AZURE_CLIENT_ID }}
                     tenant-id: ${{ secrets.YZPORTALAPI_AZURE_TENANT_ID }}
                     subscription-id: ${{ secrets.YZPORTALAPI_AZURE_SUBSCRIPTION_ID }}
-
             - 
                 name: Build and push container image to registry
                 uses: azure/container-apps-deploy-action@v2
                 with:
                     appSourcePath: ${{ github.workspace }} 
-                    registryUrl: docker.io
+                    registryUrl: dockerio
                     registryUsername: ${{ secrets.YZPORTALAPI_REGISTRY_USERNAME }}
                     registryPassword: ${{ secrets.YZPORTALAPI_REGISTRY_PASSWORD }}
                     containerAppName: yzportalapi

@@ -43,7 +43,6 @@ jobs:
                     push: true
                     tags: ${{ secrets.DOCKERHUB_USERNAME }}/yzportalclient:latest
                     file: Dockerfile.YZPortal.Client
-
             - 
                 name: Azure Login
                 uses: azure/login@v1
@@ -51,7 +50,6 @@ jobs:
                     client-id: ${{ secrets.YZPORTALCLIENT_AZURE_CLIENT_ID }}
                     tenant-id: ${{ secrets.YZPORTALCLIENT_AZURE_TENANT_ID }}
                     subscription-id: ${{ secrets.YZPORTALCLIENT_AZURE_SUBSCRIPTION_ID }}
-
             - 
                 name: Build and push container image to registry
                 uses: azure/container-apps-deploy-action@v2
