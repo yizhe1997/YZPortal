@@ -7,23 +7,18 @@
 version: '3.4'
 
 services:
-  yzportal-api:
-    image: yzportal-api
-    build:
-      context: .
-      dockerfile: Dockerfile.YZPortal.API
-  yzportal-client:
-    image: yzportal-client
-    build:
-      context: .
-      dockerfile: Dockerfile.YZPortal.Client
-    ports:
-        - "5207:80"
-        - "7195:443"
-    depends_on: 
-        yzportal-api:
-            condition: service_started
-    volumes:
-      - ${USERPROFILE}/nginx/ssl.crt:/etc/nginx/ssl.crt
-      - ${USERPROFILE}/nginx/ssl.key:/etc/nginx/ssl.key
+    yzportalapi:
+        image: yzportalapi
+        build:
+            context: .
+            dockerfile: Dockerfile.YZPortal.API
+    yzportalclient:
+        image: yzportalclient
+        build:
+            context: .
+            dockerfile: Dockerfile.YZPortal.Client
+        depends_on: 
+            yzportalapi:
+                condition: service_started
+        
   

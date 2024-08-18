@@ -1,14 +1,25 @@
 # Follow the steps below for local testing:
 # 1. Right-click the solution folder -> select "Open in Terminal" -> initiate a "Developer Command Prompt" from the dropdown. Then run the following command to build docker image: 
-# docker build -f ./Dockerfile.YZPortal.Client -t yzportal-client .
+# 1.1 Build with the default nginx.conf (for deployment)
+# docker build -f ./Dockerfile.YZPortal.Client -t yzportalclient .
+# 1.2 Build with a specific configuration file, e.g., nginx-local.conf (for local testing)
+# docker build -f ./Dockerfile.YZPortal.Client --build-arg NGINX_CONF=nginx-local.conf -t yzportalclient .
 
 # 2. Next, run the following command to generate ssl cert without password for https:
 # dotnet dev-certs https -ep %USERPROFILE%\nginx\ssl.crt -np --trust --format PEM
 
 # 3. Finally, run the following command to create a container for the image:
-# docker run -p 5207:80 -p 7195:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=7195 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ yzportal-client
+# docker run -p 5207:80 -p 7195:443 -v %USERPROFILE%\.aspnet\https:/https/ -v %USERPROFILE%\nginx\ssl.crt:/etc/nginx/ssl.crt -v %USERPROFILE%\nginx\ssl.key:/etc/nginx/ssl.key -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=7195 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx yzportalclient
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# To manually upload image to docker hub:
+# 1. docker tag yzportalclient chinyizhe97/yzportalclient
+# 2. docker push chinyizhe97/yzportalclient
+
+FROM emscripten/emsdk:latest as build
+RUN wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb; dpkg -i packages-microsoft-prod.deb;rm packages-microsoft-prod.deb
+RUN apt-get update; apt-get install -y apt-transport-https && \
+    apt-get update && \
+    apt-get install -y dotnet-sdk-8.0
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Source/Core/Application/Application.csproj", "Source/Core/Application/"]
@@ -24,8 +35,10 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./YZPortal.Client.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 
 FROM nginx:alpine AS final
-EXPOSE 80
-EXPOSE 443
+# Define a build argument with a default value
+ARG NGINX_CONF=nginx.conf
+EXPOSE 5207
+EXPOSE 7195
 WORKDIR /usr/share/nginx/html
 COPY --from=publish /app/publish/wwwroot .
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY ${NGINX_CONF} /etc/nginx/nginx.conf

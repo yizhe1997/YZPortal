@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.yml = docker-compose.yml
 		Dockerfile.YZPortal.API = Dockerfile.YZPortal.API
 		Dockerfile.YZPortal.Client = Dockerfile.YZPortal.Client
+		nginx-local.conf = nginx-local.conf
 		nginx.conf = nginx.conf
 		README.md = README.md
 	EndProjectSection

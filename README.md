@@ -1,4 +1,5 @@
-- Client App: https://yzportalclient.azurewebsites.net/
+- Client App(App Service): https://yzportalclient.azurewebsites.net/
+- Client App(Azure Container App): https://yzportalclient.salmonocean-c4793747.southeastasia.azurecontainerapps.io
 ##
 - Swagger UI(App Service): https://yzportalapi.azurewebsites.net/docs/index.html
 - Swagger UI(Azure Container App): https://yzportalapi.salmonocean-c4793747.southeastasia.azurecontainerapps.io/docs/index.html

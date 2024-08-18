@@ -5,8 +5,8 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "yzportal-api": "StartWithoutDebugging",
-        "yzportal-client": "StartWithoutDebugging"
+        "yzportalapi": "StartWithoutDebugging",
+        "yzportalclient": "StartWithoutDebugging"
       }
     }
   }

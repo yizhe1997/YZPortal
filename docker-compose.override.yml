@@ -1,16 +1,26 @@
 version: '3.4'
 
 services:
-  yzportal-api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:8081;http://+:8080
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=P@ssw0rd123
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-    ports:
-        - "8080:80"
-        - "8081:443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-      - ${USERPROFILE}/.aspnet/https:/https:ro
+    yzportalapi:
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_URLS=https://+:8081;http://+:8080
+            - ASPNETCORE_Kestrel__Certificates__Default__Password=P@ssw0rd123
+            - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+        ports:
+            - "8080:80"
+            - "8081:443"
+        volumes:
+            - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+            - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+            - ${USERPROFILE}/.aspnet/https:/https:ro
+    yzportalclient:
+        build:
+            args:
+                - NGINX_CONF=nginx-local.conf
+        ports:
+            - "5207:80"
+            - "7195:443"
+        volumes:
+            - ${USERPROFILE}/nginx/ssl.crt:/etc/nginx/ssl.crt
+            - ${USERPROFILE}/nginx/ssl.key:/etc/nginx/ssl.key

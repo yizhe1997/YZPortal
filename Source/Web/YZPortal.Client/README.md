@@ -39,6 +39,7 @@ on the local host. Presently, the backend API supports the following configurati
 - [Redirect to https on nginx inside Docker container](https://stackoverflow.com/questions/72748458/redirect-to-https-on-nginx-inside-docker-container)
 - [Development SSL for .NET Core and NGINX in Docker](https://meikle.io/opensource/development-ssl-dotnetcore-docker.html)
 - [Docker support not available for Web Assembly project](https://stackoverflow.com/questions/64829076/blazor-webassembly-app-with-docker-support-linux)
+- [.Net 6 Blazor WASM in Azure Container App](https://clearmeasure.com/net-6-blazor-wasm-in-azure-container-app/)
 
 ### 4.2. Misc
 - [Nav menu](https://stackoverflow.com/questions/58914389/how-to-create-navmenu-with-collapsible-submenu-in-net-core-blazor-app)

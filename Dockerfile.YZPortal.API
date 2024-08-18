@@ -2,16 +2,19 @@
 
 # Follow the steps below for local testing:
 # 1. Right-click the solution folder -> select "Open in Terminal" -> initiate a "Developer Command Prompt" from the dropdown. Then run the following command to build docker image: 
-# docker build -f ./Dockerfile.YZPortal.API -t yzportal-api .
+# docker build -f ./Dockerfile.YZPortal.API -t yzportalapi .
 
 # 2. Next, run the following commands to generate ssl cert with password for https:
 # dotnet dev-certs https --clean
 # dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p P@ssw0rd123 --trust
 
 # 3. Finally, run the following command to create a container for the image:
-# docker run -p 8080:80 -p 8081:443 -v %USERPROFILE%\.aspnet\https:/https:ro -v %APPDATA%\Microsoft\UserSecrets:/home/app/.microsoft/usersecrets:ro -v %APPDATA%\ASP.NET\Https:/home/app/.aspnet/https:ro -e ASPNETCORE_URLS="https://+:8081;http://+:8080" -e ASPNETCORE_HTTPS_PORTS=8081 -e ASPNETCORE_HTTP_PORTS=8080 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -e ASPNETCORE_ENVIRONMENT=Development yzportal-api
-
+# docker run -p 8080:80 -p 8081:443 -v %APPDATA%\Microsoft\UserSecrets:/root/.microsoft/usersecrets:ro -v %APPDATA%\Microsoft\UserSecrets:/home/app/.microsoft/usersecrets:ro -v %APPDATA%\ASP.NET\Https:/root/.aspnet/https:ro -v %APPDATA%\ASP.NET\Https:/home/app/.aspnet/https:ro -v %USERPROFILE%\.aspnet\https:/https:ro -e ASPNETCORE_HTTPS_PORT=8081 -e ASPNETCORE_HTTP_PORTS=80 -e ASPNETCORE_HTTPS_PORTS=443 -e ASPNETCORE_Kestrel__Certificates__Default__Password="P@ssw0rd123" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -e ASPNETCORE_ENVIRONMENT=Development yzportalapi
 # To debug using Visual Studio, launch the "Docker" profile from launchSettings.json and make sure to set as Debug mode:
+
+# To manually upload image to docker hub:
+# 1. docker tag yzportalapi {REPLACE_WITH_DOCKER_HUB_NAME}/yzportalapi
+# 2. docker push {REPLACE_WITH_DOCKER_HUB_NAME}/yzportalapi
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
