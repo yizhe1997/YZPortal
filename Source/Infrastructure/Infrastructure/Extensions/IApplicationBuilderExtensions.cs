@@ -14,7 +14,7 @@ namespace Infrastructure.Extensions
                 .UseSerilogRequestLogging()
                 .UseCorsPolicy()
                 .UseHsts()
-                //.UseHttpsRedirection()
+                .UseHttpsRedirection()
                 .UseStaticFiles()
                 .UseRouting()
                 .UseAuthentication()
