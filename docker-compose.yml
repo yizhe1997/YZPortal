@@ -8,11 +8,19 @@ version: '3.4'
 
 services:
     yzportalapi:
+        container_name: yzportalapi
         image: yzportalapi
         build:
             context: .
             dockerfile: Dockerfile.YZPortal.API
+        depends_on:
+            prometheus:
+                condition: service_healthy
+            grafana:
+                condition: service_healthy
+
     yzportalclient:
+        container_name: yzportalclient
         image: yzportalclient
         build:
             context: .
@@ -20,5 +28,38 @@ services:
         depends_on: 
             yzportalapi:
                 condition: service_started
+
+    grafana:
+        container_name: grafana_grafprom
+        image: grafana/grafana:master
+        ports:
+          - "3000:3000"
+        volumes:
+            - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+            - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+        depends_on:
+            prometheus:
+                condition: service_healthy
+        healthcheck:
+            test: wget -q --tries=1 -O- http://localhost:3000/
+            interval: 3s
+            timeout: 3s
+            retries: 10
+            start_period: 10s
+
+    prometheus:
+        image: prom/prometheus
+        container_name: prometheus_grafprom
+        restart: always
+        ports:
+          - 9090:9090
+        volumes:
+          - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+        healthcheck:
+            test: wget -q --tries=1 -O- http://localhost:9090/
+            interval: 3s
+            timeout: 3s
+            retries: 10
+            start_period: 10s
         
   

@@ -14,7 +14,7 @@ namespace Infrastructure.Extensions
                 .UseSerilogRequestLogging()
                 .UseCorsPolicy()
                 .UseHsts()
-                .UseHttpsRedirection()
+                //.UseHttpsRedirection()
                 .UseStaticFiles()
                 .UseRouting()
                 .UseAuthentication()
@@ -26,7 +26,8 @@ namespace Infrastructure.Extensions
                         .AddSupportedCultures(supportedCultures)
                         .AddSupportedUICultures(supportedCultures);
                 })
-                .UseHangfireDashboard();
+                .UseHangfireDashboard()
+                .UseOpenTelemetryPrometheusScrapingEndpoint();
 
         private static IApplicationBuilder UseHangfireDashboard(this IApplicationBuilder app)
         {

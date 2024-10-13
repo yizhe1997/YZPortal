@@ -50,6 +50,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SendGrid.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
@@ -389,6 +390,7 @@ namespace Infrastructure.Extensions
         private static void AddInstrumentation(this IServiceCollection services, IWebHostEnvironment environment)
         {
             services.AddOpenTelemetry()
+                .ConfigureResource(resource => resource.AddService(serviceName: environment.ApplicationName))
                 .WithTracing(x =>
                 {
                     if (environment.IsDevelopment())
@@ -396,20 +398,32 @@ namespace Infrastructure.Extensions
                         x.SetSampler<AlwaysOnSampler>();
                     }
 
-                    x.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation();
+                    x.AddAspNetCoreInstrumentation(instrumentationOptions =>
+                    {
+                        instrumentationOptions.RecordException = true;
+                    })
+                    .AddHttpClientInstrumentation(instrumentationOptions =>
+                    {
+                        instrumentationOptions.RecordException = true;
+                    })
+                    .AddSqlClientInstrumentation(instrumentationOptions =>
+                    {
+                        instrumentationOptions.RecordException = true;
+                        instrumentationOptions.SetDbStatementForText = true;
+                    });
                     //.AddGrpcClientInstrumentation()
-                    //.AddSqlClientInstrumentation();
 
                     //x.AddConsoleExporter();
                 })
                 .WithMetrics(x =>
                 {
+                    // .NET Runtime metrics like - GC, Memory Pressure, Heap Leaks etc
                     x.AddRuntimeInstrumentation()
                         .AddMeter(
                             "Microsoft.AspNetCore.Hosting",
                             "Microsoft.AspNetCore.Server.Kestrel",
-                            "System.Net.Http");
+                            "System.Net.Http")
+                        .AddPrometheusExporter(o => o.DisableTotalNameSuffixForCounters = true);
                 });
         }
 

@@ -173,8 +173,11 @@ on the local host. Presently, the backend API supports the following configurati
 - [Manually Trigger a GitHub Action with “workflow_dispatch”](https://medium.com/@irfankaraman/manually-trigger-a-github-action-with-workflow-dispatch-124708e26afe)
 - [Azure AD B2C IEF deployment](https://learn.microsoft.com/en-us/azure/active-directory-b2c/deploy-custom-policies-github-action)
 
-### 4.8 Instrumentation
-#### 4.8.1 Logging
+### 4.8 Instrumentation/Observability
+#### 4.8.1 Metrics
+- [Metrics with Prometheus and Grafana](https://medium.com/c-sharp-programming/net-core-microservice-metrics-with-prometheus-and-grafana-d228bea89283)
+
+#### 4.8.2 Logging
 - [Logging in Azure with Application Insights and Serilog](https://hackernoon.com/logging-in-azure-with-application-insights-and-serilog)
 - [Logging in .NET Core and ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-6.0)
 - [Azure App Service Logs](https://stackify.com/azure-app-service-log-files/)

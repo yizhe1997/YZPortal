@@ -3,17 +3,22 @@ version: '3.4'
 services:
     yzportalapi:
         environment:
+            - ASPNETCORE_HTTPS_PORT=8081
+            - ASPNETCORE_HTTP_PORTS=80
+            - ASPNETCORE_HTTPS_PORTS=443
             - ASPNETCORE_ENVIRONMENT=Development
-            - ASPNETCORE_URLS=https://+:8081;http://+:8080
             - ASPNETCORE_Kestrel__Certificates__Default__Password=P@ssw0rd123
             - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
         ports:
             - "8080:80"
             - "8081:443"
         volumes:
+            - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
             - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+            - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
             - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
             - ${USERPROFILE}/.aspnet/https:/https:ro
+
     yzportalclient:
         build:
             args:
