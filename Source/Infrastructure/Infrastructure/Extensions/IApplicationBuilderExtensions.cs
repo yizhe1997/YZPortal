@@ -8,6 +8,8 @@ namespace Infrastructure.Extensions
 {
     public static class IApplicationBuilderExtensions
     {
+        private static readonly string[] supportedCultures = ["en", "de"];
+
         public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder, IServiceCollection services) =>
             builder
                 .UseExceptionHandler(o => { }) // https://github.com/dotnet/aspnetcore/issues/51888
@@ -21,7 +23,6 @@ namespace Infrastructure.Extensions
                 .UseAuthorization()
                 .UseRequestLocalization(options =>
                 {
-                    var supportedCultures = new[] { "en", "de" };
                     options.SetDefaultCulture(supportedCultures[0])
                         .AddSupportedCultures(supportedCultures)
                         .AddSupportedUICultures(supportedCultures);

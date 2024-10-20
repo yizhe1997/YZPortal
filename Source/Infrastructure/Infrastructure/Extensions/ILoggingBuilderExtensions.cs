@@ -12,7 +12,6 @@ namespace Infrastructure.Extensions
             builder.AddConsole();
             builder.AddDebug();
             builder.AddAzureWebAppDiagnostics();
-
             builder.ConfigureOpenTelemetry();
 
             // Ref: https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/wiki/PII

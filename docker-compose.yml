@@ -14,6 +14,8 @@ services:
             context: .
             dockerfile: Dockerfile.YZPortal.API
         depends_on:
+            loki:
+                condition: service_healthy
             prometheus:
                 condition: service_healthy
             grafana:
@@ -28,6 +30,19 @@ services:
         depends_on: 
             yzportalapi:
                 condition: service_started
+    
+    loki:
+        container_name: loki
+        image: grafana/loki:master
+        ports:
+           - 3100:3100
+        command: -config.file=/etc/loki/local-config.yaml
+        healthcheck:
+            test: wget -q --tries=1 -O- http://localhost:3100/ready 
+            interval: 3s
+            timeout: 3s
+            retries: 10
+            start_period: 10s
 
     grafana:
         container_name: grafana_grafprom

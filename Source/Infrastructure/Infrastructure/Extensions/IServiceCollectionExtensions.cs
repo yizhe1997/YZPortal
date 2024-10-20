@@ -53,6 +53,8 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SendGrid.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Sinks.Grafana.Loki;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
@@ -64,6 +66,9 @@ namespace Infrastructure.Extensions
     {
         public static void AddInfrastructureLayer(this IServiceCollection services, ConfigurationManager configuration, IWebHostEnvironment environment)
         {
+            // Logging
+            services.AddLoggingProviderSerilog(configuration, environment);
+
             // Configurations
             services.AddConfigurationPipelines(configuration, environment);
 
@@ -618,6 +623,25 @@ namespace Infrastructure.Extensions
         {
             services.AddTransient<IEventPublisher, EventPublisher>();
         }
+
+        private static void AddLoggingProviderSerilog(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            services.AddSerilog(x =>
+            {
+                x.ReadFrom.Configuration(configuration)
+                .Enrich.FromLogContext()
+                .Enrich.WithProperty("Application", environment.ApplicationName)
+                .Enrich.WithProperty("Environment", environment.EnvironmentName)
+                .WriteTo.Console()
+                .WriteTo.GrafanaLoki("http://loki:3100", [
+                    new LokiLabel()
+                    {
+                        Key = "Application",
+                        Value = environment.ApplicationName
+                    }]);
+            });
+        }
+
         #endregion
     }
 }

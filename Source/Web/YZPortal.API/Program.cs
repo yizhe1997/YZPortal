@@ -4,20 +4,18 @@ using Application.Extensions;
 using YZPortal.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
 
 #region Logging
 
 builder.Logging.ConfigureLogging();
-builder.Host.UseSerilog(configuration);
 
 #endregion
 
 #region Add services
 
 builder.Services.AddApplicationLayer();
-builder.Services.AddInfrastructureLayer(configuration, builder.Environment);
-builder.Services.AddWebLayer(configuration);
+builder.Services.AddInfrastructureLayer(builder.Configuration, builder.Environment);
+builder.Services.AddWebLayer(builder.Configuration);
 
 #endregion
 
@@ -27,7 +25,7 @@ await app.Services.MigrateDatabaseAsync();
 
 app.UseInfrastructure(builder.Services);
 
-app.UseSwagger(app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), configuration);
+app.UseSwagger(app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), builder.Configuration);
 
 app.MapEndpoints();
 

@@ -182,6 +182,8 @@ on the local host. Presently, the backend API supports the following configurati
 - [Logging in .NET Core and ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-6.0)
 - [Azure App Service Logs](https://stackify.com/azure-app-service-log-files/)
 - [Azure App Service Logging](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/azure-app-service-logging-how-to-monitor-your-web-apps-in-real/ba-p/3800390)
+- [Logging with Loki and Grafana](https://medium.com/c-sharp-programming/net-core-microservice-logging-with-grafana-and-loki-92cd2783ed88)
+- [Logging with Loki and Grafana](https://greekdeveloper.com/posts/c-logging-with-grafana-loki)
 
 ### 4.9.0 Exception
 - [Exption Handler](https://www.roundthecode.com/dotnet-tutorials/exception-handling-own-middleware-dotnet-8)
