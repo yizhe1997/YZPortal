@@ -187,6 +187,8 @@ on the local host. Presently, the backend API supports the following configurati
 
 ### 4.9.0 Exception
 - [Exption Handler](https://www.roundthecode.com/dotnet-tutorials/exception-handling-own-middleware-dotnet-8)
+- [Using ProblemDetails for exception handling Example 1](https://code-maze.com/using-the-problemdetails-class-in-asp-net-core-web-api/)
+- [Using ProblemDetails for exception handling Example 2](https://www.youtube.com/watch?v=-TGZypSinpw&ab_channel=NickChapsas)
 
 ### 4.10.0 Events
 - [Example](https://code-maze.com/csharp-event-driven-architecture/)

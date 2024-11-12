@@ -110,7 +110,12 @@
 
     private async Task DownloadFileAsync(UploadFile item)
     {
-        await YZPortalApiClient.GetUserProfileImageAsync(User.Id);
+        var getUserProfileImageAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+            async () => await YZPortalApiClient.GetUserProfileImageAsync(User.Id),
+            ToastService,
+            title: "Download user profile image",
+            hideSuccessToast: true
+        );
     }
 
     private async Task<bool> OnFileDelete(UploadFile item)

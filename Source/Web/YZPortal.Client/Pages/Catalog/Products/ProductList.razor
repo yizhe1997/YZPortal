@@ -120,20 +120,28 @@
 
 	private async Task DownloadFileFromURL()
 	{
-		var result = await YZPortalApiClient.GetProductsExcelAsync(new SearchRequest()
-			{
-				PageSize = queryPageOptions.PageItems,
-				PageNumber = queryPageOptions.PageIndex,
-				SearchString = queryPageOptions.SearchText ?? "",
-				OrderBy = orderby.ToArray()
-			});
+		var getProductsExcelAsyncResult = await YZPortalApiHttpClient.ExecuteCallGuardedAsync(
+			async () => await YZPortalApiClient.GetProductsExcelAsync(new SearchRequest()
+				{
+					PageSize = queryPageOptions.PageItems,
+					PageNumber = queryPageOptions.PageIndex,
+					SearchString = queryPageOptions.SearchText ?? "",
+					OrderBy = orderby.ToArray()
+				}),
+			ToastService,
+			title: "Download products excel",
+			hideSuccessToast: true
+		);
 
-		await JS.InvokeVoidAsync("BlazorDownloadFile", new
+		if (getProductsExcelAsyncResult.Succeeded)
 		{
-			Content = result,
-			FileName = $"{nameof(ProductCategory)}.xlsx",
-			ContentType = "application/octet-stream"
-		});
+			await JS.InvokeVoidAsync("BlazorDownloadFile", new
+			{
+				Content = getProductsExcelAsyncResult.Data,
+				FileName = $"{nameof(ProductCategory)}.xlsx",
+				ContentType = "application/octet-stream"
+			});
+		}
 	}
 
 	private async Task<QueryData<ProductDto>> OnQueryAsync(QueryPageOptions options)

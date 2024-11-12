@@ -184,6 +184,7 @@ namespace Application.Models
 
         public new static Task<Result<T>> FailAsync()
         {
+
             return Task.FromResult(Fail());
         }
 

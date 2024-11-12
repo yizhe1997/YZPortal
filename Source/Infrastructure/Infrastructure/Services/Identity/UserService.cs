@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Exceptions;
+using Application.Interfaces;
 using Application.Interfaces.Services.Events;
 using Application.Interfaces.Services.Identity;
 using Application.Models;
@@ -82,7 +83,7 @@ namespace Infrastructure.Services.Identity
             var user = await userManager.Users.FirstOrDefaultAsync(u => u.SubjectIdentifier == currentUserService.NameIdentifier, cancellationToken);
 
             if (user != null)
-                return await Result<User>.FailAsync("User already exist");
+                throw new InternalServerException("User already exist");
 
             var newUser = mapper.Map<User>(body);
 

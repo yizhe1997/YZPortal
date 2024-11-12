@@ -13,9 +13,9 @@ namespace YZPortal.API.Controllers.Users
     public class UsersController(IGraphService graphService, IUserService userService, ICurrentUserService currentUserService, IMediator mediator, LinkGenerator linkGenerator) : AuthApiController(mediator, linkGenerator)
     {
         [HttpPost("TriggerApiControllerException")]
-        public async Task<ActionResult<Result>> TriggerApiControllerExceptionAsync()
+        public async Task<IActionResult> TriggerApiControllerExceptionAsync()
         {
-            throw new Exception();
+            throw new Exception("Server generated exception.");
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
-﻿using Application.Exceptions;
-using Application.Extensions;
+﻿using Application.Extensions;
 using Application.Interfaces.Contexts;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Repositories.Users;
@@ -37,6 +36,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
@@ -56,7 +56,6 @@ using SendGrid.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Text;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -78,6 +77,19 @@ namespace Infrastructure.Extensions
             // Persistence
             services.AddDbContext(configuration);
             services.AddRepositories();
+
+            // Problem Details 
+            services.AddProblemDetails(options =>
+            {
+                options.CustomizeProblemDetails = ctx =>
+                {
+                    ctx.ProblemDetails.Instance = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
+                    ctx.ProblemDetails.Extensions.TryAdd("traceId", ctx.HttpContext.TraceIdentifier);
+
+                    var activity = ctx.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+                    ctx.ProblemDetails.Extensions.TryAdd("requestId", activity?.Id);
+                };
+            });
 
             // Identity
             services.AddIdentity(configuration);
@@ -354,16 +366,9 @@ namespace Infrastructure.Extensions
 
             services.AddScoped(x =>
             {
-                try
-                {
-                    var blobServiceClient = new BlobServiceClient(azureStorageConfig.ConnectionString);
+                var blobServiceClient = new BlobServiceClient(azureStorageConfig.ConnectionString);
 
-                    return blobServiceClient;
-                }
-                catch (Exception ex)
-                {
-                    throw new RestException(HttpStatusCode.InternalServerError, ex.Message);
-                }
+                return blobServiceClient;
             });
 
             services.AddScoped<IDataFileStorageService, DataFileStorageService>();
@@ -614,8 +619,7 @@ namespace Infrastructure.Extensions
 
         private static void AddExceptionHandlers(this IServiceCollection services)
         {
-            services.AddExceptionHandler<RestExceptionHandler>();
-            services.AddExceptionHandler<ODataErrorExceptionHandler>();
+            services.AddExceptionHandler<ValidationExceptionHandler>();
             services.AddExceptionHandler<ExceptionHandler>();
         }
 

@@ -4,8 +4,8 @@ using Application.Interfaces.Services;
 using Application.Models;
 using Application.Requests;
 using Domain.Entities.Users;
+using FluentValidation;
 using MediatR;
-using Microsoft.Extensions.Localization;
 
 namespace Application.Features.Users.UserProfileImages.Commands
 {
@@ -13,18 +13,26 @@ namespace Application.Features.Users.UserProfileImages.Commands
     {
     }
 
+    public class UpdatePortalConfigCommandValidator : AbstractValidator<UploadDataFileCommand>
+    {
+        public UpdatePortalConfigCommandValidator()
+        {
+            RuleFor(p => p.File)
+            .NotNull();
+            RuleFor(p => p.RefId)
+            .NotNull();
+        }
+    }
+
     public class UploadUserProfileImageCommandHandler(
         IUnitOfWork<Guid> unitOfWork,
         IUserProfileImageRepository userProfileImageRepository,
-        IStringLocalizer<SharedResource> localizer,
         IDataFileStorageService dataFileStorageService) : IRequestHandler<UploadUserProfileImageCommand, Result>
     {
         public async Task<Result> Handle(UploadUserProfileImageCommand command, CancellationToken cancellationToken)
         {
+            // TODO: let validator handle
             if (command.File is null) { return await Result.FailAsync("File required"); }
-
-            var user = await unitOfWork.Repository<User>().GetByIdAsync(command.RefId, cancellationToken);
-            if (user is null) { return await Result.FailAsync(localizer["Not Found"]); }
 
             var userProfileImage = await userProfileImageRepository.GetByUserIdFirstOrDefaultAsync(command.RefId, cancellationToken);
             if (userProfileImage is not null) { return await Result.FailAsync("User has profile image"); }

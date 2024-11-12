@@ -2,6 +2,7 @@
 using Application.Models;
 using Domain.Entities.Products;
 using MediatR;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Features.Products.Commands.DeleteProduct
 {
@@ -11,7 +12,8 @@ namespace Application.Features.Products.Commands.DeleteProduct
     }
 
     public class DeleteProductCommandCommandHandler(
-        IUnitOfWork<Guid> unitOfWork) : IRequestHandler<DeleteProductCommand, Result<Guid>>
+        IUnitOfWork<Guid> unitOfWork,
+        IStringLocalizer<SharedResource> localizer) : IRequestHandler<DeleteProductCommand, Result<Guid>>
     {
         public async Task<Result<Guid>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
         {
@@ -19,7 +21,7 @@ namespace Application.Features.Products.Commands.DeleteProduct
 
             if (product == null)
             {
-                return await Result<Guid>.FailAsync("Product not found.");
+                return await Result<Guid>.FailAsync(localizer["Not Found"]);
             }
 
             await unitOfWork.Repository<Product>().DeleteAsync(product, cancellationToken);

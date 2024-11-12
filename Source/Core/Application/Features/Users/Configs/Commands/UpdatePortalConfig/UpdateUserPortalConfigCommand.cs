@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Repositories;
 using Application.Models;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Localization;
 using System.Text.Json.Serialization;
@@ -19,6 +20,25 @@ namespace Application.Features.Users.Configs.Commands.UpdatePortalConfig
         public bool ShowFooter { get; set; } = true;
     }
 
+    public class UpdatePortalConfigCommandValidator : AbstractValidator<UpdateUserPortalConfigCommand>
+    {
+        public UpdatePortalConfigCommandValidator()
+        {
+            RuleFor(p => p.Theme)
+            .NotEmpty()
+            .MaximumLength(75);
+
+            //TODO: add rule that the theme must exist in the db
+        }
+
+        //public async Task<bool> BeUniqueTitle(UpdateTodoListCommand model, string title, CancellationToken cancellationToken)
+        //{
+        //    return await _context.TodoLists
+        //        .Where(l => l.Id != model.Id)
+        //        .AllAsync(l => l.Title != title, cancellationToken);
+        //}
+    }
+
     public class UpdatePortalConfigCommandHandler(
         IUnitOfWork<Guid> unitOfWork,
         IStringLocalizer<SharedResource> localizer,
@@ -27,19 +47,16 @@ namespace Application.Features.Users.Configs.Commands.UpdatePortalConfig
     {
         public async Task<Result> Handle(UpdateUserPortalConfigCommand command, CancellationToken cancellationToken)
         {
-            var portalConfig = await portalConfigRepository.GetByUserSubIdFirstOrDefaultAsync(command.UserSubId);
-            if (portalConfig != null)
-            {
-                mapper.Map(command, portalConfig);
+            var portalConfig = await portalConfigRepository.GetByUserSubIdFirstOrDefaultAsync(command.UserSubId, cancellationToken);
 
-                await unitOfWork.Commit(cancellationToken);
-
-                return await Result.SuccessAsync("Portal configuration updated successfully.");
-            }
-            else
-            {
+            if (portalConfig == null)
                 return await Result.FailAsync(localizer["Not Found"]);
-            }
+
+            mapper.Map(command, portalConfig);
+
+            await unitOfWork.Commit(cancellationToken);
+
+            return await Result.SuccessAsync("Portal configuration updated successfully.");
         }
     }
 }
